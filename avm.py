@@ -235,3 +235,74 @@ class AVM(AVMContainer):
                 else:
 
                     print "WARNING: ignoring tag %s:%s" % (tag, name)
+
+    def to_wcs(self):
+        '''
+        Convert AVM projection information into a pywcs.WCS object
+        '''
+
+        # Try importing pywcs
+        try:
+            import pywcs
+        except:
+            raise Exception("PyWCS is required to use to_wcs()")
+
+        # Initializing WCS object
+        wcs = pywcs.WCS(naxis=2)
+
+        # Find the coordinate type
+        try:
+            ctype = self.Spatial.CoordinateFrame
+        except:
+            print "WARNING: Spatial.CoordinateFrame not found, assuming ICRS"
+            ctype = 'ICRS'
+
+        wcs.wcs.radesys = ctype
+
+        if ctype in ['ICRS', 'FK5', 'FK4']:
+            xcoord = "RA--"
+            ycoord = "DEC-"
+        elif ctype in ['ECL']:
+            xcoord = "ELON"
+            ycoord = "ELAT"
+        elif ctype in ['GAL']:
+            xcoord = "GLON"
+            ycoord = "GLAT"
+        elif ctype in ['SGAL']:
+            xcoord = "SLON"
+            ycoord = "SLAT"
+        else:
+            raise Exception("Unknown coordinate system: %s" % ctype)
+
+        # Find the projection type
+        cproj = ('%+4s' % self.Spatial.CoordsystemProjection).replace(' ', '-')
+
+        wcs.wcs.ctype[0] = xcoord + cproj
+        wcs.wcs.ctype[1] = ycoord + cproj
+
+        # Find the equinox
+        equinox = self.Spatial.Equinox
+
+        if type(equinox) is str:
+            if equinox == "J2000":
+                wcs.wcs.equinox = 2000.
+            elif equinox == "B1950":
+                wcs.wcs.equinox = 1950.
+            else:
+                raise Exception("Unknown equinox: %s" % equinox)
+        else:
+            wcs.wcs.equinox = float(equinox)
+
+        # Set standard WCS parameters
+        wcs.naxis1, wcs.naxis2 = self.Spatial.ReferenceDimension
+        wcs.wcs.crval = self.Spatial.ReferenceValue
+        wcs.wcs.crpix = self.Spatial.ReferencePixel
+
+        if hasattr(self.Spatial, "CDMatrix"):
+            wcs.wcs.cd = [self.Spatial.CDMatrix[0:2], self.Spatial.CDMatrix[2:4]]
+        elif hasattr(self.Spatial, "Scale"):
+            wcs.wcs.cdelt = self.Spatial.Scale
+            if hasattr(self.Spatial, "Rotation"):
+                wcs.wcs.crota = self.Spatial.Rotation, self.Spatial.Rotation
+
+        return wcs
