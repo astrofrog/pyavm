@@ -209,8 +209,9 @@ class AVM(AVMContainer):
             contents = file(filename, 'rb').read()
 
         # Look for XMP packets
+        start = 0
         while True:
-            start = contents.find("<?xpacket begin=")
+            start = contents.find("<?xpacket begin=", start)
             if start < 0:
                 raise Exception("No AVM data found")
             start = contents.index("?>", start) + 2
