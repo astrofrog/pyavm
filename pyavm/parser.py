@@ -43,15 +43,15 @@ tags['Iptc4xmpCore'] = [
 
 tags['dc'] = [
               'creator',
-              'rights', # Not in 1.1 standard, but in all examples
-              'format', # Not in 1.1 standard, but in all examples
+              'rights',  # Not in 1.1 standard, but in all examples
+              'format',  # Not in 1.1 standard, but in all examples
               'title',
               'description',
               'subject',
              ]
 
 tags['avm'] = [
-               'CreatorURL', # Not in 1.1 standard, but in all examples
+               'CreatorURL',  # Not in 1.1 standard, but in all examples
                'Subject.Category',
                'Distance',
                'Distance.Notes',
@@ -110,7 +110,7 @@ def parse_rdf_seq(rdf):
     '''Parse and RDF Seq/Bag/Alt and return a list'''
     start = rdf.find("<rdf:Seq>")
     end = rdf.find("</rdf:Seq>")
-    content = rdf[start+9:end].strip()
+    content = rdf[start + 9:end].strip()
     start = 0
     seq = []
     while True:
@@ -119,7 +119,7 @@ def parse_rdf_seq(rdf):
             break
         start = content.index(">", start)
         end = content.find("</rdf:li", start)
-        seq.append(auto_type(content[start+1:end].strip()))
+        seq.append(auto_type(content[start + 1:end].strip()))
     return seq
 
 
@@ -128,13 +128,13 @@ def parse_object(tag, string):
 
     start1 = string.index('<%s:' % tag)
     end1 = string.index('>', start1)
-    name = string[start1+2+len(tag):end1]
+    name = string[start1 + 2 + len(tag):end1]
     name = name.split()[0]
 
     start2 = string.index('</%s' % tag)
     end2 = string.index('>', start2)
 
-    content = string[end1+1:start2]
+    content = string[end1 + 1:start2]
 
     if "<rdf" in content:
         if "<rdf:Seq>" in content:
@@ -158,15 +158,15 @@ class AVMContainer(object):
         string = ""
         for family in self.__dict__:
             if type(self.__dict__[family]) is AVMContainer:
-                string += indent*" " + "%s:\n" % family
+                string += indent * " " + "%s:\n" % family
                 string += self.__dict__[family].__str__(indent + 3)
             else:
                 if type(self.__dict__[family]) is list:
-                    string += indent*" " +"%s:\n" % family
+                    string += indent * " " + "%s:\n" % family
                     for elem in self.__dict__[family]:
-                        string += indent*" " +"   * %s\n" % str(elem)
+                        string += indent * " " + "   * %s\n" % str(elem)
                 else:
-                    string += indent*" " + \
+                    string += indent * " " + \
                               "%s: %s\n" % (family, str(self.__dict__[family]))
 
         return string
@@ -239,7 +239,7 @@ class AVM(AVMContainer):
                 end = xml.index('>', end)
 
                 # Parse the AVM
-                name, content = parse_object(tag, xml[start:end+1])
+                name, content = parse_object(tag, xml[start:end + 1])
 
                 if name in tags[tag]:
 
@@ -319,7 +319,8 @@ class AVM(AVMContainer):
         wcs.wcs.crpix = self.Spatial.ReferencePixel
 
         if hasattr(self.Spatial, "CDMatrix"):
-            wcs.wcs.cd = [self.Spatial.CDMatrix[0:2], self.Spatial.CDMatrix[2:4]]
+            wcs.wcs.cd = [self.Spatial.CDMatrix[0:2],
+                          self.Spatial.CDMatrix[2:4]]
         elif hasattr(self.Spatial, "Scale"):
             wcs.wcs.cdelt = self.Spatial.Scale
             if hasattr(self.Spatial, "Rotation"):
