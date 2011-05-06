@@ -3,7 +3,7 @@ PyAVM provides the ``AVM()`` class to retrieve [AVM](http://www.virtualastronomy
     >>> from pyavm import AVM
 
 To use, simply create an instance of this class using the filename of the
-image:
+image (or any file-like object):
 
     >>> avm = AVM('myexample.jpg')
 

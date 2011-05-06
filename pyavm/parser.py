@@ -203,7 +203,10 @@ class AVM(AVMContainer):
     def __init__(self, filename):
 
         # Read in image
-        contents = file(filename, 'rb').read()
+        if hasattr(filename, 'read'):
+            contents = filename.read()
+        else:
+            contents = file(filename, 'rb').read()
 
         # Look for XMP packets
         while True:
