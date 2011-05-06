@@ -1,14 +1,17 @@
+import glob
 import os
 import urllib
 
 from pyavm import AVM
 
-for url in open('example_urls.txt', 'rb'):
-    image = urllib.urlopen(url.strip())
+if not os.path.exists('images'):
+    raise Exception("images/ does not exist - either run download.py first, or use the remote testing script test_remote.py")
+
+for filename in glob.glob(os.path.join('images/', '*')):
     print "-" * 30
-    print "Downloading %s" % os.path.basename(url.strip())
+    print "Testing %s" % os.path.basename(filename)
     try:
-        avm = AVM(image)
+        avm = AVM(filename)
         print "-> Parsing succeeded"
     except:
         print "-> Parsing failed"
