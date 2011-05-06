@@ -1,4 +1,4 @@
-``pyavm`` provides the AVM() class to retrieve AVM meta-data from an image file:
+PyAVM provides the ``AVM()`` class to retrieve [AVM](http://www.virtualastronomy.org/avm_metadata.php) meta-data from an image file:
 
     >>> from pyavm import AVM
 
