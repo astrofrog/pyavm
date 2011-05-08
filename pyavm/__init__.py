@@ -1,3 +1,3 @@
-from parser import AVM
+from avm import AVM
 
 __version__ = "0.1.0"
