@@ -271,6 +271,12 @@ class AVM(AVMContainer):
         elif len(args) > 1:
             raise Exception("Too many arguments")
 
+    def create_group(self, group):
+        if hasattr(self, group):
+            raise Exception("Group %s already exists" % group)
+        else:
+            self.__dict__[group] = AVMContainer()
+
     def from_file(self, filename):
 
         # Read in image

@@ -19,10 +19,6 @@ You can view the contents of the ``avm`` object by using
 
     >>> print avm
 
-or
-
-    >>> avm
-
 The AVM meta-data can be accessed using the attribute notation:
 
     >>> avm.Spatial.Equinox
@@ -30,6 +26,23 @@ The AVM meta-data can be accessed using the attribute notation:
 
     >>> avm.Publisher
     'Chandra X-ray Observatory'
+
+Creating and Updating tags
+==========================
+
+Tags can be modified in place:
+
+    >>> avm.Spatial.Equinox = "B1950"
+
+If the tag does not already exist, it is created.
+
+Tag groups can be created using:
+
+    >>> avm.create_group("Spatial")
+
+after which tags can be created in the group:
+
+    >>> avm.Spatial.Notes = "The WCS information was updated on 04/02/2010"
 
 Converting to a WCS object
 ==========================
