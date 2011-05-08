@@ -1,0 +1,16 @@
+CHANGES
+--------
+
+Version 0.1.2
+
+    Added support for embedding AVM meta-data in TIF files
+
+Version 0.1.1
+
+    Added support for embedding AVM meta-data in JPG and PNG images, and
+    added methods to create AVM container from WCS or FITS header
+    information.
+
+Version 0.1.0
+
+    Initial Release
