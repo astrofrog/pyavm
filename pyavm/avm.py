@@ -395,7 +395,7 @@ class AVM(AVMContainer):
 
         return wcs
 
-    def from_header(self, header):
+    def from_header(self, header, include_full_header=True):
         '''
         Convert a FITS header into AVM information
         '''
@@ -406,7 +406,8 @@ class AVM(AVMContainer):
         if not hasattr(self, 'Spatial'):
             self.Spatial = AVMContainer()
 
-        self.Spatial.FITSheader = str(header)
+        if include_full_header:
+            self.Spatial.FITSheader = str(header)
 
         if pywcs_installed:
             wcs = pywcs.WCS(header)

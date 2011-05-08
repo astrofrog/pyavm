@@ -40,6 +40,10 @@ To create an AVM meta-data object from a FITS header, simply pass the header (as
     >>> header = pyfits.getheader('image.fits')
     >>> avm = AVM(header)
 
+By default, the AVM tag Spatial.FITSheader will be created, containing the full header (in addition to the other Spatial.* keywords). This can be disabled with:
+
+    >>> avm = AVM(header, include_full_header=False)
+
 Initializing from a WCS object
 ==============================
 
