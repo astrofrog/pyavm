@@ -24,6 +24,8 @@
 
 # Try importing pywcs
 
+from StringIO import StringIO
+
 try:
     import pywcs
     pywcs_installed = True
@@ -95,7 +97,7 @@ tags['avm'] = [
                'Spatial.CoordsystemProjection',
                'Spatial.Quality',
                'Spatial.Notes',
-               'Spatial.FITSHeader',
+               'Spatial.FITSheader',
                'Spatial.CDMatrix',
                'Publisher',
                'PublisherID',
@@ -326,13 +328,18 @@ class AVM(AVMContainer):
 
                     print "WARNING: ignoring tag %s:%s" % (tag, name)
 
-    def to_wcs(self):
+    def to_wcs(self, use_full_header=True):
         '''
         Convert AVM projection information into a pywcs.WCS object
         '''
 
         if not pywcs_installed:
             raise Exception("PyWCS is required to use to_wcs()")
+
+        if use_full_header and hasattr(self.Spatial, 'FITSheader'):
+            print "Using full FITS header from Spatial.FITSheader"
+            header = pyfits.Header(txtfile=StringIO(self.Spatial.FITSheader))
+            return pywcs.WCS(header)
 
         # Initializing WCS object
         wcs = pywcs.WCS(naxis=2)
@@ -437,7 +444,7 @@ class AVM(AVMContainer):
         else:
             raise Exception("Projections do not agree: %s / %s" % (proj1, proj2))
 
-        self.Spatial.ReferenceDimensions = [wcs.naxis1, wcs.naxis2]
+        self.Spatial.ReferenceDimension = [wcs.naxis1, wcs.naxis2]
         self.Spatial.ReferenceValue = wcs.wcs.crval.tolist()
         self.Spatial.ReferencePixel = wcs.wcs.crpix.tolist()
         self.Spatial.Scale = wcs.wcs.cdelt.tolist()

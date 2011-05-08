@@ -31,6 +31,17 @@ The AVM meta-data can be accessed using the attribute notation:
     >>> avm.Publisher
     'Chandra X-ray Observatory'
 
+Converting to a WCS object
+==========================
+
+It is possible to create a pywcs.WCS object from the AVM meta-data:
+
+    >>> wcs = avm.to_wcs()
+
+By default, Spatial.FITSheader will be used if available, but if not, the WCS information is extracted from the other Spatial.* tags. To force PyAVM to not try Spatial.FITSheader, use:
+
+    >>> wcs = avm.to_wcs(use_full_header=False)
+
 Initializing from a FITS header
 ===============================
 
