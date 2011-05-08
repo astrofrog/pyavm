@@ -133,4 +133,4 @@ def embed_xmp(image_in, image_out, xmp_packet):
         f_out.write(xmp_packet)
 
     else:
-        raise Exception("Only JPG and PNG files are supported at this time")
+        raise Exception("Only JPG, PNG, and TIFF files are supported at this time")
