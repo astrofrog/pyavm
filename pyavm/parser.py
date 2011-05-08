@@ -22,6 +22,16 @@
 # Please note: this should 'do the job' but could probably be written in a
 # more efficient way - suggestions are welcome!
 
+# Try importing pywcs
+
+try:
+    import pywcs
+    pywcs_installed = True
+except:
+    pywcs_installed = False
+
+from pyavm.embed import embed_xmp
+
 # Define acceptable tags to avoid reading in non-AVM meta-data
 
 tags = {}
@@ -123,6 +133,19 @@ def parse_rdf_seq(rdf):
     return seq
 
 
+def format_rdf_seq(seq):
+
+    rdf = " <rdf:Seq>\n"
+    for item in seq:
+        if type(item) is float:
+            rdf += "  <rdf:li>%.16f</rdf:li>\n" % item
+        else:
+            rdf += "  <rdf:li>%s</rdf:li>\n" % str(item)
+    rdf += " </rdf:Seq>\n"
+
+    return rdf
+
+
 def parse_object(tag, string):
     '''Parse a single AVM tag'''
 
@@ -149,6 +172,23 @@ def parse_object(tag, string):
         content = auto_type(content.strip())
 
     return name, content
+
+
+def format_object(name, content):
+
+    string = "<avm:%s>" % name
+
+    if type(content) in [list, tuple]:
+        string += '\n' + format_rdf_seq(content)
+    else:
+        if type(content) is float:
+            string += "%.16f" % content
+        else:
+            string += "%s" % str(content)
+
+    string += "</avm:%s>\n" % name
+
+    return string
 
 
 class AVMContainer(object):
@@ -200,7 +240,19 @@ class AVM(AVMContainer):
     'Chandra X-ray Observatory'
     '''
 
-    def __init__(self, filename):
+    def __init__(self, *args):
+
+        if len(args) == 1:
+            if type(args[0]) is str:
+                self.from_file(args[0])
+            elif pywcs_installed and isinstance(args[0], pywcs.WCS):
+                self.from_wcs(args[0])
+            else:
+                raise Exception("Unknown arguemnt type: %s" % type(args[0]))
+        elif len(args) > 1:
+            raise Exception("Too many arguments")
+
+    def from_file(self, filename):
 
         # Read in image
         if hasattr(filename, 'read'):
@@ -262,10 +314,7 @@ class AVM(AVMContainer):
         Convert AVM projection information into a pywcs.WCS object
         '''
 
-        # Try importing pywcs
-        try:
-            import pywcs
-        except:
+        if not pywcs_installed:
             raise Exception("PyWCS is required to use to_wcs()")
 
         # Initializing WCS object
@@ -328,3 +377,78 @@ class AVM(AVMContainer):
                 wcs.wcs.crota = self.Spatial.Rotation, self.Spatial.Rotation
 
         return wcs
+
+    def from_wcs(self, wcs):
+        '''
+        Convert a pywcs.WCS object into AVM information
+        '''
+
+        if not pywcs_installed:
+            raise Exception("PyWCS is required to use from_wcs()")
+
+        if not hasattr(self, 'Spatial'):
+            self.Spatial = AVMContainer()
+
+        # Equinox
+
+        self.Spatial.Equinox = wcs.wcs.equinox
+
+        # Projection
+
+        proj1 = wcs.wcs.ctype[0][-3:]
+        proj2 = wcs.wcs.ctype[1][-3:]
+        if proj1 == proj2:
+            self.Spatial.CoordsystemProjection = proj1
+        else:
+            raise Exception("Projections do not agree: %s / %s" % (proj1, proj2))
+
+        self.Spatial.ReferenceDimensions = [wcs.naxis1, wcs.naxis2]
+        self.Spatial.ReferenceValue = wcs.wcs.crval.tolist()
+        self.Spatial.ReferencePixel = wcs.wcs.crpix.tolist()
+        self.Spatial.Scale = wcs.wcs.cdelt.tolist()
+        try:
+            self.Spatial.Rotation, wcs.wcs.crota[1]
+        except:
+            pass
+
+        self.Spatial.Quality = "Full"
+
+    def to_xmp(self):
+
+        packet = ''
+
+        # AVM header
+
+        packet += '<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
+        packet += '<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="PyAVM">\n'
+        packet += '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">\n'
+        packet += '<rdf:Description rdf:about="" xmlns:avm="http://www.communicatingastronomy.org/avm/1.0/">\n'
+
+        # AVM information
+
+        packet += format_object("MetadataVersion", "1.1")
+
+        for name in self.__dict__:
+            if isinstance(self.__dict__[name], AVMContainer):
+                for key in self.__dict__[name].__dict__:
+                    packet += format_object('%s.%s' % (name, key), self.__dict__[name].__dict__[key])
+            else:
+                packet += format_object(name, self.__dict__[name])
+
+        packet += '</rdf:Description>\n'
+        packet += '</rdf:RDF>\n'
+        packet += '</x:xmpmeta>\n'
+        packet += '<?xpacket end="w"?>\n'
+
+        return packet
+
+    def embed(self, filename_in, filename_out, verify=False):
+
+        # Embed XMP packet into file
+        embed_xmp(filename_in, filename_out, self.to_xmp())
+
+        # Verify file if needed
+        if verify:
+            import Image
+            image = Image.open(filename_out)
+            image.verify()
