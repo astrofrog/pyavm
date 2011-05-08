@@ -30,6 +30,12 @@ def embed_xmp(image_in, image_out, xmp_packet):
         except:
             raise Exception("Could not find SOI marker")
 
+        # Embed packet in image
+        f_out = open(image_out, 'wb')
+        f_out.write(contents[:position])
+        f_out.write(full_xmp_packet)
+        f_out.write(contents[position:])
+
     elif image_in.lower().endswith('png'):
 
         # Keyword
@@ -69,11 +75,62 @@ def embed_xmp(image_in, image_out, xmp_packet):
         else:
             raise Exception("Expected IHDR chunk in PNG file to appear first")
 
+        # Embed packet in image
+        f_out = open(image_out, 'wb')
+        f_out.write(contents[:position])
+        f_out.write(full_xmp_packet)
+        f_out.write(contents[position:])
+
+    elif image_in.lower().endswith('tif') or image_in.lower().endswith('tiff'):
+
+        # Identify byte order (little endian or big endian)
+        byte_order = contents[:2]
+        if byte_order == 'II':
+            endian = '<'
+        elif byte_order == 'MM':
+            endian = '>'
+        else:
+            raise Exception("Unexpected byte order: %s" % byte_order)
+
+        position = 4
+
+        while True:
+            new_position = struct.unpack(endian + 'I', contents[position:position+4])[0]
+            if new_position == 0:
+                break
+            position = new_position
+            number = struct.unpack(endian + 'H', contents[position:position+2])[0]
+            position = position + 2 + number * 12
+
+        # Find file length
+        file_length = len(contents)
+
+        # Update offset to point to the end of the file
+        contents = contents[:position] + struct.pack(endian + 'I', file_length) + contents[position+4:]
+
+        # Number of directory entries
+        ifd = struct.pack(endian + 'H', 1)
+
+        # Field identification
+        ifd += struct.pack(endian + 'H', 700)
+
+        # Field type
+        ifd += struct.pack(endian + 'H', 1)
+
+        # XMP packet length
+        ifd += struct.pack(endian + 'I', len(xmp_packet))
+
+        # XMP packet
+        ifd += struct.pack(endian + 'I', file_length + 18)
+
+        # End of file
+        ifd += struct.pack(endian + 'I', 0)
+
+        # Embed packet in image
+        f_out = open(image_out, 'wb')
+        f_out.write(contents)
+        f_out.write(ifd)
+        f_out.write(xmp_packet)
+
     else:
         raise Exception("Only JPG and PNG files are supported at this time")
-
-    # Embed packet in image
-    f_out = open(image_out, 'wb')
-    f_out.write(contents[:position])
-    f_out.write(full_xmp_packet)
-    f_out.write(contents[position:])
