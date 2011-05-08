@@ -69,6 +69,9 @@ def embed_xmp(image_in, image_out, xmp_packet):
         else:
             raise Exception("Expected IHDR chunk in PNG file to appear first")
 
+    else:
+        raise Exception("Only JPG and PNG files are supported at this time")
+
     # Embed packet in image
     f_out = open(image_out, 'wb')
     f_out.write(contents[:position])
