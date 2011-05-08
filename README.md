@@ -44,6 +44,13 @@ after which tags can be created in the group:
 
     >>> avm.Spatial.Notes = "The WCS information was updated on 04/02/2010"
 
+Creating an AVM object from scratch
+===================================
+
+To create an empty AVM meta-data holder, simply call ``AVM()`` without any arguments:
+
+    >>> avm = AVM()
+
 Converting to a WCS object
 ==========================
 
