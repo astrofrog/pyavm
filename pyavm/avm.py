@@ -30,6 +30,12 @@ try:
 except:
     pywcs_installed = False
 
+try:
+    import pyfits
+    pyfits_installed = True
+except:
+    pyfits_installed = False
+
 from pyavm.embed import embed_xmp
 
 # Define acceptable tags to avoid reading in non-AVM meta-data
@@ -254,6 +260,8 @@ class AVM(AVMContainer):
         if len(args) == 1:
             if type(args[0]) is str:
                 self.from_file(args[0])
+            elif pyfits_installed and isinstance(args[0], pyfits.Header):
+                self.from_header(args[0])
             elif pywcs_installed and isinstance(args[0], pywcs.WCS):
                 self.from_wcs(args[0])
             else:
@@ -386,6 +394,23 @@ class AVM(AVMContainer):
                 wcs.wcs.crota = self.Spatial.Rotation, self.Spatial.Rotation
 
         return wcs
+
+    def from_header(self, header):
+        '''
+        Convert a FITS header into AVM information
+        '''
+
+        if not pyfits_installed:
+            raise Exception("PyWCS is required to use from_wcs()")
+
+        if not hasattr(self, 'Spatial'):
+            self.Spatial = AVMContainer()
+
+        self.Spatial.FITSheader = str(header)
+
+        if pywcs_installed:
+            wcs = pywcs.WCS(header)
+            self.from_wcs(wcs)
 
     def from_wcs(self, wcs):
         '''

@@ -1,12 +1,21 @@
+About
+=====
+
 PyAVM provides the ``AVM()`` class to represent [AVM](http://www.virtualastronomy.org/avm_metadata.php) meta-data:
 
     >>> from pyavm import AVM
 
-To parse AVM meta-data from an existing file, simply create an instance of this class using the filename of the image (or any file-like object):
+Parsing files
+=============
+
+To parse AVM meta-data from an existing file, simply create an instance of the ``AVM`` class using the filename of the image (or any file-like object):
 
     >>> avm = AVM('myexample.jpg')
 
-Then, you can view the contents by using
+Accessing the meta-data
+=======================
+
+You can view the contents of the ``avm`` object by using
 
     >>> print avm
 
@@ -22,7 +31,19 @@ The AVM meta-data can be accessed using the attribute notation:
     >>> avm.Publisher
     'Chandra X-ray Observatory'
 
-It is also possible to initialize an AVM object using a pywcs.WCS instance:
+Initializing from a FITS header
+===============================
+
+To create an AVM meta-data object from a FITS header, simply pass the header (as a ``pyfits.Header`` instance) instead of a filename when initializing the ``AVM`` object:
+
+    >>> import pyfits
+    >>> header = pyfits.getheader('image.fits')
+    >>> avm = AVM(header)
+
+Initializing from a WCS object
+==============================
+
+Similarly, it is possible to create an AVM meta-data object from a ``pywcs.WCS`` instance:
 
     >>> import pyfits
     >>> import pywcs
@@ -30,7 +51,10 @@ It is also possible to initialize an AVM object using a pywcs.WCS instance:
     >>> wcs = pywcs.WCS(pyfits.getheader('image.fits'))
     >>> avm = AVM(wcs)
 
-Finally, it is possible to embed AVM meta-data into an image file:
+Tagging images with AVM meta-data
+=================================
+
+It is possible to embed AVM meta-data into an image file:
 
     >>> avm.embed('original_image.jpg', 'tagged_image.jpg')
 
