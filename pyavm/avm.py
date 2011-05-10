@@ -19,11 +19,6 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-# Please note: this should 'do the job' but could probably be written in a
-# more efficient way - suggestions are welcome!
-
-# Try importing pywcs
-
 from StringIO import StringIO
 from xml.etree.ElementTree import parse
 
