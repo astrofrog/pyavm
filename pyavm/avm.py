@@ -309,21 +309,14 @@ class AVM(AVMContainer):
             contents = file(filename, 'rb').read()
 
         # Look for XMP packets
-        start = 0
-        while True:
-            start = contents.find("<?xpacket begin=", start)
-            if start < 0:
-                raise NoAVMPresent("No AVM data found")
-            start = contents.index("?>", start) + 2
-            end = contents.index("</x:xmpmeta>") + 12
-            print "Found XMP packet with %i bytes" % (end - start)
-            if "<avm:" in contents[start:end]:
-                print "Found AVM meta-data in XMP packet"
-                break
-            else:
-                print "Did not find AVM meta-data in XMP packet"
+        start = contents.find("<?xpacket begin=")
+        if start < 0:
+            raise NoAVMPresent("No XMP packet found")
+        start = contents.index("?>", start) + 2
+        end = contents.index("</x:xmpmeta>") + 12
+        print "Found XMP packet with %i bytes" % (end - start)
 
-        # AVM data has been found
+        # Extract XMP packet
         xml = contents[start:end]
 
         # Parse XML
