@@ -25,6 +25,7 @@
 # Try importing pywcs
 
 from StringIO import StringIO
+from xml.etree.ElementTree import parse
 
 try:
     import pywcs
@@ -44,69 +45,72 @@ from pyavm.embed import embed_xmp
 
 tags = {}
 
-tags['xapRights'] = [
-                     'UsageTerms',
-                    ]
+tags['photoshop'] = {}
+tags['xapRights'] = {}
+tags['Iptc4xmpCore'] = {}
+tags['dc'] = {}
+tags['avm'] = {}
 
-tags['Iptc4xmpCore'] = [
-                        'CiUrlWork',
-                        'CiEmailWork',
-                        'CiTelWork',
-                        'CiAdrExtadr',
-                        'CiAdrCity',
-                        'CiAdrRegion',
-                        'CiAdrPcode',
-                        'CiAdrCtry',
-                       ]
+tags['photoshop']['Source'] = 'Creator'
+tags['Iptc4xmpCore']['CiUrlWork'] = 'CreatorURL'
+tags['dc']['creator'] = 'Contact.Name'
+tags['Iptc4xmpCore']['CiEmailWork'] = 'Contact.Email'
+tags['Iptc4xmpCore']['CiTelWork'] = 'Contact.Telephone'
+tags['Iptc4xmpCore']['CiAdrExtadr'] = 'Contact.Address'
+tags['Iptc4xmpCore']['CiAdrCity'] = 'Contact.City'
+tags['Iptc4xmpCore']['CiAdrRegion'] = 'Contact.StateProvince'
+tags['Iptc4xmpCore']['CiAdrPcode'] = 'Contact.PostalCode'
+tags['Iptc4xmpCore']['CiAdrCtry'] = 'Contact.Country'
+tags['xapRights']['UsageTerms'] = 'Rights'
+tags['dc']['title'] = 'Title'
+tags['photoshop']['Headline'] = 'Headline'
+tags['dc']['description'] = 'Description'
+tags['avm']['Subject.Category'] = 'Subject.Category'
+tags['dc']['subject'] = 'Subject.Name'
+tags['avm']['Distance'] = 'Distance'
+tags['avm']['Distance.Notes'] = 'Distance.Notes'
+tags['avm']['ReferenceURL'] = 'ReferenceURL'
+tags['photoshop']['Credit'] = 'Credit'
+tags['photoshop']['DateCreated'] = 'Date'
+tags['avm']['ID'] = 'ID'
+tags['avm']['Type'] = 'Type'
+tags['avm']['Image.ProductQuality'] = 'Image.ProductQuality'
+tags['avm']['Facility'] = 'Facility'
+tags['avm']['Instrument'] = 'Instrument'
+tags['avm']['Spectral.ColorAssignment'] = 'Spectral.ColorAssignment'
+tags['avm']['Spectral.Band'] = 'Spectral.Band'
+tags['avm']['Spectral.Bandpass'] = 'Spectral.Bandpass'
+tags['avm']['Spectral.CentralWavelength'] = 'Spectral.CentralWavelength'
+tags['avm']['Spectral.Notes'] = 'Spectral.Notes'
+tags['avm']['Temporal.StartTime'] = 'Temporal.StartTime'
+tags['avm']['Temporal.IntegrationTime'] = 'Temporal.IntegrationTime'
+tags['avm']['DatasetID'] = 'DatasetID'
+tags['avm']['Spatial.CoordinateFrame'] = 'Spatial.CoordinateFrame'
+tags['avm']['Spatial.Equinox'] = 'Spatial.Equinox'
+tags['avm']['Spatial.ReferenceValue'] = 'Spatial.ReferenceValue'
+tags['avm']['Spatial.ReferenceDimension'] = 'Spatial.ReferenceDimension'
+tags['avm']['Spatial.ReferencePixel'] = 'Spatial.ReferencePixel'
+tags['avm']['Spatial.Scale'] = 'Spatial.Scale'
+tags['avm']['Spatial.Rotation'] = 'Spatial.Rotation'
+tags['avm']['Spatial.CoordsystemProjection'] = 'Spatial.CoordsystemProjection'
+tags['avm']['Spatial.Quality'] = 'Spatial.Quality'
+tags['avm']['Spatial.Notes'] = 'Spatial.Notes'
+tags['avm']['Spatial.FITSheader'] = 'Spatial.FITSheader'
+tags['avm']['Spatial.CDMatrix'] = 'Spatial.CDMatrix'
+tags['avm']['Publisher'] = 'Publisher'
+tags['avm']['PublisherID'] = 'PublisherID'
+tags['avm']['ResourceID'] = 'ResourceID'
+tags['avm']['ResourceURL'] = 'ResourceURL'
+tags['avm']['RelatedResources'] = 'RelatedResources'
+tags['avm']['MetadataDate'] = 'MetadataDate'
+tags['avm']['MetadataVersion'] = 'MetadataVersion'
 
-tags['dc'] = [
-              'creator',
-              'rights',  # Not in 1.1 standard, but in all examples
-              'format',  # Not in 1.1 standard, but in all examples
-              'title',
-              'description',
-              'subject',
-             ]
-
-tags['avm'] = [
-               'CreatorURL',  # Not in 1.1 standard, but in all examples
-               'Subject.Category',
-               'Distance',
-               'Distance.Notes',
-               'ReferenceURL',
-               'ID',
-               'Type',
-               'Image.ProductQuality',
-               'Facility',
-               'Instrument',
-               'Spectral.ColorAssignment',
-               'Spectral.Band',
-               'Spectral.Bandpass',
-               'Spectral.CentralWavelength',
-               'Spectral.Notes',
-               'Temporal.StartTime',
-               'Temporal.IntegrationTime',
-               'DatasetID',
-               'Spatial.CoordinateFrame',
-               'Spatial.Equinox',
-               'Spatial.ReferenceValue',
-               'Spatial.ReferenceDimension',
-               'Spatial.ReferencePixel',
-               'Spatial.Scale',
-               'Spatial.Rotation',
-               'Spatial.CoordsystemProjection',
-               'Spatial.Quality',
-               'Spatial.Notes',
-               'Spatial.FITSheader',
-               'Spatial.CDMatrix',
-               'Publisher',
-               'PublisherID',
-               'ResourceID',
-               'ResourceURL',
-               'RelatedResources',
-               'MetadataDate',
-               'MetadataVersion',
-              ]
+namespaces = {}
+namespaces['http://www.communicatingastronomy.org/avm/1.0/'] = 'avm'
+namespaces['http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/'] = 'Iptc4xmpCore'
+namespaces['http://purl.org/dc/elements/1.1/'] = 'dc'
+namespaces['http://ns.adobe.com/photoshop/1.0/'] = 'photoshop'
+namespaces['http://ns.adobe.com/xap/1.0/rights/'] = 'xapRights'
 
 
 def capitalize(string):
@@ -124,23 +128,6 @@ def auto_type(string):
             return string
 
 
-def parse_rdf_seq(rdf):
-    '''Parse and RDF Seq/Bag/Alt and return a list'''
-    start = rdf.find("<rdf:Seq>")
-    end = rdf.find("</rdf:Seq>")
-    content = rdf[start + 9:end].strip()
-    start = 0
-    seq = []
-    while True:
-        start = content.find("<rdf:li", start)
-        if start < 0:
-            break
-        start = content.index(">", start)
-        end = content.find("</rdf:li", start)
-        seq.append(auto_type(content[start + 1:end].strip()))
-    return seq
-
-
 def format_rdf_seq(seq):
 
     rdf = " <rdf:Seq>\n"
@@ -152,34 +139,6 @@ def format_rdf_seq(seq):
     rdf += " </rdf:Seq>\n"
 
     return rdf
-
-
-def parse_object(tag, string):
-    '''Parse a single AVM tag'''
-
-    start1 = string.index('<%s:' % tag)
-    end1 = string.index('>', start1)
-    name = string[start1 + 2 + len(tag):end1]
-    name = name.split()[0]
-
-    start2 = string.index('</%s' % tag)
-    end2 = string.index('>', start2)
-
-    content = string[end1 + 1:start2]
-
-    if "<rdf" in content:
-        if "<rdf:Seq>" in content:
-            content = parse_rdf_seq(content)
-        elif "<rdf:Bag>" in content:
-            content = parse_rdf_seq(content)
-        elif "<rdf:Alt>" in content:
-            content = parse_rdf_seq(content)
-        else:
-            raise Exception("Unexpected RDF content: %s" % content)
-    else:
-        content = auto_type(content.strip())
-
-    return name, content
 
 
 def format_object(name, content):
@@ -218,6 +177,44 @@ class AVMContainer(object):
                               "%s: %s\n" % (family, str(self.__dict__[family]))
 
         return string
+
+
+def parse_avm_content(rdf):
+
+    avm_content = {}
+
+    for item in rdf.attrib:
+
+        # Find URI
+        uri, tag = item[1:].split('}')
+
+        if uri in namespaces:
+            avm_content[(namespaces[uri], tag)] = auto_type(rdf.attrib[item])
+
+    for item in rdf:
+
+        # Find URI
+        uri, tag = item.tag[1:].split('}')
+
+        if uri == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#':
+            sub_avm_content = parse_avm_content(item)
+            for key in sub_avm_content:
+                avm_content[key] = sub_avm_content[key]
+        elif uri in namespaces:
+            if len(item) == 0:
+                avm_content[(namespaces[uri], tag)] = auto_type(item.text)
+            elif len(item) == 1:
+                c_uri, c_tag = item[0].tag[1:].split('}')
+                if c_uri == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#' and c_tag in ['Bag', 'Seq', 'Alt']:
+                    avm_content[(namespaces[uri], tag)] = [auto_type(x.text) for x in item[0]]
+                else:
+                    raise Exception("Unexpected tag %s:%s" % (c_uri, c_tag))
+            elif len(item) > 1:
+                sub_avm_content = parse_avm_content(item)
+                for key in sub_avm_content:
+                    avm_content[key] = sub_avm_content[key]
+
+    return avm_content
 
 
 class AVM(AVMContainer):
@@ -292,7 +289,7 @@ class AVM(AVMContainer):
             if start < 0:
                 raise Exception("No AVM data found")
             start = contents.index("?>", start) + 2
-            end = contents.index("</x:xmpmeta>")
+            end = contents.index("</x:xmpmeta>") + 12
             print "Found XMP packet with %i bytes" % (end - start)
             if "<avm:" in contents[start:end]:
                 print "Found AVM meta-data in XMP packet"
@@ -303,36 +300,31 @@ class AVM(AVMContainer):
         # AVM data has been found
         xml = contents[start:end]
 
-        for tag in tags:
+        # Parse XML
+        tree = parse(StringIO(xml))
+        root = tree.getroot()
+        avm_content = parse_avm_content(root)
 
-            end = 0
+        for tag, name in avm_content:
 
-            while True:
+            content = avm_content[(tag, name)]
 
-                # Search for next AVM block
-                start = xml.find('<%s' % tag, end)
-                if start < 0:
-                    break
-                end = xml.index('</%s' % tag, start)
-                end = xml.index('>', end)
+            if name in tags[tag]:
 
-                # Parse the AVM
-                name, content = parse_object(tag, xml[start:end + 1])
+                avm_name = tags[tag][name]
 
-                if name in tags[tag]:
-
-                    # Add to AVM dictionary
-                    if "." in name:
-                        family, key = name.split('.')
-                        if not family in self.__dict__:
-                            self.__dict__[capitalize(family)] = AVMContainer()
-                        self.__dict__[capitalize(family)].__dict__[capitalize(key)] = content
-                    else:
-                        self.__dict__[capitalize(name)] = content
-
+                # Add to AVM dictionary
+                if "." in avm_name:
+                    family, key = avm_name.split('.')
+                    if not family in self.__dict__:
+                        self.__dict__[capitalize(family)] = AVMContainer()
+                    self.__dict__[capitalize(family)].__dict__[capitalize(key)] = content
                 else:
+                    self.__dict__[capitalize(avm_name)] = content
 
-                    print "WARNING: ignoring tag %s:%s" % (tag, name)
+            else:
+
+                print "WARNING: ignoring tag %s:%s" % (tag, name)
 
     def to_wcs(self, use_full_header=True):
         '''
