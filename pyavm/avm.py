@@ -46,6 +46,10 @@ tags['Iptc4xmpCore'] = {}
 tags['dc'] = {}
 tags['avm'] = {}
 
+# Metadata Tag Definitions
+
+# Creator Metadata
+
 tags['photoshop']['Source'] = 'Creator'
 tags['Iptc4xmpCore']['CiUrlWork'] = 'CreatorURL'
 tags['dc']['creator'] = 'Contact.Name'
@@ -57,6 +61,9 @@ tags['Iptc4xmpCore']['CiAdrRegion'] = 'Contact.StateProvince'
 tags['Iptc4xmpCore']['CiAdrPcode'] = 'Contact.PostalCode'
 tags['Iptc4xmpCore']['CiAdrCtry'] = 'Contact.Country'
 tags['xapRights']['UsageTerms'] = 'Rights'
+
+# Content Metadata
+
 tags['dc']['title'] = 'Title'
 tags['photoshop']['Headline'] = 'Headline'
 tags['dc']['description'] = 'Description'
@@ -70,6 +77,9 @@ tags['photoshop']['DateCreated'] = 'Date'
 tags['avm']['ID'] = 'ID'
 tags['avm']['Type'] = 'Type'
 tags['avm']['Image.ProductQuality'] = 'Image.ProductQuality'
+
+# Observation Metadata
+
 tags['avm']['Facility'] = 'Facility'
 tags['avm']['Instrument'] = 'Instrument'
 tags['avm']['Spectral.ColorAssignment'] = 'Spectral.ColorAssignment'
@@ -80,6 +90,9 @@ tags['avm']['Spectral.Notes'] = 'Spectral.Notes'
 tags['avm']['Temporal.StartTime'] = 'Temporal.StartTime'
 tags['avm']['Temporal.IntegrationTime'] = 'Temporal.IntegrationTime'
 tags['avm']['DatasetID'] = 'DatasetID'
+
+# Coordinate Metadata
+
 tags['avm']['Spatial.CoordinateFrame'] = 'Spatial.CoordinateFrame'
 tags['avm']['Spatial.Equinox'] = 'Spatial.Equinox'
 tags['avm']['Spatial.ReferenceValue'] = 'Spatial.ReferenceValue'
@@ -92,6 +105,9 @@ tags['avm']['Spatial.Quality'] = 'Spatial.Quality'
 tags['avm']['Spatial.Notes'] = 'Spatial.Notes'
 tags['avm']['Spatial.FITSheader'] = 'Spatial.FITSheader'
 tags['avm']['Spatial.CDMatrix'] = 'Spatial.CDMatrix'
+
+# Published Metadata
+
 tags['avm']['Publisher'] = 'Publisher'
 tags['avm']['PublisherID'] = 'PublisherID'
 tags['avm']['ResourceID'] = 'ResourceID'
@@ -100,11 +116,14 @@ tags['avm']['RelatedResources'] = 'RelatedResources'
 tags['avm']['MetadataDate'] = 'MetadataDate'
 tags['avm']['MetadataVersion'] = 'MetadataVersion'
 
-# Define reverse dictionary
+# Define reverse dictionary for above tags
+
 reverse_tags = {}
 for tag in tags:
     for name in tags[tag]:
         reverse_tags[tags[tag][name]] = (tag, name)
+
+# Define namespace to tag mapping
 
 namespaces = {}
 namespaces['http://www.communicatingastronomy.org/avm/1.0/'] = 'avm'
