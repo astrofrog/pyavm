@@ -1,3 +1,3 @@
-from avm import AVM
+from avm import AVM, NoAVMPresent
 
 __version__ = "0.1.2"

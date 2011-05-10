@@ -105,12 +105,22 @@ tags['avm']['RelatedResources'] = 'RelatedResources'
 tags['avm']['MetadataDate'] = 'MetadataDate'
 tags['avm']['MetadataVersion'] = 'MetadataVersion'
 
+# Define reverse dictionary
+reverse_tags = {}
+for tag in tags:
+    for name in tags[tag]:
+        reverse_tags[tags[tag][name]] = (tag, name)
+
 namespaces = {}
 namespaces['http://www.communicatingastronomy.org/avm/1.0/'] = 'avm'
 namespaces['http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/'] = 'Iptc4xmpCore'
 namespaces['http://purl.org/dc/elements/1.1/'] = 'dc'
 namespaces['http://ns.adobe.com/photoshop/1.0/'] = 'photoshop'
 namespaces['http://ns.adobe.com/xap/1.0/rights/'] = 'xapRights'
+
+
+class NoAVMPresent(Exception):
+    pass
 
 
 def capitalize(string):
@@ -135,15 +145,17 @@ def format_rdf_seq(seq):
         if type(item) is float:
             rdf += "  <rdf:li>%.16f</rdf:li>\n" % item
         else:
-            rdf += "  <rdf:li>%s</rdf:li>\n" % str(item)
+            rdf += "  <rdf:li>%s</rdf:li>\n" % unicode(item)
     rdf += " </rdf:Seq>\n"
 
     return rdf
 
 
-def format_object(name, content):
+def format_object(avm_name, content):
 
-    string = "<avm:%s>" % name
+    tag, name = reverse_tags[avm_name]
+
+    string = "<%s:%s>" % (tag, name)
 
     if type(content) in [list, tuple]:
         string += '\n' + format_rdf_seq(content)
@@ -151,9 +163,9 @@ def format_object(name, content):
         if type(content) is float:
             string += "%.16f" % content
         else:
-            string += "%s" % str(content)
+            string += "%s" % unicode(content)
 
-    string += "</avm:%s>\n" % name
+    string += "</%s:%s>\n" % (tag, name)
 
     return string
 
@@ -171,10 +183,10 @@ class AVMContainer(object):
                 if type(self.__dict__[family]) is list:
                     string += indent * " " + "%s:\n" % family
                     for elem in self.__dict__[family]:
-                        string += indent * " " + "   * %s\n" % str(elem)
+                        string += indent * " " + "   * %s\n" % unicode(elem)
                 else:
                     string += indent * " " + \
-                              "%s: %s\n" % (family, str(self.__dict__[family]))
+                              "%s: %s\n" % (family, unicode(self.__dict__[family]))
 
         return string
 
@@ -287,7 +299,7 @@ class AVM(AVMContainer):
         while True:
             start = contents.find("<?xpacket begin=", start)
             if start < 0:
-                raise Exception("No AVM data found")
+                raise NoAVMPresent("No AVM data found")
             start = contents.index("?>", start) + 2
             end = contents.index("</x:xmpmeta>") + 12
             print "Found XMP packet with %i bytes" % (end - start)
@@ -412,7 +424,7 @@ class AVM(AVMContainer):
             self.Spatial = AVMContainer()
 
         if include_full_header:
-            self.Spatial.FITSheader = str(header)
+            self.Spatial.FITSheader = unicode(header)
 
         if pywcs_installed:
             wcs = pywcs.WCS(header)
@@ -459,10 +471,10 @@ class AVM(AVMContainer):
 
         # AVM header
 
-        packet += '<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
-        packet += '<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="PyAVM">\n'
-        packet += '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">\n'
-        packet += '<rdf:Description rdf:about="" xmlns:avm="http://www.communicatingastronomy.org/avm/1.0/">\n'
+        packet += u'<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
+        packet += u'<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="PyAVM">\n'
+        packet += u'<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">\n'
+        packet += u'<rdf:Description rdf:about="" xmlns:avm="http://www.communicatingastronomy.org/avm/1.0/">\n'
 
         # AVM information
 
