@@ -22,7 +22,7 @@ def embed_xmp(image_in, image_out, xmp_packet):
         full_xmp_packet += "http://ns.adobe.com/xap/1.0/\x00"
 
         # XMP packet
-        full_xmp_packet += xmp_packet
+        full_xmp_packet += xmp_packet.encode('utf-8')
 
         # Position at which to insert the packet
         try:
@@ -57,7 +57,7 @@ def embed_xmp(image_in, image_out, xmp_packet):
         chunk += '\xff'
 
         # Text
-        chunk += xmp_packet
+        chunk += xmp_packet.encode('utf-8')
 
         # Calculate CRC
         crc = struct.pack('>i', crc32('iTXt' + chunk))
@@ -130,7 +130,7 @@ def embed_xmp(image_in, image_out, xmp_packet):
         f_out = open(image_out, 'wb')
         f_out.write(contents)
         f_out.write(ifd)
-        f_out.write(xmp_packet)
+        f_out.write(xmp_packet.encode('utf-8'))
 
     else:
         raise Exception("Only JPG, PNG, and TIFF files are supported at this time")
