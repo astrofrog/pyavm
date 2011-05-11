@@ -22,6 +22,12 @@
 from StringIO import StringIO
 import xml.etree.ElementTree as et
 
+def register_namespace(tag, uri):
+    try:
+        et.register_namespace(tag, uri)
+    except:
+        et._namespace_map[uri] = tag
+
 try:
     import pywcs
     pywcs_installed = True
@@ -479,10 +485,10 @@ class AVM(AVMContainer):
     def to_xmp(self):
 
         # Register namespaces
-        et.register_namespace('x', "adobe:ns:meta/")
-        et.register_namespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
+        register_namespace('x', "adobe:ns:meta/")
+        register_namespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
         for namespace in namespaces:
-            et.register_namespace(namespaces[namespace], namespace)
+            register_namespace(namespaces[namespace], namespace)
 
         # Initialize XMP packet
         packet = u'<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
