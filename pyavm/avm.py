@@ -20,7 +20,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 from StringIO import StringIO
-from xml.etree.ElementTree import parse
+import xml.etree.ElementTree as et
 
 try:
     import pywcs
@@ -132,6 +132,10 @@ namespaces['http://purl.org/dc/elements/1.1/'] = 'dc'
 namespaces['http://ns.adobe.com/photoshop/1.0/'] = 'photoshop'
 namespaces['http://ns.adobe.com/xap/1.0/rights/'] = 'xapRights'
 
+reverse_namespaces = {}
+for key in namespaces:
+    reverse_namespaces[namespaces[key]] = key
+
 
 class NoAVMPresent(Exception):
     pass
@@ -152,36 +156,36 @@ def auto_type(string):
             return string
 
 
-def format_rdf_seq(seq):
+def format_rdf_seq(parent, seq):
 
-    rdf = " <rdf:Seq>\n"
+    element = et.SubElement(parent, "rdf:Seq")
+
     for item in seq:
+        li = et.SubElement(element, "rdf:li")
         if type(item) is float:
-            rdf += "  <rdf:li>%.16f</rdf:li>\n" % item
+            li.text = "%.16f" % item
         else:
-            rdf += "  <rdf:li>%s</rdf:li>\n" % unicode(item)
-    rdf += " </rdf:Seq>\n"
+            li.text = "%s" % unicode(item)
 
-    return rdf
+    return element
 
 
-def format_object(avm_name, content):
+def format_object(parent, avm_name, content):
 
     tag, name = reverse_tags[avm_name]
+    uri = reverse_namespaces[tag]
 
-    string = "<%s:%s>" % (tag, name)
+    element = et.SubElement(parent, "{%s}%s" % (uri, name))
 
     if type(content) in [list, tuple]:
-        string += '\n' + format_rdf_seq(content)
+        format_rdf_seq(element, content)
     else:
         if type(content) is float:
-            string += "%.16f" % content
+            element.text = "%.16f" % content
         else:
-            string += "%s" % unicode(content)
+            element.text = "%s" % unicode(content)
 
-    string += "</%s:%s>\n" % (tag, name)
-
-    return string
+    return element
 
 
 class AVMContainer(object):
@@ -202,7 +206,7 @@ class AVMContainer(object):
                     string += indent * " " + \
                               "%s: %s\n" % (family, unicode(self.__dict__[family]))
 
-        return string
+        return string.encode('utf-8')
 
 
 def parse_avm_content(rdf):
@@ -320,7 +324,7 @@ class AVM(AVMContainer):
         xml = contents[start:end]
 
         # Parse XML
-        tree = parse(StringIO(xml))
+        tree = et.parse(StringIO(xml))
         root = tree.getroot()
         avm_content = parse_avm_content(root)
 
@@ -474,29 +478,43 @@ class AVM(AVMContainer):
 
     def to_xmp(self):
 
-        packet = ''
+        # Register namespaces
+        et.register_namespace('x', "adobe:ns:meta/")
+        et.register_namespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
+        for namespace in namespaces:
+            et.register_namespace(namespaces[namespace], namespace)
 
-        # AVM header
+        # Initialize XMP packet
+        packet = u'<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
 
-        packet += u'<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
-        packet += u'<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="PyAVM">\n'
-        packet += u'<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">\n'
-        packet += u'<rdf:Description rdf:about="" xmlns:avm="http://www.communicatingastronomy.org/avm/1.0/">\n'
+        # Create containing structure
+        root = et.Element("{adobe:ns:meta/}xmpmeta")
+        trunk = et.SubElement(root, "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}RDF")
+        branch = et.SubElement(trunk, "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}Description")
 
-        # AVM information
+        # Write meta-data version
+        format_object(branch, "MetadataVersion", "1.1")
 
-        packet += format_object("MetadataVersion", "1.1")
-
+        # Write all the elements
         for name in self.__dict__:
             if isinstance(self.__dict__[name], AVMContainer):
                 for key in self.__dict__[name].__dict__:
-                    packet += format_object('%s.%s' % (name, key), self.__dict__[name].__dict__[key])
+                    format_object(branch, '%s.%s' % (name, key), self.__dict__[name].__dict__[key])
             else:
-                packet += format_object(name, self.__dict__[name])
+                format_object(branch, name, self.__dict__[name])
 
-        packet += '</rdf:Description>\n'
-        packet += '</rdf:RDF>\n'
-        packet += '</x:xmpmeta>\n'
+        # Create XML Tree
+        tree = et.ElementTree(root)
+
+        # Need to create a StringIO object to write to
+        s = StringIO()
+        tree.write(s)
+
+        # Rewind and read the contents
+        s.seek(0)
+        packet += s.read().encode('utf-8')
+
+        # Close the XMP packet
         packet += '<?xpacket end="w"?>\n'
 
         return packet
