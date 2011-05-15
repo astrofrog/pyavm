@@ -355,7 +355,7 @@ class AVM(AVMContainer):
 
                 print "WARNING: ignoring tag %s:%s" % (tag, name)
 
-    def to_wcs(self, use_full_header=True):
+    def to_wcs(self, use_full_header=False):
         '''
         Convert AVM projection information into a pywcs.WCS object
         '''
