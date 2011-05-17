@@ -196,23 +196,47 @@ def format_object(parent, avm_name, content):
 
 class AVMContainer(object):
 
+    def __init__(self, allow_value=False):
+        if allow_value:
+            self.__dict__["_value"] = None
+
     def __str__(self, indent=0):
 
         string = ""
         for family in self.__dict__:
+
+            if family.startswith('_'):
+                continue
+
             if type(self.__dict__[family]) is AVMContainer:
-                string += indent * " " + "%s:\n" % family
-                string += self.__dict__[family].__str__(indent + 3)
+                substring = self.__dict__[family].__str__(indent + 3)
+                if substring != "":
+                    if hasattr(self.__dict__[family], '_value'):
+                        string += indent * " " + "%s: %s\n" % (family, unicode(self.__dict__[family]._value))
+                    else:
+                        string += indent * " " + "%s:\n" % family
+                    string += substring
             else:
                 if type(self.__dict__[family]) is list:
                     string += indent * " " + "%s:\n" % family
                     for elem in self.__dict__[family]:
-                        string += indent * " " + "   * %s\n" % unicode(elem)
+                        if elem is not None:
+                            string += indent * " " + "   * %s\n" % unicode(elem)
                 else:
-                    string += indent * " " + \
-                              "%s: %s\n" % (family, unicode(self.__dict__[family]))
+                    if self.__dict__[family] is not None:
+                        string += indent * " " + \
+                                  "%s: %s\n" % (family, unicode(self.__dict__[family]))
 
         return string.encode('utf-8')
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __setattr__(self, attribute, value):
+        if attribute not in self.__dict__:
+            raise Exception("%s is not a valid AVM tag" % attribute)
+        else:
+            object.__setattr__(self, attribute, value)
 
 
 def parse_avm_content(rdf):
@@ -292,6 +316,23 @@ class AVM(AVMContainer):
 
     def __init__(self, *args):
 
+        for avm_name in reverse_tags:
+
+            if "Distance" in avm_name:
+                if not "Distance" in self.__dict__:
+                    self.__dict__["Distance"] = AVMContainer(allow_value=True)
+
+            if "." in avm_name:
+                family, key = avm_name.split('.')
+                if not family in self.__dict__:
+                    self.__dict__[family] = AVMContainer()
+                self.__dict__[family].__dict__[key] = None
+            else:
+                if avm_name in self.__dict__ and hasattr(self.__dict__[avm_name], '_value'):
+                    self.__dict__[avm_name]._value = None
+                else:
+                    self.__dict__[avm_name] = None
+
         if len(args) == 1:
             if type(args[0]) is str:
                 self.from_file(args[0])
@@ -304,11 +345,16 @@ class AVM(AVMContainer):
         elif len(args) > 1:
             raise Exception("Too many arguments")
 
-    def create_group(self, group):
-        if hasattr(self, group):
-            raise Exception("Group %s already exists" % group)
+    def __setattr__(self, attribute, value):
+        if attribute not in self.__dict__:
+            raise Exception("%s is not a valid AVM group or tag" % attribute)
+        elif isinstance(self.__dict__[attribute], AVMContainer):
+            if hasattr(self.__dict__[attribute], "_value"):
+                self.__dict__[attribute]._value = value
+            else:
+                raise Exception("%s is an AVM group, not a tag" % attribute)
         else:
-            self.__dict__[group] = AVMContainer()
+            object.__setattr__(self, attribute, value)
 
     def from_file(self, filename):
 
@@ -345,11 +391,12 @@ class AVM(AVMContainer):
                 # Add to AVM dictionary
                 if "." in avm_name:
                     family, key = avm_name.split('.')
-                    if not family in self.__dict__:
-                        self.__dict__[capitalize(family)] = AVMContainer()
-                    self.__dict__[capitalize(family)].__dict__[capitalize(key)] = content
+                    self.__dict__[family].__dict__[key] = content
                 else:
-                    self.__dict__[capitalize(avm_name)] = content
+                    if hasattr(self.__dict__[avm_name], '_value'):
+                        self.__dict__[avm_name]._value = content
+                    else:
+                        self.__dict__[avm_name] = content
 
             else:
 
@@ -363,7 +410,7 @@ class AVM(AVMContainer):
         if not pywcs_installed:
             raise Exception("PyWCS is required to use to_wcs()")
 
-        if use_full_header and hasattr(self.Spatial, 'FITSheader'):
+        if use_full_header and self.Spatial.FITSheader is not None:
             print "Using full FITS header from Spatial.FITSheader"
             header = pyfits.Header(txtfile=StringIO(self.Spatial.FITSheader))
             return pywcs.WCS(header)
@@ -372,9 +419,9 @@ class AVM(AVMContainer):
         wcs = pywcs.WCS(naxis=2)
 
         # Find the coordinate type
-        try:
+        if self.Spatial.CoordinateFrame is not None:
             ctype = self.Spatial.CoordinateFrame
-        except:
+        else:
             print "WARNING: Spatial.CoordinateFrame not found, assuming ICRS"
             ctype = 'ICRS'
 
@@ -419,12 +466,12 @@ class AVM(AVMContainer):
         wcs.wcs.crval = self.Spatial.ReferenceValue
         wcs.wcs.crpix = self.Spatial.ReferencePixel
 
-        if hasattr(self.Spatial, "CDMatrix"):
+        if self.Spatial.CDMatrix is not None:
             wcs.wcs.cd = [self.Spatial.CDMatrix[0:2],
                           self.Spatial.CDMatrix[2:4]]
-        elif hasattr(self.Spatial, "Scale"):
+        elif self.Spatial.Scale is not None:
             wcs.wcs.cdelt = self.Spatial.Scale
-            if hasattr(self.Spatial, "Rotation"):
+            if self.Spatial.Rotation is not None:
                 wcs.wcs.crota = self.Spatial.Rotation, self.Spatial.Rotation
 
         return wcs
@@ -436,9 +483,6 @@ class AVM(AVMContainer):
 
         if not pyfits_installed:
             raise Exception("PyWCS is required to use from_wcs()")
-
-        if not hasattr(self, 'Spatial'):
-            self.Spatial = AVMContainer()
 
         if include_full_header:
             self.Spatial.FITSheader = unicode(header)
@@ -454,9 +498,6 @@ class AVM(AVMContainer):
 
         if not pywcs_installed:
             raise Exception("PyWCS is required to use from_wcs()")
-
-        if not hasattr(self, 'Spatial'):
-            self.Spatial = AVMContainer()
 
         # Equinox
 
@@ -505,9 +546,14 @@ class AVM(AVMContainer):
         for name in self.__dict__:
             if isinstance(self.__dict__[name], AVMContainer):
                 for key in self.__dict__[name].__dict__:
-                    format_object(branch, '%s.%s' % (name, key), self.__dict__[name].__dict__[key])
+                    if self.__dict__[name].__dict__[key] is not None:
+                        if key == "_value":
+                            format_object(branch, '%s' % name, self.__dict__[name]._value)
+                        else:
+                            format_object(branch, '%s.%s' % (name, key), self.__dict__[name].__dict__[key])
             else:
-                format_object(branch, name, self.__dict__[name])
+                if self.__dict__[name] is not None:
+                    format_object(branch, name, self.__dict__[name])
 
         # Create XML Tree
         tree = et.ElementTree(root)
