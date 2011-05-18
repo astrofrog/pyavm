@@ -151,6 +151,10 @@ def capitalize(string):
     return string[0].upper() + string[1:]
 
 
+def utf8(value):
+    return unicode(value).encode('utf-8')
+
+
 def auto_type(string):
     '''Try and convert a string to an integer or float'''
     try:
@@ -171,7 +175,7 @@ def format_rdf_seq(parent, seq):
         if type(item) is float:
             li.text = "%.16f" % item
         else:
-            li.text = "%s" % unicode(item)
+            li.text = "%s" % utf8(item)
 
     return element
 
@@ -189,7 +193,7 @@ def format_object(parent, avm_name, content):
         if type(content) is float:
             element.text = "%.16f" % content
         else:
-            element.text = "%s" % unicode(content)
+            element.text = "%s" % utf8(content)
 
     return element
 
@@ -212,7 +216,7 @@ class AVMContainer(object):
                 substring = self.__dict__[family].__str__(indent + 3)
                 if substring != "":
                     if hasattr(self.__dict__[family], '_value'):
-                        string += indent * " " + "%s: %s\n" % (family, unicode(self.__dict__[family]._value))
+                        string += indent * " " + "%s: %s\n" % (family, utf8(self.__dict__[family]._value))
                     else:
                         string += indent * " " + "%s:\n" % family
                     string += substring
@@ -221,13 +225,13 @@ class AVMContainer(object):
                     string += indent * " " + "%s:\n" % family
                     for elem in self.__dict__[family]:
                         if elem is not None:
-                            string += indent * " " + "   * %s\n" % unicode(elem)
+                            string += indent * " " + "   * %s\n" % utf8(elem)
                 else:
                     if self.__dict__[family] is not None:
                         string += indent * " " + \
-                                  "%s: %s\n" % (family, unicode(self.__dict__[family]))
+                                  "%s: %s\n" % (family, utf8(self.__dict__[family]))
 
-        return string.encode('utf-8')
+        return string
 
     def __repr__(self):
         return self.__str__()
@@ -485,7 +489,7 @@ class AVM(AVMContainer):
             raise Exception("PyWCS is required to use from_wcs()")
 
         if include_full_header:
-            self.Spatial.FITSheader = unicode(header)
+            self.Spatial.FITSheader = utf8(header)
 
         if pywcs_installed:
             wcs = pywcs.WCS(header)
@@ -532,7 +536,7 @@ class AVM(AVMContainer):
             register_namespace(namespaces[namespace], namespace)
 
         # Initialize XMP packet
-        packet = u'<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
+        packet = '<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
 
         # Create containing structure
         root = et.Element("{adobe:ns:meta/}xmpmeta")
@@ -564,7 +568,7 @@ class AVM(AVMContainer):
 
         # Rewind and read the contents
         s.seek(0)
-        packet += s.read().encode('utf-8')
+        packet += s.read()
 
         # Close the XMP packet
         packet += '<?xpacket end="w"?>\n'
