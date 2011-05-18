@@ -453,17 +453,18 @@ class AVM(AVMContainer):
         wcs.wcs.ctype[1] = ycoord + cproj
 
         # Find the equinox
-        equinox = self.Spatial.Equinox
-
-        if type(equinox) is str:
-            if equinox == "J2000":
+        if self.Spatial.Equinox is None:
+            warnings.warn("Spatial.Equinox is not present, assuming 2000")
+            wcs.wcs.equinox = 2000.
+        elif type(self.Spatial.Equinox) is str:
+            if self.Spatial.Equinox == "J2000":
                 wcs.wcs.equinox = 2000.
-            elif equinox == "B1950":
+            elif self.Spatial.Equinox == "B1950":
                 wcs.wcs.equinox = 1950.
             else:
-                raise Exception("Unknown equinox: %s" % equinox)
+                raise Exception("Unknown equinox: %s" % self.Spatial.Equinox)
         else:
-            wcs.wcs.equinox = float(equinox)
+            wcs.wcs.equinox = float(self.Spatial.Equinox)
 
         # Set standard WCS parameters
         wcs.naxis1, wcs.naxis2 = self.Spatial.ReferenceDimension
