@@ -573,7 +573,7 @@ class AVM(AVMContainer):
         packet += s.read()
 
         # Close the XMP packet
-        packet += '<?xpacket end="w"?>\n'
+        packet += '<?xpacket end="w"?>'
 
         return packet
 
