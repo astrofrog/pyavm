@@ -25,10 +25,17 @@ def embed_xmp(image_in, image_out, xmp_packet):
         full_xmp_packet += xmp_packet
 
         # Position at which to insert the packet
+
+        # Find SOI
         try:
             position = contents.index('\xff\xd8') + 2
         except:
             raise Exception("Could not find SOI marker")
+
+        # Skip APP0
+        while contents[position:position + 2] == '\xff\xe0':
+            length = struct.unpack('>H', contents[position + 2:position + 4])[0]
+            position = position + length + 2
 
         # Embed packet in image
         f_out = open(image_out, 'wb')
@@ -95,18 +102,18 @@ def embed_xmp(image_in, image_out, xmp_packet):
         position = 4
 
         while True:
-            new_position = struct.unpack(endian + 'I', contents[position:position+4])[0]
+            new_position = struct.unpack(endian + 'I', contents[position:position + 4])[0]
             if new_position == 0:
                 break
             position = new_position
-            number = struct.unpack(endian + 'H', contents[position:position+2])[0]
+            number = struct.unpack(endian + 'H', contents[position:position + 2])[0]
             position = position + 2 + number * 12
 
         # Find file length
         file_length = len(contents)
 
         # Update offset to point to the end of the file
-        contents = contents[:position] + struct.pack(endian + 'I', file_length) + contents[position+4:]
+        contents = contents[:position] + struct.pack(endian + 'I', file_length) + contents[position + 4:]
 
         # Number of directory entries
         ifd = struct.pack(endian + 'H', 1)
