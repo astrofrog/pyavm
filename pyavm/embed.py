@@ -32,8 +32,8 @@ def embed_xmp(image_in, image_out, xmp_packet):
         except:
             raise Exception("Could not find SOI marker")
 
-        # Skip APP0
-        while contents[position:position + 2] == '\xff\xe0':
+        # Skip APP0 and existing APP1
+        while contents[position:position + 2] in ['\xff\xe0', '\xff\xe1']:
             length = struct.unpack('>H', contents[position + 2:position + 4])[0]
             position = position + length + 2
 
