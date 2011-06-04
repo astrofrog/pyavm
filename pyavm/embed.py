@@ -49,19 +49,19 @@ def embed_xmp(image_in, image_out, xmp_packet):
         chunk = 'XML:com.adobe.xmp'
 
         # Null separator
-        chunk += '\xff'
+        chunk += '\x00'
 
         # Compression flag
-        chunk += '\xff'
+        chunk += '\x00'
 
         # Compression method
-        chunk += '\xff'
+        chunk += '\x00'
 
         # Null separator
-        chunk += '\xff'
+        chunk += '\x00'
 
         # Null separator
-        chunk += '\xff'
+        chunk += '\x00'
 
         # Text
         chunk += xmp_packet
