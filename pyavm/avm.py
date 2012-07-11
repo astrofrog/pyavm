@@ -23,6 +23,8 @@ import warnings
 from StringIO import StringIO
 import xml.etree.ElementTree as et
 
+from .specs import SPECS, REVERSE_SPECS
+
 def register_namespace(tag, uri):
     try:
         et.register_namespace(tag, uri)
@@ -41,94 +43,7 @@ try:
 except:
     pyfits_installed = False
 
-from pyavm.embed import embed_xmp
-
-# Define acceptable tags to avoid reading in non-AVM meta-data
-
-tags = {}
-
-tags['photoshop'] = {}
-tags['xapRights'] = {}
-tags['Iptc4xmpCore'] = {}
-tags['dc'] = {}
-tags['avm'] = {}
-
-# Metadata Tag Definitions
-
-# Creator Metadata
-
-tags['photoshop']['Source'] = 'Creator'
-tags['Iptc4xmpCore']['CiUrlWork'] = 'CreatorURL'
-tags['dc']['creator'] = 'Contact.Name'
-tags['Iptc4xmpCore']['CiEmailWork'] = 'Contact.Email'
-tags['Iptc4xmpCore']['CiTelWork'] = 'Contact.Telephone'
-tags['Iptc4xmpCore']['CiAdrExtadr'] = 'Contact.Address'
-tags['Iptc4xmpCore']['CiAdrCity'] = 'Contact.City'
-tags['Iptc4xmpCore']['CiAdrRegion'] = 'Contact.StateProvince'
-tags['Iptc4xmpCore']['CiAdrPcode'] = 'Contact.PostalCode'
-tags['Iptc4xmpCore']['CiAdrCtry'] = 'Contact.Country'
-tags['xapRights']['UsageTerms'] = 'Rights'
-
-# Content Metadata
-
-tags['dc']['title'] = 'Title'
-tags['photoshop']['Headline'] = 'Headline'
-tags['dc']['description'] = 'Description'
-tags['avm']['Subject.Category'] = 'Subject.Category'
-tags['dc']['subject'] = 'Subject.Name'
-tags['avm']['Distance'] = 'Distance'
-tags['avm']['Distance.Notes'] = 'Distance.Notes'
-tags['avm']['ReferenceURL'] = 'ReferenceURL'
-tags['photoshop']['Credit'] = 'Credit'
-tags['photoshop']['DateCreated'] = 'Date'
-tags['avm']['ID'] = 'ID'
-tags['avm']['Type'] = 'Type'
-tags['avm']['Image.ProductQuality'] = 'Image.ProductQuality'
-
-# Observation Metadata
-
-tags['avm']['Facility'] = 'Facility'
-tags['avm']['Instrument'] = 'Instrument'
-tags['avm']['Spectral.ColorAssignment'] = 'Spectral.ColorAssignment'
-tags['avm']['Spectral.Band'] = 'Spectral.Band'
-tags['avm']['Spectral.Bandpass'] = 'Spectral.Bandpass'
-tags['avm']['Spectral.CentralWavelength'] = 'Spectral.CentralWavelength'
-tags['avm']['Spectral.Notes'] = 'Spectral.Notes'
-tags['avm']['Temporal.StartTime'] = 'Temporal.StartTime'
-tags['avm']['Temporal.IntegrationTime'] = 'Temporal.IntegrationTime'
-tags['avm']['DatasetID'] = 'DatasetID'
-
-# Coordinate Metadata
-
-tags['avm']['Spatial.CoordinateFrame'] = 'Spatial.CoordinateFrame'
-tags['avm']['Spatial.Equinox'] = 'Spatial.Equinox'
-tags['avm']['Spatial.ReferenceValue'] = 'Spatial.ReferenceValue'
-tags['avm']['Spatial.ReferenceDimension'] = 'Spatial.ReferenceDimension'
-tags['avm']['Spatial.ReferencePixel'] = 'Spatial.ReferencePixel'
-tags['avm']['Spatial.Scale'] = 'Spatial.Scale'
-tags['avm']['Spatial.Rotation'] = 'Spatial.Rotation'
-tags['avm']['Spatial.CoordsystemProjection'] = 'Spatial.CoordsystemProjection'
-tags['avm']['Spatial.Quality'] = 'Spatial.Quality'
-tags['avm']['Spatial.Notes'] = 'Spatial.Notes'
-tags['avm']['Spatial.FITSheader'] = 'Spatial.FITSheader'
-tags['avm']['Spatial.CDMatrix'] = 'Spatial.CDMatrix'
-
-# Published Metadata
-
-tags['avm']['Publisher'] = 'Publisher'
-tags['avm']['PublisherID'] = 'PublisherID'
-tags['avm']['ResourceID'] = 'ResourceID'
-tags['avm']['ResourceURL'] = 'ResourceURL'
-tags['avm']['RelatedResources'] = 'RelatedResources'
-tags['avm']['MetadataDate'] = 'MetadataDate'
-tags['avm']['MetadataVersion'] = 'MetadataVersion'
-
-# Define reverse dictionary for above tags
-
-reverse_tags = {}
-for tag in tags:
-    for name in tags[tag]:
-        reverse_tags[tags[tag][name]] = (tag, name)
+from .embed import embed_xmp
 
 # Define namespace to tag mapping
 
@@ -165,38 +80,6 @@ def auto_type(string):
             return float(string)
         except:
             return string
-
-
-def format_rdf_seq(parent, seq):
-
-    element = et.SubElement(parent, "rdf:Seq")
-
-    for item in seq:
-        li = et.SubElement(element, "rdf:li")
-        if type(item) is float:
-            li.text = "%.16f" % item
-        else:
-            li.text = "%s" % utf8(item)
-
-    return element
-
-
-def format_object(parent, avm_name, content):
-
-    tag, name = reverse_tags[avm_name]
-    uri = reverse_namespaces[tag]
-
-    element = et.SubElement(parent, "{%s}%s" % (uri, name))
-
-    if type(content) in [list, tuple]:
-        format_rdf_seq(element, content)
-    else:
-        if type(content) is float:
-            element.text = "%.16f" % content
-        else:
-            element.text = "%s" % utf8(content)
-
-    return element
 
 
 class AVMContainer(object):
@@ -319,9 +202,12 @@ class AVM(AVMContainer):
     At this time, only JPG and PNG files are supported for embedding.
     '''
 
-    def __init__(self, *args):
+    def __init__(self, origin=None, version="1.1"):
 
-        for avm_name in reverse_tags:
+        self.__dict__['specs'] = SPECS[version]
+        self.__dict__['reverse_specs'] = REVERSE_SPECS[version]
+
+        for avm_name in self.specs:
 
             if "Distance" in avm_name:
                 if not "Distance" in self.__dict__:
@@ -338,22 +224,25 @@ class AVM(AVMContainer):
                 else:
                     self.__dict__[avm_name] = None
 
-        if len(args) == 1:
-            if type(args[0]) is str:
-                self.from_file(args[0])
-            elif pyfits_installed and isinstance(args[0], pyfits.Header):
-                self.from_header(args[0])
-            elif pywcs_installed and isinstance(args[0], pywcs.WCS):
-                self.from_wcs(args[0])
+        if origin is not None:
+            if type(origin) is str:
+                self.from_file(origin)
+            elif pyfits_installed and isinstance(origin, pyfits.Header):
+                self.from_header(origin)
+            elif pywcs_installed and isinstance(origin, pywcs.WCS):
+                self.from_wcs(origin)
             else:
-                raise Exception("Unknown arguemnt type: %s" % type(args[0]))
-        elif len(args) > 1:
-            raise Exception("Too many arguments")
+                raise Exception("Unknown arguemnt type: %s" % type(origin))
 
     def __setattr__(self, attribute, value):
-        if attribute not in self.__dict__:
+
+        if attribute not in self.specs:
             raise Exception("%s is not a valid AVM group or tag" % attribute)
-        elif isinstance(self.__dict__[attribute], AVMContainer):
+
+        avm_class = self.specs[attribute]
+        value = avm_class.check_data(value)
+
+        if isinstance(self.__dict__[attribute], AVMContainer):
             if hasattr(self.__dict__[attribute], "_value"):
                 self.__dict__[attribute]._value = value
             else:
@@ -389,11 +278,13 @@ class AVM(AVMContainer):
 
             content = avm_content[(tag, name)]
 
-            if name in tags[tag]:
+            if (tag, name) in self.reverse_specs:
 
-                avm_name = tags[tag][name]
+                avm_name = self.reverse_specs[tag, name]
 
                 # Add to AVM dictionary
+                avm_class = self.specs[avm_name]
+                content = avm_class.check_data(content)
                 if "." in avm_name:
                     family, key = avm_name.split('.')
                     self.__dict__[family].__dict__[key] = content
@@ -529,7 +420,7 @@ class AVM(AVMContainer):
 
         self.Spatial.Quality = "Full"
 
-    def to_xmp(self):
+    def to_xml(self):
 
         # Register namespaces
         register_namespace('x', "adobe:ns:meta/")
@@ -537,16 +428,12 @@ class AVM(AVMContainer):
         for namespace in namespaces:
             register_namespace(namespaces[namespace], namespace)
 
-        # Initialize XMP packet
-        packet = '<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
-
         # Create containing structure
         root = et.Element("{adobe:ns:meta/}xmpmeta")
         trunk = et.SubElement(root, "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}RDF")
         branch = et.SubElement(trunk, "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}Description")
 
-        # Write meta-data version
-        format_object(branch, "MetadataVersion", "1.1")
+        self.MetadataVersion = 1.1
 
         # Write all the elements
         for name in self.__dict__:
@@ -554,12 +441,15 @@ class AVM(AVMContainer):
                 for key in self.__dict__[name].__dict__:
                     if self.__dict__[name].__dict__[key] is not None:
                         if key == "_value":
-                            format_object(branch, '%s' % name, self.__dict__[name]._value)
+                            avm_class = self.specs['%s' % name]
+                            avm_class.to_xml(branch, self.__dict__[name]._value)
                         else:
-                            format_object(branch, '%s.%s' % (name, key), self.__dict__[name].__dict__[key])
+                            avm_class = self.specs['%s.%s' % (name, key)]
+                            avm_class.to_xml(branch, self.__dict__[name].__dict__[key])
             else:
-                if self.__dict__[name] is not None:
-                    format_object(branch, name, self.__dict__[name])
+                if self.__dict__[name] is not None and name in self.specs:
+                    avm_class = self.specs[name]
+                    avm_class.to_xml(branch, self.__dict__[name])
 
         # Create XML Tree
         tree = et.ElementTree(root)
@@ -570,9 +460,14 @@ class AVM(AVMContainer):
 
         # Rewind and read the contents
         s.seek(0)
-        packet += s.read()
+        xml_string = s.read()
 
-        # Close the XMP packet
+        return xml_string
+
+    def to_xmp(self):
+
+        packet = '<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
+        packet += self.to_xml()
         packet += '<?xpacket end="w"?>'
 
         return packet

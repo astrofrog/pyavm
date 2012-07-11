@@ -9,19 +9,19 @@
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #      * Redistributions of source code must retain the above copyright
 #        notice, this list of conditions and the following disclaimer.
-# 
+#
 #      * Redistributions in binary form must reproduce the above copyright
 #        notice, this list of conditions and the following disclaimer in the
 #        documentation and/or other materials provided with the distribution.
-# 
-#      * Neither the name of the European Space Agency, European Southern 
-#        Observatory nor the names of its contributors may be used to endorse or 
-#        promote products derived from this software without specific prior 
+#
+#      * Neither the name of the European Space Agency, European Southern
+#        Observatory nor the names of its contributors may be used to endorse or
+#        promote products derived from this software without specific prior
 #        written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY ESA/ESO ``AS IS'' AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 # MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -41,87 +41,88 @@ Specification for various versions of AVM
 
 from .datatypes import *
 from .cv import *
-from .consts import *
 
+SPECS = {}
 
-AVM_SCHEMAS = {
-    XMP_NS_IPTCCore: 'Iptc4xmpCore',
-    XMP_NS_DC: 'dc',
-    XMP_NS_AVM: 'avm',
-    XMP_NS_XMP: 'xmpRights',
-    XMP_NS_Photoshop: 'photoshop',
-}
-
-SPECS_1_1 = {
+SPECS['1.1'] = {
 
     # Creator Metadata
-    'Creator' : AVMString(XMP_NS_Photoshop, 'photoshop:Source'),
-    'CreatorURL': AVMURL(XMP_NS_IPTCCore, 'Iptc4xmpCore:CreatorContactInfo/Iptc4xmpCore:CiUrlWork'),
-    'Contact.Name': AVMOrderedList(XMP_NS_DC, 'dc:creator'),
-    'Contact.Email': AVMEmail(XMP_NS_IPTCCore, 'Iptc4xmpCore:CreatorContactInfo/Iptc4xmpCore:CiEmailWork'),
-    'Contact.Address': AVMString(XMP_NS_IPTCCore, 'Iptc4xmpCore:CreatorContactInfo/Iptc4xmpCore:CiAdrExtadr'),
-    'Contact.Telephone': AVMString(XMP_NS_IPTCCore, 'Iptc4xmpCore:CreatorContactInfo/Iptc4xmpCore:CiTelWork'),
-    'Contact.City': AVMString(XMP_NS_IPTCCore, 'Iptc4xmpCore:CreatorContactInfo/Iptc4xmpCore:CiAdrCity'),
-    'Contact.StateProvince': AVMString(XMP_NS_IPTCCore, 'Iptc4xmpCore:CreatorContactInfo/Iptc4xmpCore:CiAdrRegion'),
-    'Contact.PostalCode': AVMString(XMP_NS_IPTCCore, 'Iptc4xmpCore:CreatorContactInfo/Iptc4xmpCore:CiAdrPcode'),
-    'Contact.Country': AVMString(XMP_NS_IPTCCore, 'Iptc4xmpCore:CreatorContactInfo/Iptc4xmpCore:CiAdrCtry'),
-    'Rights': AVMLocalizedString(XMP_NS_XMP_Rights, 'xmpRights:UsageTerms'),
-    
+    'Creator' : AVMString('photoshop:Source'),
+    'CreatorURL': AVMURL('Iptc4xmpCore:CreatorContactInfo.CiUrlWork'),
+    'Contact.Name': AVMOrderedList('dc:creator'),
+    'Contact.Email': AVMEmail('Iptc4xmpCore:CreatorContactInfo.CiEmailWork'),
+    'Contact.Address': AVMString('Iptc4xmpCore:CreatorContactInfo.CiAdrExtadr'),
+    'Contact.Telephone': AVMString('Iptc4xmpCore:CreatorContactInfo.CiTelWork'),
+    'Contact.City': AVMString('Iptc4xmpCore:CreatorContactInfo.CiAdrCity'),
+    'Contact.StateProvince': AVMString('Iptc4xmpCore:CreatorContactInfo.CiAdrRegion'),
+    'Contact.PostalCode': AVMString('Iptc4xmpCore:CreatorContactInfo.CiAdrPcode'),
+    'Contact.Country': AVMString('Iptc4xmpCore:CreatorContactInfo.CiAdrCtry'),
+    'Rights': AVMLocalizedString('xmpRights:UsageTerms'),
+
     # Content Metadata
-    'Title': AVMLocalizedString(XMP_NS_DC, 'dc:title'),
-    'Headline': AVMString(XMP_NS_Photoshop, 'photoshop:Headline'),
-    'Description': AVMLocalizedString(XMP_NS_DC, 'dc:description'),
-    'Subject.Category': AVMUnorderedStringList(XMP_NS_AVM, 'avm:Subject.Category'),
-    'Subject.Name': AVMUnorderedStringList(XMP_NS_DC, 'dc:subject'),
-    'Distance': AVMOrderedFloatList(XMP_NS_AVM, 'avm:Distance', length=2, strict_length=False),
-    'Distance.Notes': AVMString(XMP_NS_AVM, 'avm:Distance.Notes'),
-    'ReferenceURL': AVMURL(XMP_NS_AVM, 'avm:ReferenceURL'),
-    'Credit': AVMString(XMP_NS_Photoshop, 'photoshop:Credit'),
-    'Date': AVMDateTime(XMP_NS_Photoshop, 'photoshop:DateCreated'),
-    'ID': AVMString(XMP_NS_AVM, 'avm:ID'),
-    'Type': AVMStringCVCapitalize(XMP_NS_AVM, 'avm:Type', TYPE_CHOICES),
-    'Image.ProductQuality': AVMStringCVCapitalize(XMP_NS_AVM, 'avm:Image.ProductQuality', IMAGE_PRODUCT_QUALITY_CHOICES),
-    
+    'Title': AVMLocalizedString('dc:title'),
+    'Headline': AVMString('photoshop:Headline'),
+    'Description': AVMLocalizedString('dc:description'),
+    'Subject.Category': AVMUnorderedStringList('avm:Subject.Category'),
+    'Subject.Name': AVMUnorderedStringList('dc:subject'),
+    'Distance': AVMOrderedFloatList('avm:Distance', length=2, strict_length=False),
+    'Distance.Notes': AVMString('avm:Distance.Notes'),
+    'ReferenceURL': AVMURL('avm:ReferenceURL'),
+    'Credit': AVMString('photoshop:Credit'),
+    'Date': AVMDateTime('photoshop:DateCreated'),
+    'ID': AVMString('avm:ID'),
+    'Type': AVMStringCVCapitalize('avm:Type', TYPE_CHOICES),
+    'Image.ProductQuality': AVMStringCVCapitalize('avm:Image.ProductQuality', IMAGE_PRODUCT_QUALITY_CHOICES),
+
     # Observation Metadata
-    'Facility': AVMOrderedList(XMP_NS_AVM, 'avm:Facility'),
-    'Instrument': AVMOrderedList(XMP_NS_AVM, 'avm:Instrument'),
-    'Spectral.ColorAssignment': AVMOrderedListCV(XMP_NS_AVM, 'avm:Spectral.ColorAssignment', SPECTRAL_COLOR_ASSIGNMENT_CHOICES),
-    'Spectral.Band': AVMOrderedListCV(XMP_NS_AVM, 'avm:Spectral.Band', SPECTRAL_BAND_CHOICES),
-    'Spectral.Bandpass': AVMOrderedList(XMP_NS_AVM, 'avm:Spectral.Bandpass'),
-    'Spectral.CentralWavelength': AVMOrderedFloatList(XMP_NS_AVM, 'avm:Spectral.CentralWavelength'),
-    'Spectral.Notes': AVMLocalizedString(XMP_NS_AVM, 'avm:Spectral.Notes'),
-    'Temporal.StartTime': AVMDateTimeList(XMP_NS_AVM, 'avm:Temporal.StartTime'),
-    'Temporal.IntegrationTime': AVMOrderedFloatList(XMP_NS_AVM, 'avm:Temporal.IntegrationTime'),
-    'DatasetID': AVMOrderedList(XMP_NS_AVM, 'avm:DatasetID'),
-    
+    'Facility': AVMOrderedList('avm:Facility'),
+    'Instrument': AVMOrderedList('avm:Instrument'),
+    'Spectral.ColorAssignment': AVMOrderedListCV('avm:Spectral.ColorAssignment', SPECTRAL_COLOR_ASSIGNMENT_CHOICES),
+    'Spectral.Band': AVMOrderedListCV('avm:Spectral.Band', SPECTRAL_BAND_CHOICES),
+    'Spectral.Bandpass': AVMOrderedList('avm:Spectral.Bandpass'),
+    'Spectral.CentralWavelength': AVMOrderedFloatList('avm:Spectral.CentralWavelength'),
+    'Spectral.Notes': AVMLocalizedString('avm:Spectral.Notes'),
+    'Temporal.StartTime': AVMDateTimeList('avm:Temporal.StartTime'),
+    'Temporal.IntegrationTime': AVMOrderedFloatList('avm:Temporal.IntegrationTime'),
+    'DatasetID': AVMOrderedList('avm:DatasetID'),
+
     # Coordinate Metadata
-    'Spatial.CoordinateFrame': AVMStringCVUpper(XMP_NS_AVM, 'avm:Spatial.CoordinateFrame', SPATIAL_COORDINATE_FRAME_CHOICES),
-    'Spatial.Equinox': AVMStringCVUpper(XMP_NS_AVM, 'avm:Spatial.Equinox', SPATIAL_EQUINOX_CHOICES),
-    'Spatial.ReferenceValue': AVMOrderedFloatList(XMP_NS_AVM, 'avm:Spatial.ReferenceValue', length=2, strict_length=True),
-    'Spatial.ReferenceDimension': AVMOrderedFloatList(XMP_NS_AVM, 'avm:Spatial.ReferenceDimension', length=2, strict_length=True),
-    'Spatial.ReferencePixel': AVMOrderedFloatList(XMP_NS_AVM, 'avm:Spatial.ReferencePixel', length=2, strict_length=True),
-    'Spatial.Scale': AVMOrderedFloatList(XMP_NS_AVM, 'avm:Spatial.Scale', length=2, strict_length=True),
-    'Spatial.Rotation': AVMFloat(XMP_NS_AVM, 'avm:Spatial.Rotation'),
-    'Spatial.CoordsystemProjection': AVMStringCVUpper(XMP_NS_AVM, 'avm:Spatial.CoordsystemProjection', SPATIAL_COORDSYSTEM_PROJECTION_CHOICES),
-    'Spatial.Quality': AVMStringCVCapitalize(XMP_NS_AVM, 'avm:Spatial.Quality', SPATIAL_QUALITY_CHOICES),
-    'Spatial.Notes': AVMLocalizedString(XMP_NS_AVM, 'avm:Spatial.Notes'),
-    'Spatial.FITSheader': AVMString(XMP_NS_AVM, 'avm:Spatial.FITSheader'),
-    'Spatial.CDMatrix': AVMOrderedFloatList(XMP_NS_AVM, 'avm:Spatial.CDMatrix', length=4, strict_length=True, deprecated=True),
-    
+    'Spatial.CoordinateFrame': AVMStringCVUpper('avm:Spatial.CoordinateFrame', SPATIAL_COORDINATE_FRAME_CHOICES),
+    'Spatial.Equinox': AVMStringCVUpper('avm:Spatial.Equinox', SPATIAL_EQUINOX_CHOICES),
+    'Spatial.ReferenceValue': AVMOrderedFloatList('avm:Spatial.ReferenceValue', length=2, strict_length=True),
+    'Spatial.ReferenceDimension': AVMOrderedFloatList('avm:Spatial.ReferenceDimension', length=2, strict_length=True),
+    'Spatial.ReferencePixel': AVMOrderedFloatList('avm:Spatial.ReferencePixel', length=2, strict_length=True),
+    'Spatial.Scale': AVMOrderedFloatList('avm:Spatial.Scale', length=2, strict_length=True),
+    'Spatial.Rotation': AVMFloat('avm:Spatial.Rotation'),
+    'Spatial.CoordsystemProjection': AVMStringCVUpper('avm:Spatial.CoordsystemProjection', SPATIAL_COORDSYSTEM_PROJECTION_CHOICES),
+    'Spatial.Quality': AVMStringCVCapitalize('avm:Spatial.Quality', SPATIAL_QUALITY_CHOICES),
+    'Spatial.Notes': AVMLocalizedString('avm:Spatial.Notes'),
+    'Spatial.FITSheader': AVMString('avm:Spatial.FITSheader'),
+    'Spatial.CDMatrix': AVMOrderedFloatList('avm:Spatial.CDMatrix', length=4, strict_length=True, deprecated=True),
+
     # Publisher Metadata
-    'Publisher': AVMString(XMP_NS_AVM, 'avm:Publisher'),
-    'PublisherID': AVMString(XMP_NS_AVM, 'avm:PublisherID'),
-    'ResourceID': AVMString(XMP_NS_AVM, 'avm:ResourceID'),
-    'ResourceURL': AVMURL(XMP_NS_AVM, 'avm:ResourceURL'),
-    'RelatedResources': AVMUnorderedStringList(XMP_NS_AVM, 'avm:RelatedResources'),
-    'MetadataDate': AVMDateTime(XMP_NS_AVM, 'avm:MetadataDate'),
-    'MetadataVersion': AVMFloat(XMP_NS_AVM, 'avm:MetadataVersion'),
+    'Publisher': AVMString('avm:Publisher'),
+    'PublisherID': AVMString('avm:PublisherID'),
+    'ResourceID': AVMString('avm:ResourceID'),
+    'ResourceURL': AVMURL('avm:ResourceURL'),
+    'RelatedResources': AVMUnorderedStringList('avm:RelatedResources'),
+    'MetadataDate': AVMDateTime('avm:MetadataDate'),
+    'MetadataVersion': AVMFloat('avm:MetadataVersion'),
 }
 
-SPECS_1_2 = SPECS_1_1
+SPECS['1.2'] = SPECS['1.1']
 
 # Content Metadata
 
-SPECS_1_2['PublicationID'] = AVMUnorderedStringList(XMP_NS_AVM, 'avm:PublicationID')
-SPECS_1_2['ProposalID'] = AVMUnorderedStringList(XMP_NS_AVM, 'avm:ProposalID')
-SPECS_1_2["RelatedResources"] = AVMUnorderedStringList(XMP_NS_AVM, 'avm:RelatedResources', deprecated=True)
+SPECS['1.2']['PublicationID'] = AVMUnorderedStringList('avm:PublicationID')
+SPECS['1.2']['ProposalID'] = AVMUnorderedStringList('avm:ProposalID')
+SPECS['1.2']["RelatedResources"] = AVMUnorderedStringList('avm:RelatedResources', deprecated=True)
+
+# Create reverse lookup
+
+REVERSE_SPECS = {}
+for spec in SPECS:
+    REVERSE_SPECS[spec] = {}
+    for key in SPECS[spec]:
+        value = SPECS[spec][key]
+        REVERSE_SPECS[spec][value.namespace, value.tag] = key

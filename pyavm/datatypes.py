@@ -2,9 +2,27 @@ import re
 import time
 import datetime
 from dateutil import parser
+import xml.etree.ElementTree as et
 
-from .core import _encode_as_utf8
 from .exceptions import AVMItemNotInControlledVocabularyError, AVMListLengthError
+
+
+def _encode_as_utf8( obj, input_encoding=None ):
+    """
+    Helper function to ensure that a proper string object in UTF-8 encoding.
+
+    If obj is not a string, it will try to convert the object into a unicode
+    string and thereafter encode as UTF-8.
+    """
+    if isinstance( obj, unicode ):
+        return obj.encode('utf-8')
+    elif isinstance( obj, str ):
+        if not input_encoding or input_encoding == 'utf-8':
+            return obj
+        else:
+            return obj.decode(input_encoding).encode('utf-8')
+    else:
+        return unicode( obj ).encode('utf-8')
 
 
 __all__ = [
@@ -25,15 +43,25 @@ __all__ = [
 ]
 
 
+namespaces = {}
+namespaces['http://www.communicatingastronomy.org/avm/1.0/'] = 'avm'
+namespaces['http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/'] = 'Iptc4xmpCore'
+namespaces['http://purl.org/dc/elements/1.1/'] = 'dc'
+namespaces['http://ns.adobe.com/photoshop/1.0/'] = 'photoshop'
+namespaces['http://ns.adobe.com/xap/1.0/rights/'] = 'xmpRights'
+
+reverse_namespaces = {}
+for key in namespaces:
+    reverse_namespaces[namespaces[key]] = key
+
 class AVMData(object):
     """
     Abstract AVM data class.  All other data classes inherit from AVMData.
     """
 
-    def __init__(self, ns, path, deprecated=False, **kwargs):
+    def __init__(self, path, deprecated=False, **kwargs):
         """ """
-        self.namespace = ns
-        self.path = path
+        self.namespace, self.tag = path.split(':')
         self.deprecated = deprecated
 
     def check_data(self, value):
@@ -59,10 +87,18 @@ class AVMString(AVMData):
         """
         if not value:
             return None
+        if isinstance(value, (list, tuple)) and len(value) == 1:
+            value = value[0]
         if isinstance(value, str) or isinstance(value, unicode):
             return _encode_as_utf8(value)
         else:
             raise TypeError("Value is not a string or unicode.")
+
+    def to_xml(self, parent, value):
+        uri = reverse_namespaces[self.namespace]
+        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
+        element.text = "%s" % _encode_as_utf8(value)
+        return element
 
 
 class AVMURL(AVMString):
@@ -131,18 +167,22 @@ class AVMEmail(AVMString):
             r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE
         )
 
-        if re.search(email_re, value):
-            return value
-        else:
-            raise ValueError("Enter a proper email address.")
+        # if re.search(email_re, value):
+        #     return value
+        # else:
+        #     raise ValueError("Enter a proper email address.")
 
+        if not re.search(email_re, value):
+            print "WARNING: Enter a proper email address"
+
+        return value
 
 class AVMStringCV(AVMString):
     """ """
 
-    def __init__(self, ns, path, cv, **kwargs):
+    def __init__(self, path, cv, **kwargs):
         self.controlled_vocabulary = cv
-        super(AVMStringCV, self).__init__(ns, path, **kwargs)
+        super(AVMStringCV, self).__init__(path, **kwargs)
 
     def format_data(self, value):
         """
@@ -206,8 +246,19 @@ class AVMStringCVUpper(AVMStringCV):
         """
         return value.upper()
 
+class AVMLocalizedString(AVMString):
+
+    def to_xml(self, parent, value):
+
+        uri = reverse_namespaces[self.namespace]
+        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
+        subelement = et.SubElement(element, "rdf:Alt")
+        li = et.SubElement(subelement, "rdf:li")
+        li.text = "%s" % _encode_as_utf8(value)
+        li.attrib['xml:lang'] = 'x-default'
+        return element
+
 # TODO: implement these
-AVMLocalizedString = AVMString
 AVMDate = AVMString
 AVMDateTime = AVMString
 
@@ -225,22 +276,26 @@ class AVMFloat(AVMData):
         if not value:
             return None
 
-        value = _encode_as_utf8(value)
-
         try:
-            float(value)
+            value = float(value)
         except:
             raise TypeError(
                 "Enter a value that can be represented as a number.")
 
         return value
 
+    def to_xml(self, parent, value):
+        print value
+        uri = reverse_namespaces[self.namespace]
+        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
+        element.text = "%.16f" % value
+        return element
 
 class AVMUnorderedList(AVMData):
     """
     Generic data type for lists (i.e xmp bag arrays)
     """
-    def __init__(self, ns, path, **kwargs):
+    def __init__(self, path, **kwargs):
         # Optional keyword arguments
         if 'length' in kwargs:
             self.length = kwargs['length']
@@ -252,7 +307,7 @@ class AVMUnorderedList(AVMData):
         else:
             self.strict_length = False
 
-        super(AVMUnorderedList, self).__init__(ns, path, **kwargs)
+        super(AVMUnorderedList, self).__init__(path, **kwargs)
 
     def check_length(self, values):
         """
@@ -307,6 +362,21 @@ class AVMUnorderedList(AVMData):
 
         return checked_data
 
+    def to_xml(self, parent, values):
+
+        uri = reverse_namespaces[self.namespace]
+        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
+
+        subelement = et.SubElement(element, "rdf:Bag")
+
+        for item in values:
+            li = et.SubElement(subelement, "rdf:li")
+            if type(item) is float:
+                li.text = "%.16f" % item
+            else:
+                li.text = "%s" % _encode_as_utf8(item)
+
+        return element
 
 class AVMUnorderedStringList(AVMUnorderedList):
     """
@@ -340,22 +410,46 @@ class AVMUnorderedStringList(AVMUnorderedList):
 
         return checked_data
 
+    def to_xml(self, parent, values):
+
+        uri = reverse_namespaces[self.namespace]
+        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
+
+        subelement = et.SubElement(element, "rdf:Bag")
+
+        for item in values:
+            li = et.SubElement(subelement, "rdf:li")
+            li.text = "%s" % _encode_as_utf8(item)
+
+        return element
 
 class AVMOrderedList(AVMUnorderedList):
     """
     Data type for ordered lists (i.e. seq arrays)
     """
-    pass
+    def to_xml(self, parent, values):
 
+        uri = reverse_namespaces[self.namespace]
+        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
+
+        subelement = et.SubElement(element, "rdf:Seq")
+
+        for item in values:
+            li = et.SubElement(subelement, "rdf:li")
+            if type(item) is float:
+                li.text = "%.16f" % item
+            else:
+                li.text = "%s" % _encode_as_utf8(item)
+
+        return element
 
 class AVMOrderedListCV(AVMOrderedList, AVMStringCVCapitalize):
     """
     Data type for an ordered list constrained to a controlled vocabulary.
     """
-    def __init__(self, ns, path, cv, deprecated=False, **kwargs):
+    def __init__(self, path, cv, deprecated=False, **kwargs):
 
-        self.namespace = ns
-        self.path = path
+        self.namespace, self.tag = path.split(':')
         self.deprecated = deprecated
         self.controlled_vocabulary = cv
 
@@ -450,6 +544,20 @@ class AVMOrderedFloatList(AVMOrderedList):
         return checked_data
 
 
+    def to_xml(self, parent, values):
+
+        uri = reverse_namespaces[self.namespace]
+        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
+
+        subelement = et.SubElement(element, "rdf:Bag")
+
+        for item in values:
+            li = et.SubElement(subelement, "rdf:li")
+            li.text = "%.16f" % item
+
+        return element
+
+
 class AVMDateTimeList(AVMOrderedList):
     """
     Data type for lists composed of DateTime objects
@@ -473,6 +581,9 @@ class AVMDateTimeList(AVMOrderedList):
             if value:
                 if (isinstance(value, datetime.date) or isinstance(value, datetime.datetime)):
                     value = _encode_as_utf8(value.isoformat())
+                    checked_data.append(value)
+                elif isinstance(value, basestring):
+                    value = _encode_as_utf8(value)
                     checked_data.append(value)
                 else:
                     raise TypeError("Elements of the list need to be a Python Date or Datetime object.")
