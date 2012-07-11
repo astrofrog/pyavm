@@ -7,22 +7,22 @@ import xml.etree.ElementTree as et
 from .exceptions import AVMItemNotInControlledVocabularyError, AVMListLengthError
 
 
-def _encode_as_utf8( obj, input_encoding=None ):
+def _encode_as_utf8(obj, input_encoding=None):
     """
     Helper function to ensure that a proper string object in UTF-8 encoding.
 
     If obj is not a string, it will try to convert the object into a unicode
     string and thereafter encode as UTF-8.
     """
-    if isinstance( obj, unicode ):
+    if isinstance(obj, unicode):
         return obj.encode('utf-8')
-    elif isinstance( obj, str ):
+    elif isinstance(obj, str):
         if not input_encoding or input_encoding == 'utf-8':
             return obj
         else:
             return obj.decode(input_encoding).encode('utf-8')
     else:
-        return unicode( obj ).encode('utf-8')
+        return unicode(obj).encode('utf-8')
 
 
 __all__ = [
@@ -53,6 +53,7 @@ namespaces['http://ns.adobe.com/xap/1.0/rights/'] = 'xmpRights'
 reverse_namespaces = {}
 for key in namespaces:
     reverse_namespaces[namespaces[key]] = key
+
 
 class AVMData(object):
     """
@@ -177,6 +178,7 @@ class AVMEmail(AVMString):
 
         return value
 
+
 class AVMStringCV(AVMString):
     """ """
 
@@ -246,6 +248,7 @@ class AVMStringCVUpper(AVMStringCV):
         """
         return value.upper()
 
+
 class AVMLocalizedString(AVMString):
 
     def to_xml(self, parent, value):
@@ -290,6 +293,7 @@ class AVMFloat(AVMData):
         element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
         element.text = "%.16f" % value
         return element
+
 
 class AVMUnorderedList(AVMData):
     """
@@ -378,6 +382,7 @@ class AVMUnorderedList(AVMData):
 
         return element
 
+
 class AVMUnorderedStringList(AVMUnorderedList):
     """
     Data type for an unordered list of strings
@@ -423,6 +428,7 @@ class AVMUnorderedStringList(AVMUnorderedList):
 
         return element
 
+
 class AVMOrderedList(AVMUnorderedList):
     """
     Data type for ordered lists (i.e. seq arrays)
@@ -442,6 +448,7 @@ class AVMOrderedList(AVMUnorderedList):
                 li.text = "%s" % _encode_as_utf8(item)
 
         return element
+
 
 class AVMOrderedListCV(AVMOrderedList, AVMStringCVCapitalize):
     """
@@ -542,7 +549,6 @@ class AVMOrderedFloatList(AVMOrderedList):
                 checked_data = []
 
         return checked_data
-
 
     def to_xml(self, parent, values):
 

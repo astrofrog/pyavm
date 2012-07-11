@@ -47,7 +47,7 @@ SPECS = {}
 SPECS['1.1'] = {
 
     # Creator Metadata
-    'Creator' : AVMString('photoshop:Source'),
+    'Creator': AVMString('photoshop:Source'),
     'CreatorURL': AVMURL('Iptc4xmpCore:CreatorContactInfo.CiUrlWork'),
     'Contact.Name': AVMOrderedList('dc:creator'),
     'Contact.Email': AVMEmail('Iptc4xmpCore:CreatorContactInfo.CiEmailWork'),

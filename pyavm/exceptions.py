@@ -29,13 +29,16 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE
 
+
 class AVMListLengthError(Exception):
     """ Raised when a list is not the correct length """
     pass
 
+
 class AVMItemNotInControlledVocabularyError(Exception):
     """ Raise when an string is not in a required controlled vocabulary """
     pass
+
 
 class AVMEmptyValueError(Exception):
     """ Raise when a list is given with no relevant data """
