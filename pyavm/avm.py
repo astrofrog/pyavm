@@ -25,6 +25,7 @@ import xml.etree.ElementTree as et
 
 from .specs import SPECS, REVERSE_SPECS
 
+
 def register_namespace(tag, uri):
     try:
         et.register_namespace(tag, uri)

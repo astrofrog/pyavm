@@ -73,7 +73,7 @@ SPATIAL_QUALITY_CHOICES = [
 ]
 
 METADATA_VERSION_CHOICES = [
-        1.2,
+    1.2,
     1.1,
     1.0,
 ]
