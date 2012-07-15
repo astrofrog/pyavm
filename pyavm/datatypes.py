@@ -93,7 +93,7 @@ class AVMString(AVMData):
         if isinstance(value, str) or isinstance(value, unicode):
             return _encode_as_utf8(value)
         else:
-            raise TypeError("Value is not a string or unicode.")
+            raise TypeError("{0:s} is not a string or unicode".format(self.tag))
 
     def to_xml(self, parent, value):
         uri = reverse_namespaces[self.namespace]
@@ -121,7 +121,7 @@ class AVMURL(AVMString):
             return None
 
         if not (isinstance(value, str) or isinstance(value, unicode)):
-            raise TypeError("Value is not a string or unicode.")
+            raise TypeError("{0:s} is not a string or unicode".format(self.tag))
 
         value = _encode_as_utf8(value)
 
@@ -136,10 +136,10 @@ class AVMURL(AVMString):
             r'(?::\d+)?'  # optional port
             r'(?:/?|/\S+)$', re.IGNORECASE)
 
-        if re.search(url_re, value):
-            return value
-        else:
-            raise ValueError("Enter a proper URL.")
+        if not re.search(url_re, value):
+            warnings.warn("{0:s} is not a valid URL".format(self.tag))
+
+        return value
 
 
 class AVMEmail(AVMString):
@@ -158,7 +158,7 @@ class AVMEmail(AVMString):
         :return: String (UTF-8)
         """
         if not (isinstance(value, str) or isinstance(value, unicode)):
-            raise TypeError("Value is not a string or unicode.")
+            raise TypeError("{0:s} is not a string or unicode".format(self.tag))
 
         value = _encode_as_utf8(value)
 
@@ -168,13 +168,8 @@ class AVMEmail(AVMString):
             r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE
         )
 
-        # if re.search(email_re, value):
-        #     return value
-        # else:
-        #     raise ValueError("Enter a proper email address.")
-
         if not re.search(email_re, value):
-            print "WARNING: Enter a proper email address"
+            warnings.warn("{0:s} is not a valid email address".format(self.tag))
 
         return value
 
@@ -224,7 +219,7 @@ class AVMStringCV(AVMString):
                 raise AVMItemNotInControlledVocabularyError(
                     "Item is not in the controlled vocabulary.")
         else:
-            raise TypeError("Value is not a string or unicode.")
+            raise TypeError("{0:s} is not a string or unicode".format(self.tag))
 
 
 class AVMStringCVCapitalize(AVMStringCV):
