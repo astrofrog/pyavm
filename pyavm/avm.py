@@ -269,7 +269,7 @@ class AVM(AVMContainer):
 
         # Extract XMP packet
         xml = contents[start:end]
-
+        
         # Parse XML
         tree = et.parse(StringIO(xml))
         root = tree.getroot()
@@ -462,7 +462,7 @@ class AVM(AVMContainer):
         # Rewind and read the contents
         s.seek(0)
         xml_string = s.read()
-
+        
         return xml_string
 
     def to_xmp(self):
