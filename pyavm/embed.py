@@ -1,143 +1,90 @@
 import struct
-from zlib import crc32
+
+from .jpeg import is_jpeg, JPEGFile, JPEGSegment
+from .png import is_png, PNGFile, PNGChunk
 
 
 def embed_xmp(image_in, image_out, xmp_packet):
 
-    contents = open(image_in, 'rb').read()
-
-    if image_in.lower().endswith('jpg') or image_in.lower().endswith('jpeg'):
+    if is_jpeg(image_in):
 
         # Check length
         if len(xmp_packet) >= 65503:
             raise Exception("XMP packet is too long to embed in JPG file")
 
+        # XMP segment
+        xmp_segment = JPEGSegment()
+
         # APP1 marker
-        full_xmp_packet = "\xff\xe1"
+        xmp_segment.bytes = "\xff\xe1"
 
         # Length of XMP packet + 2 + 29
-        full_xmp_packet += struct.pack('>H', len(xmp_packet) + 29 + 2)
+        xmp_segment.bytes += struct.pack('>H', len(xmp_packet) + 29 + 2)
 
         # XMP Namespace URI (NULL-terminated)
-        full_xmp_packet += "http://ns.adobe.com/xap/1.0/\x00"
+        xmp_segment.bytes += "http://ns.adobe.com/xap/1.0/\x00"
 
         # XMP packet
-        full_xmp_packet += xmp_packet
+        xmp_segment.bytes += xmp_packet
+
+        # Read in input file
+        jpeg_file = JPEGFile.read(image_in)
+
+        # Need to check there isn't alrady XMP meta-data
 
         # Position at which to insert the packet
+        markers = [x.type for x in jpeg_file.segments]
 
-        # Find SOI
-        try:
-            position = contents.index('\xff\xd8') + 2
-        except:
-            raise Exception("Could not find SOI marker")
+        if 'APP1' in markers: # Put it after existing APP1
+            index = markers.index('APP1') + 1
+        elif 'APP0' in markers: # Put it after existing APP0
+            index = markers.index('APP0') + 1
+        elif 'SOF' in markers:
+            index = markers.index('SOF')
+        else:
+            raise ValueError("Could not find SOF marker")
 
-        # Skip APP0 and existing APP1
-        while contents[position:position + 2] in ['\xff\xe0', '\xff\xe1']:
-            length = struct.unpack('>H', contents[position + 2:position + 4])[0]
-            position = position + length + 2
+        # Insert segment into JPEG file
+        jpeg_file.segments.insert(index, xmp_segment)
+        jpeg_file.write(image_out)
 
-        # Embed packet in image
-        f_out = open(image_out, 'wb')
-        f_out.write(contents[:position])
-        f_out.write(full_xmp_packet)
-        f_out.write(contents[position:])
+    elif is_png(image_in):
 
-    elif image_in.lower().endswith('png'):
+        xmp_chunk = PNGChunk()
 
         # Keyword
-        chunk = 'XML:com.adobe.xmp'
+        xmp_chunk.data = b'XML:com.adobe.xmp'
 
         # Null separator
-        chunk += '\x00'
+        xmp_chunk.data += b'\x00'
 
         # Compression flag
-        chunk += '\x00'
+        xmp_chunk.data += b'\x00'
 
         # Compression method
-        chunk += '\x00'
+        xmp_chunk.data += b'\x00'
 
         # Null separator
-        chunk += '\x00'
+        xmp_chunk.data += b'\x00'
 
         # Null separator
-        chunk += '\x00'
+        xmp_chunk.data += b'\x00'
 
         # Text
-        chunk += xmp_packet
+        xmp_chunk.data += xmp_packet
 
-        # Calculate CRC
-        crc = struct.pack('>i', crc32('iTXt' + chunk))
+        # Set type
+        xmp_chunk.type = b'iTXt'
 
-        # Find chunk length
-        length = struct.pack('>I', len(chunk))
+        # Read in input file
+        png_file = PNGFile.read(image_in)
 
-        # Make full packet
-        full_xmp_packet = length + 'iTXt' + chunk + crc
+        # Need to check there isn't alrady XMP meta-data
 
-        # Position at which to insert the packet
-        if contents[12:16] == 'IHDR':
-            header_length = struct.unpack('>I', contents[8:12])[0]
-            position = 20 + header_length
-        else:
-            raise Exception("Expected IHDR chunk in PNG file to appear first")
-
-        # Embed packet in image
-        f_out = open(image_out, 'wb')
-        f_out.write(contents[:position])
-        f_out.write(full_xmp_packet)
-        f_out.write(contents[position:])
-
-    elif image_in.lower().endswith('tif') or image_in.lower().endswith('tiff'):
-
-        # Identify byte order (little endian or big endian)
-        byte_order = contents[:2]
-        if byte_order == 'II':
-            endian = '<'
-        elif byte_order == 'MM':
-            endian = '>'
-        else:
-            raise Exception("Unexpected byte order: %s" % byte_order)
-
-        position = 4
-
-        while True:
-            new_position = struct.unpack(endian + 'I', contents[position:position + 4])[0]
-            if new_position == 0:
-                break
-            position = new_position
-            number = struct.unpack(endian + 'H', contents[position:position + 2])[0]
-            position = position + 2 + number * 12
-
-        # Find file length
-        file_length = len(contents)
-
-        # Update offset to point to the end of the file
-        contents = contents[:position] + struct.pack(endian + 'I', file_length) + contents[position + 4:]
-
-        # Number of directory entries
-        ifd = struct.pack(endian + 'H', 1)
-
-        # Field identification
-        ifd += struct.pack(endian + 'H', 700)
-
-        # Field type
-        ifd += struct.pack(endian + 'H', 1)
-
-        # XMP packet length
-        ifd += struct.pack(endian + 'I', len(xmp_packet))
-
-        # XMP packet
-        ifd += struct.pack(endian + 'I', file_length + 18)
-
-        # End of file
-        ifd += struct.pack(endian + 'I', 0)
-
-        # Embed packet in image
-        f_out = open(image_out, 'wb')
-        f_out.write(contents)
-        f_out.write(ifd)
-        f_out.write(xmp_packet)
+        # Insert chunk into PNG file
+        png_file.chunks.insert(1, xmp_chunk)
+        png_file.write(image_out)
 
     else:
-        raise Exception("Only JPG, PNG, and TIFF files are supported at this time")
+
+        raise Exception("Only JPG and PNG files are supported at this time")
