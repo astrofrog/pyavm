@@ -1,5 +1,5 @@
 # PyAVM - Simple pure-python AVM meta-data handling
-# Copyright (c) 2011 Thomas P. Robitaille
+# Copyright (c) 2011-13 Thomas P. Robitaille
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -33,16 +33,11 @@ def register_namespace(tag, uri):
         et._namespace_map[uri] = tag
 
 try:
-    import pywcs
-    pywcs_installed = True
-except:
-    pywcs_installed = False
-
-try:
-    import pyfits
-    pyfits_installed = True
-except:
-    pyfits_installed = False
+    from astropy.wcs import WCS
+    from astropy.io import fits
+    astropy_installed = True
+except ImportError:
+    astropy_installed = False
 
 from .embed import embed_xmp
 
@@ -114,7 +109,7 @@ class AVMContainer(object):
                 else:
                     if self.__dict__[family] is not None:
                         string += indent * " " + \
-                                  "%s: %s\n" % (family, utf8(self.__dict__[family]))
+                            "%s: %s\n" % (family, utf8(self.__dict__[family]))
 
         return string
 
@@ -168,13 +163,14 @@ def parse_avm_content(rdf):
 
 class AVM(AVMContainer):
     '''
-    To parse AVM meta-data from an existing file, simply create an instance of this class using the filename of the image (or any file-like object):
+    To parse AVM meta-data from an existing file, simply create an instance of
+    this class using the filename of the image (or any file-like object):
 
         >>> avm = AVM('myexample.jpg')
 
     Then, you can view the contents by using
 
-        >>> print avm
+        >>> print(avm)
 
     or
 
@@ -188,12 +184,12 @@ class AVM(AVMContainer):
         >>> avm.Publisher
         'Chandra X-ray Observatory'
 
-    It is also possible to initialize an AVM object using a pywcs.WCS instance:
+    It is also possible to initialize an AVM object using an Astropy WCS instance:
 
-        >>> import pyfits
-        >>> import pywcs
+        >>> from astropy.io import fits
+        >>> from astropy.wcs import WCS
         >>> from pyavm import AVM
-        >>> wcs = pywcs.WCS(pyfits.getheader('image.fits'))
+        >>> wcs = WCS(fits.getheader('image.fits'))
         >>> avm = AVM(wcs)
 
     Finally, it is possible to embed AVM meta-data into an image file:
@@ -203,7 +199,7 @@ class AVM(AVMContainer):
     At this time, only JPG and PNG files are supported for embedding.
     '''
 
-    def __init__(self, origin=None, version="1.1"):
+    def __init__(self, origin=None, version="1.2"):
 
         self.__dict__['specs'] = SPECS[version]
         self.__dict__['reverse_specs'] = REVERSE_SPECS[version]
@@ -228,12 +224,12 @@ class AVM(AVMContainer):
         if origin is not None:
             if type(origin) is str:
                 self.from_file(origin)
-            elif pyfits_installed and isinstance(origin, pyfits.Header):
+            elif astropy_installed and isinstance(origin, fits.Header):
                 self.from_header(origin)
-            elif pywcs_installed and isinstance(origin, pywcs.WCS):
+            elif astropy_installed and isinstance(origin, WCS):
                 self.from_wcs(origin)
             else:
-                raise Exception("Unknown arguemnt type: %s" % type(origin))
+                raise Exception("Unknown argument type: %s" % type(origin))
 
     def __setattr__(self, attribute, value):
 
@@ -301,19 +297,19 @@ class AVM(AVMContainer):
 
     def to_wcs(self, use_full_header=False):
         '''
-        Convert AVM projection information into a pywcs.WCS object
+        Convert AVM projection information into a astropy.wcs.WCS object
         '''
 
-        if not pywcs_installed:
-            raise Exception("PyWCS is required to use to_wcs()")
+        if not astropy_installed:
+            raise Exception("Astropy is required to use to_wcs()")
 
         if use_full_header and self.Spatial.FITSheader is not None:
             print "Using full FITS header from Spatial.FITSheader"
-            header = pyfits.Header(txtfile=StringIO(self.Spatial.FITSheader))
-            return pywcs.WCS(header)
+            header = fits.Header(txtfile=StringIO(self.Spatial.FITSheader))
+            return WCS(header)
 
         # Initializing WCS object
-        wcs = pywcs.WCS(naxis=2)
+        wcs = WCS(naxis=2)
 
         # Find the coordinate type
         if self.Spatial.CoordinateFrame is not None:
@@ -379,23 +375,23 @@ class AVM(AVMContainer):
         Convert a FITS header into AVM information
         '''
 
-        if not pyfits_installed:
-            raise Exception("PyWCS is required to use from_wcs()")
+        if not astropy_installed:
+            raise Exception("Astropy is required to use from_wcs()")
 
         if include_full_header:
             self.Spatial.FITSheader = utf8(header)
 
-        if pywcs_installed:
-            wcs = pywcs.WCS(header)
+        if astropy_installed:
+            wcs = WCS(header)
             self.from_wcs(wcs)
 
     def from_wcs(self, wcs):
         '''
-        Convert a pywcs.WCS object into AVM information
+        Convert a astropy.wcs.WCS object into AVM information
         '''
 
-        if not pywcs_installed:
-            raise Exception("PyWCS is required to use from_wcs()")
+        if not astropy_installed:
+            raise Exception("Astropy is required to use from_wcs()")
 
         # Equinox
 
