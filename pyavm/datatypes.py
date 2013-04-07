@@ -533,8 +533,7 @@ class AVMOrderedFloatList(AVMOrderedList):
                 if value:
                     value = _encode_as_utf8(value)
                     try:
-                        float(value)
-                        checked_data.append(value)
+                        checked_data.append(float(value))
                     except Exception, e:
                         raise TypeError("Enter a string that can be represented as a number.")
                 else:
