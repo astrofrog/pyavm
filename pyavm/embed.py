@@ -35,9 +35,9 @@ def embed_xmp(image_in, image_out, xmp_packet):
         # Position at which to insert the packet
         markers = [x.type for x in jpeg_file.segments]
 
-        if 'APP1' in markers: # Put it after existing APP1
+        if 'APP1' in markers:  # Put it after existing APP1
             index = markers.index('APP1') + 1
-        elif 'APP0' in markers: # Put it after existing APP0
+        elif 'APP0' in markers:  # Put it after existing APP0
             index = markers.index('APP0') + 1
         elif 'SOF' in markers:
             index = markers.index('SOF')

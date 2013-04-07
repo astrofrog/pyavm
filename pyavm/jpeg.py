@@ -34,6 +34,7 @@ MARKERS[b'\xe9'] = 'APP9'
 MARKERS[b'\xfe'] = 'COM'
 MARKERS[b'\xd9'] = 'EOI'
 
+
 def is_jpeg(filename):
     with open(filename, 'rb') as f:
         return f.read(4) == b'\xff\xd8\xff\xe0'
