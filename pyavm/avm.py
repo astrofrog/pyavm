@@ -265,7 +265,13 @@ class AVM(AVMContainer):
 
         # Extract XMP packet
         xml = contents[start:end]
-        
+        return self.from_xml(xml)
+
+    def from_xml_file(self, filename):
+        return self.from_xml(open(filename, 'rb').read())
+
+    def from_xml(self, xml):
+
         # Parse XML
         tree = et.parse(StringIO(xml))
         root = tree.getroot()
