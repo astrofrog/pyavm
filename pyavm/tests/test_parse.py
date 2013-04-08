@@ -3,9 +3,48 @@ import glob
 
 import pytest
 
-from .. import AVM
+from ..avm import AVM, NoSpatialInformation
 
-@pytest.mark.parametrize('filename', glob.glob(os.path.join('data', '*.xml')))
+XML_FILES = glob.glob(os.path.join('data', '*.xml'))
+
+
+@pytest.mark.parametrize('filename', XML_FILES)
 def test_parse(filename):
     a = AVM()
     a.from_xml_file(filename)
+
+
+@pytest.mark.parametrize('filename', XML_FILES)
+def test_to_xml(filename):
+    a = AVM()
+    a.from_xml_file(filename)
+    a.to_xml()
+
+
+@pytest.mark.parametrize('filename', XML_FILES)
+def test_to_xmp(filename):
+    a = AVM()
+    a.from_xml_file(filename)
+    a.to_xmp()
+
+
+NO_WCS = ['data/heic0409a.xml',
+          'data/sig05-021-alpha.xml',
+          'data/ssc2004-06a1-alpha.xml',
+          'data/ssc2004-06b1-alpha.xml']
+
+XML_FILES_WCS = [x for x in XML_FILES if x not in NO_WCS]
+
+@pytest.mark.parametrize('filename', XML_FILES_WCS)
+def test_to_wcs(filename):
+    a = AVM()
+    a.from_xml_file(filename)
+    a.to_wcs()
+
+
+@pytest.mark.parametrize('filename', NO_WCS)
+def test_to_wcs_nowcs(filename):
+    a = AVM()
+    a.from_xml_file(filename)
+    with pytest.raises(NoSpatialInformation):
+        a.to_wcs()

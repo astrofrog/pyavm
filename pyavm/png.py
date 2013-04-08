@@ -28,11 +28,11 @@ class PNGChunk(object):
         self.data = fileobj.read(length)
 
         # Read in CRC
-        crc = struct.unpack('>I', fileobj.read(4))[0]
+        crc = struct.unpack('>i', fileobj.read(4))[0]
 
         # Check that the CRC matches the actual one
         if crc != self.crc:
-            raise ValueError("CRC ({0}) does not match expected ({1})".format(crc, self.crc))
+            raise ValueError("CRC ({0}) does not match advertised ({1})".format(self.crc, crc))
 
         if length != self.length:
             raise ValueError("Dynamic length ({0}) does not match original length ({1})".format(self.length, length))
@@ -51,7 +51,7 @@ class PNGChunk(object):
         fileobj.write(self.data)
 
         # Write CRC
-        fileobj.write(struct.pack('>I', self.crc))
+        fileobj.write(struct.pack('>i', self.crc))
 
     @property
     def crc(self):
@@ -81,7 +81,7 @@ class PNGFile(object):
         self.chunks = []
 
         while True:
-            chunk = Chunk.read(fileobj)
+            chunk = PNGChunk.read(fileobj)
             self.chunks.append(chunk)
             if chunk.type == b'IEND':
                 break

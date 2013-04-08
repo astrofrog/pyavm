@@ -7,22 +7,7 @@ import xml.etree.ElementTree as et
 from .exceptions import AVMItemNotInControlledVocabularyError, AVMListLengthError
 
 
-def _encode_as_utf8(obj, input_encoding=None):
-    """
-    Helper function to ensure that a proper string object in UTF-8 encoding.
 
-    If obj is not a string, it will try to convert the object into a unicode
-    string and thereafter encode as UTF-8.
-    """
-    if isinstance(obj, unicode):
-        return obj.encode('utf-8')
-    elif isinstance(obj, str):
-        if not input_encoding or input_encoding == 'utf-8':
-            return obj
-        else:
-            return obj.decode(input_encoding).encode('utf-8')
-    else:
-        return unicode(obj).encode('utf-8')
 
 
 __all__ = [
@@ -72,7 +57,7 @@ class AVMData(object):
 
         :return: String (UTF-8)
         """
-        return _encode_as_utf8(value)
+        return value
 
 
 class AVMString(AVMData):
@@ -91,14 +76,14 @@ class AVMString(AVMData):
         if isinstance(value, (list, tuple)) and len(value) == 1:
             value = value[0]
         if isinstance(value, basestring):
-            return _encode_as_utf8(value)
+            return value
         else:
             raise TypeError("{0:s} is not a string or unicode".format(self.tag))
 
     def to_xml(self, parent, value):
         uri = reverse_namespaces[self.namespace]
         element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
-        element.text = "%s" % _encode_as_utf8(value)
+        element.text = "%s" % value
         return element
 
 
@@ -123,7 +108,7 @@ class AVMURL(AVMString):
         if not (isinstance(value, basestring)):
             raise TypeError("{0:s} is not a string or unicode".format(self.tag))
 
-        value = _encode_as_utf8(value)
+        value = value
 
         if value and '://' not in value:
             value = 'http://%s' % value
@@ -160,7 +145,7 @@ class AVMEmail(AVMString):
         if not (isinstance(value, basestring)):
             raise TypeError("{0:s} is not a string or unicode".format(self.tag))
 
-        value = _encode_as_utf8(value)
+        value = value
 
         email_re = re.compile(
             r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
@@ -210,7 +195,7 @@ class AVMStringCV(AVMString):
             return None
 
         if isinstance(value, basestring):
-            value = _encode_as_utf8(value)
+            value = value
             value = self.format_data(value)
 
             if self.check_cv(value):
@@ -252,7 +237,7 @@ class AVMLocalizedString(AVMString):
         element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
         subelement = et.SubElement(element, "rdf:Alt")
         li = et.SubElement(subelement, "rdf:li")
-        li.text = "%s" % _encode_as_utf8(value)
+        li.text = "%s" % value
         li.attrib['xml:lang'] = 'x-default'
         return element
 
@@ -349,7 +334,7 @@ class AVMUnorderedList(AVMData):
         length = 0
 
         for value in values:
-            value = _encode_as_utf8(value)
+            value = value
             length += len(value)
             if value is "":
                 value = "-"
@@ -372,7 +357,7 @@ class AVMUnorderedList(AVMData):
             if type(item) is float:
                 li.text = "%.16f" % item
             else:
-                li.text = "%s" % _encode_as_utf8(item)
+                li.text = "%s" % item
 
         return element
 
@@ -401,7 +386,7 @@ class AVMUnorderedStringList(AVMUnorderedList):
         # Check data type in list
         for value in values:
             if (isinstance(value, basestring)):
-                value = _encode_as_utf8(value)
+                value = value
                 checked_data.append(value)
             else:
                 raise TypeError(
@@ -418,7 +403,7 @@ class AVMUnorderedStringList(AVMUnorderedList):
 
         for item in values:
             li = et.SubElement(subelement, "rdf:li")
-            li.text = "%s" % _encode_as_utf8(item)
+            li.text = "%s" % item
 
         return element
 
@@ -439,7 +424,7 @@ class AVMOrderedList(AVMUnorderedList):
             if type(item) is float:
                 li.text = "%.16f" % item
             else:
-                li.text = "%s" % _encode_as_utf8(item)
+                li.text = "%s" % item
 
         return element
 
@@ -484,7 +469,7 @@ class AVMOrderedListCV(AVMOrderedList, AVMStringCVCapitalize):
         # Check data type in list
         for value in values:
             if (isinstance(value, basestring)):
-                value = _encode_as_utf8(value)
+                value = value
                 value = self.format_data(value)
 
                 if self.check_cv(value):
@@ -532,7 +517,7 @@ class AVMOrderedFloatList(AVMOrderedList):
                 if value.strip() == '-':
                     checked_data.append(None)
                 else:
-                    value = _encode_as_utf8(value)
+                    value = value
                     try:
                         checked_data.append(float(value))
                     except Exception, e:
@@ -552,7 +537,10 @@ class AVMOrderedFloatList(AVMOrderedList):
 
         for item in values:
             li = et.SubElement(subelement, "rdf:li")
-            li.text = "%.16f" % item
+            if item is None:
+                li.text = '-'
+            else:
+                li.text = "%.16f" % item
 
         return element
 
@@ -579,10 +567,10 @@ class AVMDateTimeList(AVMOrderedList):
         for value in values:
             if value:
                 if (isinstance(value, datetime.date) or isinstance(value, datetime.datetime)):
-                    value = _encode_as_utf8(value.isoformat())
+                    value = value.isoformat()
                     checked_data.append(value)
                 elif isinstance(value, basestring):
-                    value = _encode_as_utf8(value)
+                    value = value
                     checked_data.append(value)
                 else:
                     raise TypeError("Elements of the list need to be a Python Date or Datetime object.")

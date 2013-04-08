@@ -78,13 +78,13 @@ SPECS['1.1'] = {
     
     # FITS Liberator Metadata
 
-    'FL.BackgroundLevel': AVMOrderedFloatList('avm:FL.BackgroundLevel', length=1, strict_length=True),
-    'FL.BlackLevel': AVMOrderedFloatList('avm:FL.BlackLevel', length=1, strict_length=True),
-    'FL.ScaledPeakLevel': AVMOrderedFloatList('avm:FL.ScaledPeakLevel', length=1, strict_length=True),
-    'FL.PeakLevel': AVMOrderedFloatList('avm:FL.PeakLevel', length=1, strict_length=True),
-    'FL.WhiteLevel': AVMOrderedFloatList('avm:FL.WhiteLevel', length=1, strict_length=True),
-    'FL.ScaledBackgroundLevel': AVMOrderedFloatList('avm:FL.ScaledBackgroundLevel', length=1, strict_length=True),
-    'FL.StretchFunction': AVMOrderedFloatList('avm:FL.StretchFunction')
+    'FL.BackgroundLevel': AVMOrderedFloatList('avm:FL.BackgroundLevel'),
+    'FL.BlackLevel': AVMOrderedFloatList('avm:FL.BlackLevel'),
+    'FL.ScaledPeakLevel': AVMOrderedFloatList('avm:FL.ScaledPeakLevel'),
+    'FL.PeakLevel': AVMOrderedFloatList('avm:FL.PeakLevel'),
+    'FL.WhiteLevel': AVMOrderedFloatList('avm:FL.WhiteLevel'),
+    'FL.ScaledBackgroundLevel': AVMOrderedFloatList('avm:FL.ScaledBackgroundLevel'),
+    'FL.StretchFunction': AVMOrderedListCV('avm:FL.StretchFunction', STRETCH_FUNCTION_CHOICES)
 }
 
 SPECS['1.2'] = SPECS['1.1']

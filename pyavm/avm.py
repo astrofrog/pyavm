@@ -39,6 +39,10 @@ try:
 except ImportError:
     astropy_installed = False
 
+class NoSpatialInformation(Exception):
+    pass
+
+
 from .embed import embed_xmp
 from .extract import extract_xmp
 
@@ -304,6 +308,9 @@ class AVM(AVMContainer):
         if not astropy_installed:
             raise Exception("Astropy is required to use to_wcs()")
 
+        if repr(self.Spatial) == '':
+            raise NoSpatialInformation("AVM meta-data does not contain any spatial information")
+
         if use_full_header and self.Spatial.FITSheader is not None:
             print "Using full FITS header from Spatial.FITSheader"
             header = fits.Header(txtfile=StringIO(self.Spatial.FITSheader))
@@ -352,7 +359,10 @@ class AVM(AVMContainer):
             elif self.Spatial.Equinox == "B1950":
                 wcs.wcs.equinox = 1950.
             else:
-                raise Exception("Unknown equinox: %s" % self.Spatial.Equinox)
+                try:
+                    wcs.wcs.equinox = float(self.Spatial.Equinox)
+                except ValueError:
+                    raise ValueError("Unknown equinox: %s" % self.Spatial.Equinox)
         else:
             wcs.wcs.equinox = float(self.Spatial.Equinox)
 
@@ -454,7 +464,7 @@ class AVM(AVMContainer):
 
         # Need to create a StringIO object to write to
         s = StringIO()
-        tree.write(s)
+        tree.write(s, encoding='utf-8')
 
         # Rewind and read the contents
         s.seek(0)
