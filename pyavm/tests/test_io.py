@@ -17,8 +17,12 @@ except ImportError:
 
 from .. import AVM
 
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
-@pytest.mark.parametrize('xml_file', glob.glob(os.path.join('data', '*.xml')))
+XML_FILES = glob.glob(os.path.join(ROOT, 'data', '*.xml'))
+
+
+@pytest.mark.parametrize('xml_file', XML_FILES)
 def test_io_jpg(tmpdir, xml_file):
     avm = AVM()
     avm.from_xml_file(xml_file)

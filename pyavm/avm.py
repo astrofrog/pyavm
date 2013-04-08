@@ -19,8 +19,18 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+from __future__ import print_function, division
+
+try:
+    unicode
+except:
+    basestring = unicode = str
+
 import warnings
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import BytesIO as StringIO
 import xml.etree.ElementTree as et
 
 from .specs import SPECS, REVERSE_SPECS
@@ -298,7 +308,7 @@ class AVM(AVMContainer):
 
             else:
 
-                print "WARNING: ignoring tag %s:%s" % (tag, name)
+                print("WARNING: ignoring tag %s:%s" % (tag, name))
 
     def to_wcs(self, use_full_header=False):
         '''
@@ -312,7 +322,7 @@ class AVM(AVMContainer):
             raise NoSpatialInformation("AVM meta-data does not contain any spatial information")
 
         if use_full_header and self.Spatial.FITSheader is not None:
-            print "Using full FITS header from Spatial.FITSheader"
+            print("Using full FITS header from Spatial.FITSheader")
             header = fits.Header(txtfile=StringIO(self.Spatial.FITSheader))
             return WCS(header)
 
@@ -323,10 +333,10 @@ class AVM(AVMContainer):
         if self.Spatial.CoordinateFrame is not None:
             ctype = self.Spatial.CoordinateFrame
         else:
-            print "WARNING: Spatial.CoordinateFrame not found, assuming ICRS"
+            print("WARNING: Spatial.CoordinateFrame not found, assuming ICRS")
             ctype = 'ICRS'
 
-        wcs.wcs.radesys = ctype
+        wcs.wcs.radesys = ctype.encode('ascii')
 
         if ctype in ['ICRS', 'FK5', 'FK4']:
             xcoord = "RA--"
@@ -346,8 +356,8 @@ class AVM(AVMContainer):
         # Find the projection type
         cproj = ('%+4s' % self.Spatial.CoordsystemProjection).replace(' ', '-')
 
-        wcs.wcs.ctype[0] = xcoord + cproj
-        wcs.wcs.ctype[1] = ycoord + cproj
+        wcs.wcs.ctype[0] = (xcoord + cproj).encode('ascii')
+        wcs.wcs.ctype[1] = (ycoord + cproj).encode('ascii')
 
         # Find the equinox
         if self.Spatial.Equinox is None:
@@ -469,14 +479,14 @@ class AVM(AVMContainer):
         # Rewind and read the contents
         s.seek(0)
         xml_string = s.read()
-        
+
         return xml_string
 
     def to_xmp(self):
 
-        packet = '<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
+        packet = b'<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
         packet += self.to_xml()
-        packet += '<?xpacket end="w"?>'
+        packet += b'<?xpacket end="w"?>'
 
         return packet
 
@@ -487,6 +497,12 @@ class AVM(AVMContainer):
 
         # Verify file if needed
         if verify:
-            import Image
+            try:
+                from PIL import Image
+            except ImportError:
+                try:
+                    import Image
+                except ImportError:
+                    raise ImportError("PIL is required for the verify= option")
             image = Image.open(filename_out)
             image.verify()

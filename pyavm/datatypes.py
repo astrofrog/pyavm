@@ -1,3 +1,10 @@
+from __future__ import print_function, division
+
+try:
+    unicode
+except:
+    basestring = unicode = str
+
 import re
 import time
 import datetime
@@ -5,10 +12,6 @@ from dateutil import parser
 import xml.etree.ElementTree as et
 
 from .exceptions import AVMItemNotInControlledVocabularyError, AVMListLengthError
-
-
-
-
 
 __all__ = [
     'AVMString',
@@ -520,7 +523,7 @@ class AVMOrderedFloatList(AVMOrderedList):
                     value = value
                     try:
                         checked_data.append(float(value))
-                    except Exception, e:
+                    except Exception:
                         raise TypeError("Enter a string that can be represented as a number.")
 
             if len(set(checked_data)) == 1 and checked_data[0] == "-":

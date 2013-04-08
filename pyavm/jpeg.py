@@ -1,6 +1,8 @@
 # Pure-python JPEG parser
 # Copyright (c) 2013 Thomas P. Robitaille
 
+from __future__ import print_function, division
+
 import struct
 
 # Define common markers

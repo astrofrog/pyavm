@@ -1,6 +1,8 @@
 # Pure-python PNG parser
 # Copyright (c) 2013 Thomas P. Robitaille
 
+from __future__ import print_function, division
+
 import struct
 
 PNG_SIGNATURE = b'\x89\x50\x4e\x47\x0d\x0a\x1a\x0a'
@@ -28,7 +30,7 @@ class PNGChunk(object):
         self.data = fileobj.read(length)
 
         # Read in CRC
-        crc = struct.unpack('>i', fileobj.read(4))[0]
+        crc = struct.unpack('>I', fileobj.read(4))[0]
 
         # Check that the CRC matches the actual one
         if crc != self.crc:
@@ -51,12 +53,18 @@ class PNGChunk(object):
         fileobj.write(self.data)
 
         # Write CRC
-        fileobj.write(struct.pack('>i', self.crc))
+        fileobj.write(struct.pack('>I', self.crc))
 
     @property
     def crc(self):
+        # Note from Python docs: "To generate the same numeric value across all
+        # Python versions and platforms use crc32(data) & 0xffffffff. If you
+        # are only using the checksum in packed binary format this is not
+        # necessary as the return value is the correct 32bit binary
+        # representation regardless of sign."
+        # This is indeed true, I see different values in Python 2 and 3.
         from zlib import crc32
-        return crc32(self.type + self.data)
+        return crc32(self.type + self.data) & 0xffffffff
 
     @property
     def length(self):

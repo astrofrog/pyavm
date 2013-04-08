@@ -1,3 +1,5 @@
+from __future__ import print_function, division
+
 import struct
 
 from .jpeg import is_jpeg, JPEGFile, JPEGSegment

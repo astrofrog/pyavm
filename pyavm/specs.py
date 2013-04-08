@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function, division
+
 """
 Specification for various versions of AVM
 
