@@ -90,7 +90,7 @@ class AVMString(AVMData):
             return None
         if isinstance(value, (list, tuple)) and len(value) == 1:
             value = value[0]
-        if isinstance(value, str) or isinstance(value, unicode):
+        if isinstance(value, basestring):
             return _encode_as_utf8(value)
         else:
             raise TypeError("{0:s} is not a string or unicode".format(self.tag))
@@ -120,7 +120,7 @@ class AVMURL(AVMString):
         if not value:
             return None
 
-        if not (isinstance(value, str) or isinstance(value, unicode)):
+        if not (isinstance(value, basestring)):
             raise TypeError("{0:s} is not a string or unicode".format(self.tag))
 
         value = _encode_as_utf8(value)
@@ -157,7 +157,7 @@ class AVMEmail(AVMString):
 
         :return: String (UTF-8)
         """
-        if not (isinstance(value, str) or isinstance(value, unicode)):
+        if not (isinstance(value, basestring)):
             raise TypeError("{0:s} is not a string or unicode".format(self.tag))
 
         value = _encode_as_utf8(value)
@@ -209,7 +209,7 @@ class AVMStringCV(AVMString):
         if not value:
             return None
 
-        if isinstance(value, str) or isinstance(value, unicode):
+        if isinstance(value, basestring):
             value = _encode_as_utf8(value)
             value = self.format_data(value)
 
@@ -283,7 +283,6 @@ class AVMFloat(AVMData):
         return value
 
     def to_xml(self, parent, value):
-        print value
         uri = reverse_namespaces[self.namespace]
         element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
         element.text = "%.16f" % value
@@ -401,7 +400,7 @@ class AVMUnorderedStringList(AVMUnorderedList):
         checked_data = []
         # Check data type in list
         for value in values:
-            if (isinstance(value, str) or isinstance(value, unicode)):
+            if (isinstance(value, basestring)):
                 value = _encode_as_utf8(value)
                 checked_data.append(value)
             else:
@@ -484,7 +483,7 @@ class AVMOrderedListCV(AVMOrderedList, AVMStringCVCapitalize):
         length = 0
         # Check data type in list
         for value in values:
-            if (isinstance(value, str) or isinstance(value, unicode)):
+            if (isinstance(value, basestring)):
                 value = _encode_as_utf8(value)
                 value = self.format_data(value)
 

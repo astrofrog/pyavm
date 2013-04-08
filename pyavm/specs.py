@@ -55,7 +55,7 @@ SPECS['1.1'] = {
 
     # Coordinate Metadata
     'Spatial.CoordinateFrame': AVMStringCVUpper('avm:Spatial.CoordinateFrame', SPATIAL_COORDINATE_FRAME_CHOICES),
-    'Spatial.Equinox': AVMStringCVUpper('avm:Spatial.Equinox', SPATIAL_EQUINOX_CHOICES),
+    'Spatial.Equinox': AVMString('avm:Spatial.Equinox'),
     'Spatial.ReferenceValue': AVMOrderedFloatList('avm:Spatial.ReferenceValue', length=2, strict_length=True),
     'Spatial.ReferenceDimension': AVMOrderedFloatList('avm:Spatial.ReferenceDimension', length=2, strict_length=True),
     'Spatial.ReferencePixel': AVMOrderedFloatList('avm:Spatial.ReferencePixel', length=2, strict_length=True),

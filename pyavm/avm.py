@@ -133,7 +133,7 @@ def parse_avm_content(rdf):
         uri, tag = item[1:].split('}')
 
         if uri in namespaces:
-            avm_content[(namespaces[uri], tag)] = auto_type(rdf.attrib[item])
+            avm_content[(namespaces[uri], tag)] = rdf.attrib[item]
 
     for item in rdf:
 
@@ -146,11 +146,11 @@ def parse_avm_content(rdf):
                 avm_content[key] = sub_avm_content[key]
         elif uri in namespaces:
             if len(item) == 0:
-                avm_content[(namespaces[uri], tag)] = auto_type(item.text)
+                avm_content[(namespaces[uri], tag)] = item.text
             elif len(item) == 1:
                 c_uri, c_tag = item[0].tag[1:].split('}')
                 if c_uri == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#' and c_tag in ['Bag', 'Seq', 'Alt']:
-                    avm_content[(namespaces[uri], tag)] = [auto_type(x.text) for x in item[0]]
+                    avm_content[(namespaces[uri], tag)] = [x.text for x in item[0]]
                 else:
                     raise Exception("Unexpected tag %s:%s" % (c_uri, c_tag))
             elif len(item) > 1:
