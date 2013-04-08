@@ -1,0 +1,18 @@
+language: python
+
+python:
+    - 2.6
+    - 2.7
+    - 3.2
+    - 3.3
+
+before_install:
+   # We do this to make sure we get the dependencies so pip works below
+   - sudo apt-get update -qq
+
+install:
+   - export PYTHONIOENCODING=UTF8 # just in case
+   - pip install pytest pillow -q --use-mirrors
+
+script:
+   - py.test pyavm
