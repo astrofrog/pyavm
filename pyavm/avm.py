@@ -40,6 +40,7 @@ except ImportError:
     astropy_installed = False
 
 from .embed import embed_xmp
+from .extract import extract_xmp
 
 # Define namespace to tag mapping
 
@@ -249,22 +250,16 @@ class AVM(AVMContainer):
 
     def from_file(self, filename):
 
-        # Read in image
-        if hasattr(filename, 'read'):
-            contents = filename.read()
-        else:
-            contents = file(filename, 'rb').read()
+        # Get XMP data from file
+        xmp = extract_xmp(filename)
 
-        # Look for XMP packets
-        start = contents.find("<?xpacket begin=")
-        if start < 0:
-            raise NoAVMPresent("No XMP packet found")
-        start = contents.index("?>", start) + 2
-        end = contents.index("</x:xmpmeta>") + 12
-        print "Found XMP packet with %i bytes" % (end - start)
+        # Extract XML
+        start = xmp.index("<?xpacket begin=")
+        start = xmp.index("?>", start) + 2
+        end = xmp.index("</x:xmpmeta>") + 12
 
-        # Extract XMP packet
-        xml = contents[start:end]
+        # Extract XML
+        xml = xmp[start:end]
         return self.from_xml(xml)
 
     def from_xml_file(self, filename):
