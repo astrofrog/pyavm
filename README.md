@@ -93,4 +93,4 @@ It is possible to embed AVM meta-data into an image file:
 
     >>> avm.embed('original_image.jpg', 'tagged_image.jpg')
 
-At this time, only JPG, PNG, and TIFF files are supported.
+At this time, only JPG and PNG files are supported.
