@@ -529,14 +529,14 @@ class AVMOrderedFloatList(AVMOrderedList):
 
             # Check data type in list
             for value in values:
-                if value:
+                if value.strip() == '-':
+                    checked_data.append(None)
+                else:
                     value = _encode_as_utf8(value)
                     try:
                         checked_data.append(float(value))
                     except Exception, e:
                         raise TypeError("Enter a string that can be represented as a number.")
-                else:
-                    checked_data.append("-")
 
             if len(set(checked_data)) == 1 and checked_data[0] == "-":
                 checked_data = []
