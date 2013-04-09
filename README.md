@@ -1,14 +1,36 @@
 About
 =====
 
-PyAVM provides the ``AVM()`` class to represent [AVM](http://www.virtualastronomy.org/avm_metadata.php) meta-data:
+PyAVM provides the ``AVM()`` class to represent
+[AVM](http://www.virtualastronomy.org/avm_metadata.php) meta-data:
 
     >>> from pyavm import AVM
+
+Requirements
+============
+
+PyAVM supports Python 2.6, 2.7, 3.1, 3.2, and 3.3. No other dependencies are
+needed simply to access AVM data from PNG and JPEG images.
+
+However, the following optional dependencies are needed for more advanced
+functionality:
+
+* [Astropy](http://www.astropy.org) to handle WCS objects and FITS headers
+* [py.test](http://www.pytest.org) and
+  [PIL](http://www.pythonware.com/products/pil/) for tests
+
+Installing
+==========
+
+To install PyAVM:
+
+    python setup.py install
 
 Parsing files
 =============
 
-To parse AVM meta-data from an existing file, simply create an instance of the ``AVM`` class using the filename of the image (or any file-like object):
+To parse AVM meta-data from an existing file, simply create an instance of the
+``AVM`` class using the filename of the image (or any file-like object):
 
     >>> avm = AVM('myexample.jpg')
 
@@ -47,43 +69,50 @@ after which tags can be created in the group:
 Creating an AVM object from scratch
 ===================================
 
-To create an empty AVM meta-data holder, simply call ``AVM()`` without any arguments:
+To create an empty AVM meta-data holder, simply call ``AVM()`` without any
+arguments:
 
     >>> avm = AVM()
 
 Converting to a WCS object
 ==========================
 
-It is possible to create a pywcs.WCS object from the AVM meta-data:
+It is possible to create a astropy.wcs.WCS object from the AVM meta-data:
 
     >>> wcs = avm.to_wcs()
 
-By default, Spatial.FITSheader will be used if available, but if not, the WCS information is extracted from the other Spatial.* tags. To force PyAVM to not try Spatial.FITSheader, use:
+By default, Spatial.FITSheader will be used if available, but if not, the WCS
+information is extracted from the other Spatial.* tags. To force PyAVM to not
+try Spatial.FITSheader, use:
 
     >>> wcs = avm.to_wcs(use_full_header=False)
 
 Initializing from a FITS header
 ===============================
 
-To create an AVM meta-data object from a FITS header, simply pass the header (as a ``pyfits.Header`` instance) instead of a filename when initializing the ``AVM`` object:
+To create an AVM meta-data object from a FITS header, simply pass the header
+(as a ``astropy.io.fits.Header`` instance) instead of a filename when
+initializing the ``AVM`` object:
 
-    >>> import pyfits
-    >>> header = pyfits.getheader('image.fits')
+    >>> from astropy.io import fits
+    >>> header = fits.getheader('image.fits')
     >>> avm = AVM(header)
 
-By default, the AVM tag Spatial.FITSheader will be created, containing the full header (in addition to the other Spatial.* keywords). This can be disabled with:
+By default, the AVM tag Spatial.FITSheader will be created, containing the
+full header (in addition to the other Spatial.* keywords). This can be
+disabled with:
 
     >>> avm = AVM(header, include_full_header=False)
 
 Initializing from a WCS object
 ==============================
 
-Similarly, it is possible to create an AVM meta-data object from a ``pywcs.WCS`` instance:
+Similarly, it is possible to create an AVM meta-data object from a
+``astropy.wcs.WCS`` instance:
 
-    >>> import pyfits
-    >>> import pywcs
+    >>> from astropy.wcs import WCS
     >>> from pyavm import AVM
-    >>> wcs = pywcs.WCS(pyfits.getheader('image.fits'))
+    >>> wcs = WCS('image.fits')
     >>> avm = AVM(wcs)
 
 Tagging images with AVM meta-data
@@ -93,4 +122,4 @@ It is possible to embed AVM meta-data into an image file:
 
     >>> avm.embed('original_image.jpg', 'tagged_image.jpg')
 
-At this time, only JPG, PNG, and TIFF files are supported.
+At this time, only JPG and PNG files are supported.

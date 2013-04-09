@@ -1,0 +1,319 @@
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 4.2-c020 1.124078, Tue Sep 11 2007 23:21:40        ">
+ <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about=""
+    xmlns:vr="http://www.communicatingastronomy.org/repository/1.0/">
+   <vr:MetadataVersion>1.0</vr:MetadataVersion>
+   <vr:Rights>CopyLeft</vr:Rights>
+   <vr:Type>Archive</vr:Type>
+   <vr:Coverage.Spatial.RefSky>100.2254,9.6228</vr:Coverage.Spatial.RefSky>
+   <vr:Coverage.Spatial.Equinox>'2000.   '</vr:Coverage.Spatial.Equinox>
+   <vr:Coverage.Spatial.RefPix>1319.375421,2150.535082</vr:Coverage.Spatial.RefPix>
+   <vr:Coverage.Spatial.Scale>-0.000239631,0.000239631</vr:Coverage.Spatial.Scale>
+   <vr:Coverage.Spatial.Rotation>0,-1.58024</vr:Coverage.Spatial.Rotation>
+   <vr:Coverage.Spatial.CoordsysProjection>'RA---TAN','DEC--TAN'</vr:Coverage.Spatial.CoordsysProjection>
+   <vr:Coverage.Spatial.Dimensions>2638,4300</vr:Coverage.Spatial.Dimensions>
+   <vr:Coverage.Spatial.FieldOfView>6.95904400000000e+06,1.84900000000000e+07</vr:Coverage.Spatial.FieldOfView>
+   <vr:StretchFunction>
+    <rdf:Seq>
+     <rdf:li>Inverse hyperbolic sine</rdf:li>
+    </rdf:Seq>
+   </vr:StretchFunction>
+   <vr:BackgroundLevel>
+    <rdf:Seq>
+     <rdf:li>0.14951767104658</rdf:li>
+    </rdf:Seq>
+   </vr:BackgroundLevel>
+   <vr:PeakLevel>
+    <rdf:Seq>
+     <rdf:li>45.10760252438594</rdf:li>
+    </rdf:Seq>
+   </vr:PeakLevel>
+   <vr:ScaledBackgroundLevel>
+    <rdf:Seq>
+     <rdf:li>0.00000000000000</rdf:li>
+    </rdf:Seq>
+   </vr:ScaledBackgroundLevel>
+   <vr:ScaledPeakLevel>
+    <rdf:Seq>
+     <rdf:li>30.00000000000000</rdf:li>
+    </rdf:Seq>
+   </vr:ScaledPeakLevel>
+   <vr:BlackLevel>
+    <rdf:Seq>
+     <rdf:li>0.00000000000000</rdf:li>
+    </rdf:Seq>
+   </vr:BlackLevel>
+   <vr:WhiteLevel>
+    <rdf:Seq>
+     <rdf:li>4.09462222433053</rdf:li>
+    </rdf:Seq>
+   </vr:WhiteLevel>
+  </rdf:Description>
+  <rdf:Description rdf:about=""
+    xmlns:xapMM="http://ns.adobe.com/xap/1.0/mm/"
+    xmlns:stRef="http://ns.adobe.com/xap/1.0/sType/ResourceRef#">
+   <xapMM:DocumentID>uuid:9E42ADF1412A11DCB429DAB2485F5C17</xapMM:DocumentID>
+   <xapMM:InstanceID>uuid:9E42ADF2412A11DCB429DAB2485F5C17</xapMM:InstanceID>
+   <xapMM:DerivedFrom rdf:parseType="Resource">
+    <stRef:instanceID>uuid:32A9A54F73B111DA822FB72BC283E954</stRef:instanceID>
+    <stRef:documentID>uuid:32A9A54E73B111DA822FB72BC283E954</stRef:documentID>
+   </xapMM:DerivedFrom>
+  </rdf:Description>
+  <rdf:Description rdf:about=""
+    xmlns:xap="http://ns.adobe.com/xap/1.0/">
+   <xap:CreateDate>2005-11-18T09:49:26-08:00</xap:CreateDate>
+   <xap:MetadataDate>2008-04-10T10:20:39-07:00</xap:MetadataDate>
+   <xap:SliderValue>0</xap:SliderValue>
+   <xap:foo>1</xap:foo>
+   <xap:ModifyDate>2007-07-31T19:00:26-07:00</xap:ModifyDate>
+   <xap:CreatorTool>Adobe Photoshop CS2 Macintosh</xap:CreatorTool>
+  </rdf:Description>
+  <rdf:Description rdf:about=""
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+   <dc:format>image/tiff</dc:format>
+   <dc:creator>
+    <rdf:Seq>
+     <rdf:li>Spitzer Space Telescope</rdf:li>
+    </rdf:Seq>
+   </dc:creator>
+   <dc:subject>
+    <rdf:Bag>
+     <rdf:li>Snowflake Nebula</rdf:li>
+    </rdf:Bag>
+   </dc:subject>
+   <dc:rights>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">http://www.spitzer.caltech.edu/Media/mediaimages/copyright.shtml</rdf:li>
+    </rdf:Alt>
+   </dc:rights>
+   <dc:description>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">Newborn stars, hidden behind thick dust, are revealed in this image of a section of the Christmas Tree Cluster from NASA's Spitzer Space Telescope, created in joint effort between Spitzer's Infrared Array Camera (IRAC) and Multiband Imaging Photometer (MIPS) instruments.  The newly revealed infant stars appear as pink and red specks toward the center of the combined IRAC-MIPS image (left panel). The stars appear to have formed in regularly spaced intervals along linear structures in a configuration that resembles the spokes of a wheel or the pattern of a snowflake. Hence, astronomers have nicknamed this the "Snowflake Cluster."  Star-forming clouds like this one are dynamic and evolving structures. Since the stars trace the straight line pattern of spokes of a wheel, scientists believe that these are newborn stars, or "protostars." At a mere 100,000 years old, these infant structures have yet to "crawl" away from their location of birth. Over time, the natural drifting motions of each star will break this order, and the snowflake design will be no more.  While most of the visible-light stars that give the Christmas Tree Cluster its name and triangular shape do not shine brightly in Spitzer's infrared eyes, all of the stars forming from this dusty cloud are considered part of the cluster.  Like a dusty cosmic finger pointing up to the newborn clusters, Spitzer also illuminates the optically dark and dense Cone Nebula, the tip of which can be seen towards the bottom left corner of each image.  The combined IRAC-MIPS image shows the presence of organic molecules mixed with dust as wisps of green, which have been illuminated by nearby star formation. The larger yellowish dots neighboring the baby red stars in the Snowflake Cluster are massive stellar infants forming from the same cloud. The blue dots sprinkled across the image represent older Milky Way stars at various distances along this line of sight. The image is a five-channel, false-color compo</rdf:li>
+    </rdf:Alt>
+   </dc:description>
+   <dc:title>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">Stellar Snowflake Cluster</rdf:li>
+    </rdf:Alt>
+   </dc:title>
+  </rdf:Description>
+  <rdf:Description rdf:about=""
+    xmlns:photoshop="http://ns.adobe.com/photoshop/1.0/">
+   <photoshop:Source>Spitzer Space Telescope</photoshop:Source>
+   <photoshop:Credit>NASA/JPL-Caltech/L. Allen (Harva</photoshop:Credit>
+   <photoshop:Headline>Newborn stars, hidden behind thick dust, are revealed in this image of a section of the Christmas Tree Cluster from NASA's Spitzer Space Telescope, created in joint effort between Spitzer's Infrared Array Camera (IRAC) and Multiband Imaging Photometer (MIPS) instruments.</photoshop:Headline>
+   <photoshop:DateCreated>2005-12-22</photoshop:DateCreated>
+   <photoshop:LegacyIPTCDigest>3C12316A4DE1D93CF61C498F4C7EA299</photoshop:LegacyIPTCDigest>
+   <photoshop:ColorMode>3</photoshop:ColorMode>
+   <photoshop:ICCProfile/>
+  </rdf:Description>
+  <rdf:Description rdf:about=""
+    xmlns:tiff="http://ns.adobe.com/tiff/1.0/">
+   <tiff:Orientation>1</tiff:Orientation>
+   <tiff:ImageWidth>2310</tiff:ImageWidth>
+   <tiff:ImageLength>3897</tiff:ImageLength>
+   <tiff:PhotometricInterpretation>2</tiff:PhotometricInterpretation>
+   <tiff:SamplesPerPixel>3</tiff:SamplesPerPixel>
+   <tiff:XResolution>300/1</tiff:XResolution>
+   <tiff:YResolution>300/1</tiff:YResolution>
+   <tiff:ResolutionUnit>2</tiff:ResolutionUnit>
+   <tiff:BitsPerSample>
+    <rdf:Seq>
+     <rdf:li>8</rdf:li>
+     <rdf:li>8</rdf:li>
+     <rdf:li>8</rdf:li>
+    </rdf:Seq>
+   </tiff:BitsPerSample>
+  </rdf:Description>
+  <rdf:Description rdf:about=""
+    xmlns:exif="http://ns.adobe.com/exif/1.0/">
+   <exif:PixelXDimension>2310</exif:PixelXDimension>
+   <exif:PixelYDimension>3897</exif:PixelYDimension>
+   <exif:ColorSpace>-1</exif:ColorSpace>
+   <exif:ExifVersion>0221</exif:ExifVersion>
+  </rdf:Description>
+  <rdf:Description rdf:about=""
+    xmlns:avm="http://www.communicatingastronomy.org/avm/1.0/">
+   <avm:CreatorURL>http://www.spitzer.caltech.edu</avm:CreatorURL>
+   <avm:MetadataVersion>1.1</avm:MetadataVersion>
+   <avm:Image.ProductQuality>Good</avm:Image.ProductQuality>
+   <avm:ReferenceURL>http://gallery.spitzer.caltech.edu/Imagegallery/image.php?image_name=sig05-028</avm:ReferenceURL>
+   <avm:ID>sig05-028a</avm:ID>
+   <avm:Type>Observation</avm:Type>
+   <avm:Spatial.CoordinateFrame>ICRS</avm:Spatial.CoordinateFrame>
+   <avm:Spatial.Equinox>2000.0</avm:Spatial.Equinox>
+   <avm:Spatial.Rotation>-1.5531700399524</avm:Spatial.Rotation>
+   <avm:Spatial.CoordsystemProjection>TAN</avm:Spatial.CoordsystemProjection>
+   <avm:Spatial.Quality>Full</avm:Spatial.Quality>
+   <avm:Spatial.Notes>FOV: 33.23 x 56.06 arcminutes; Ref coordinate: 6h40m9.37s 9d18m47.08s; &#xA;derived from astrometry.net file sig05-028b.fits</avm:Spatial.Notes>
+   <avm:Publisher>Spitzer Science Center</avm:Publisher>
+   <avm:Subject.Category>
+    <rdf:Bag>
+     <rdf:li>B.4.1.2.</rdf:li>
+     <rdf:li>B.3.6.4.</rdf:li>
+    </rdf:Bag>
+   </avm:Subject.Category>
+   <avm:Facility>
+    <rdf:Seq>
+     <rdf:li>Spitzer</rdf:li>
+     <rdf:li>Spitzer</rdf:li>
+     <rdf:li>Spitzer</rdf:li>
+     <rdf:li>Spitzer</rdf:li>
+     <rdf:li>Spitzer</rdf:li>
+    </rdf:Seq>
+   </avm:Facility>
+   <avm:Instrument>
+    <rdf:Seq>
+     <rdf:li>IRAC</rdf:li>
+     <rdf:li>IRAC</rdf:li>
+     <rdf:li>IRAC</rdf:li>
+     <rdf:li>IRAC</rdf:li>
+     <rdf:li>MIPS</rdf:li>
+    </rdf:Seq>
+   </avm:Instrument>
+   <avm:Spectral.Band>
+    <rdf:Seq>
+     <rdf:li>Infrared</rdf:li>
+     <rdf:li>Infrared</rdf:li>
+     <rdf:li>Infrared</rdf:li>
+     <rdf:li>Infrared</rdf:li>
+     <rdf:li>Infrared</rdf:li>
+    </rdf:Seq>
+   </avm:Spectral.Band>
+   <avm:Spectral.Bandpass>
+    <rdf:Seq>
+     <rdf:li>Near-Infrared</rdf:li>
+     <rdf:li>Near-Infrared</rdf:li>
+     <rdf:li>Near-Infrared</rdf:li>
+     <rdf:li>Near-Infrared</rdf:li>
+     <rdf:li>Mid-Infrared</rdf:li>
+    </rdf:Seq>
+   </avm:Spectral.Bandpass>
+   <avm:Spectral.CentralWavelength>
+    <rdf:Seq>
+     <rdf:li>3600</rdf:li>
+     <rdf:li>4500</rdf:li>
+     <rdf:li>5800</rdf:li>
+     <rdf:li>8000</rdf:li>
+     <rdf:li>24000</rdf:li>
+    </rdf:Seq>
+   </avm:Spectral.CentralWavelength>
+   <avm:Spatial.ReferenceValue>
+    <rdf:Seq>
+     <rdf:li>100.039047108</rdf:li>
+     <rdf:li>9.31307719886</rdf:li>
+    </rdf:Seq>
+   </avm:Spatial.ReferenceValue>
+   <avm:Spatial.ReferenceDimension>
+    <rdf:Seq>
+     <rdf:li>2310</rdf:li>
+     <rdf:li>3897</rdf:li>
+    </rdf:Seq>
+   </avm:Spatial.ReferenceDimension>
+   <avm:Spatial.ReferencePixel>
+    <rdf:Seq>
+     <rdf:li>1896.12124634</rdf:li>
+     <rdf:li>687.80169678</rdf:li>
+    </rdf:Seq>
+   </avm:Spatial.ReferencePixel>
+   <avm:Spatial.Scale>
+    <rdf:Seq>
+     <rdf:li>-0.00023973598326419</rdf:li>
+     <rdf:li>0.00023973598326419</rdf:li>
+    </rdf:Seq>
+   </avm:Spatial.Scale>
+   <avm:FL.StretchFunction>
+    <rdf:Seq>
+     <rdf:li>Linear</rdf:li>
+     <rdf:li>Linear</rdf:li>
+     <rdf:li>Linear</rdf:li>
+     <rdf:li>Linear</rdf:li>
+    </rdf:Seq>
+   </avm:FL.StretchFunction>
+   <avm:FL.BackgroundLevel>
+    <rdf:Seq>
+     <rdf:li>15.49152322715847</rdf:li>
+     <rdf:li>0.00000000000000</rdf:li>
+     <rdf:li>0.00000000000000</rdf:li>
+     <rdf:li>0.00000000000000</rdf:li>
+    </rdf:Seq>
+   </avm:FL.BackgroundLevel>
+   <avm:FL.PeakLevel>
+    <rdf:Seq>
+     <rdf:li>53.22686115247363</rdf:li>
+     <rdf:li>178.51771027450562</rdf:li>
+     <rdf:li>142.14035157006978</rdf:li>
+     <rdf:li>10.00000000000000</rdf:li>
+    </rdf:Seq>
+   </avm:FL.PeakLevel>
+   <avm:FL.ScaledBackgroundLevel>
+    <rdf:Seq>
+     <rdf:li>0.00000000000000</rdf:li>
+     <rdf:li>0.00000000000000</rdf:li>
+     <rdf:li>0.00000000000000</rdf:li>
+     <rdf:li>0.00000000000000</rdf:li>
+    </rdf:Seq>
+   </avm:FL.ScaledBackgroundLevel>
+   <avm:FL.ScaledPeakLevel>
+    <rdf:Seq>
+     <rdf:li>100.00000000000000</rdf:li>
+     <rdf:li>178.51771027450562</rdf:li>
+     <rdf:li>142.14035157006978</rdf:li>
+     <rdf:li>2.85439068745043</rdf:li>
+    </rdf:Seq>
+   </avm:FL.ScaledPeakLevel>
+   <avm:FL.BlackLevel>
+    <rdf:Seq>
+     <rdf:li>0.00000000000000</rdf:li>
+     <rdf:li>5.13156566827804</rdf:li>
+     <rdf:li>0.10491086090789</rdf:li>
+     <rdf:li>0.11807826518201</rdf:li>
+    </rdf:Seq>
+   </avm:FL.BlackLevel>
+   <avm:FL.WhiteLevel>
+    <rdf:Seq>
+     <rdf:li>85.85702227925083</rdf:li>
+     <rdf:li>20.69808537219229</rdf:li>
+     <rdf:li>12.82364560051002</rdf:li>
+     <rdf:li>2.02000000000000</rdf:li>
+    </rdf:Seq>
+   </avm:FL.WhiteLevel>
+   <avm:Spectral.ColorAssignment>
+    <rdf:Seq>
+     <rdf:li>Blue</rdf:li>
+     <rdf:li>Blue</rdf:li>
+     <rdf:li>Green</rdf:li>
+     <rdf:li>Green</rdf:li>
+     <rdf:li>Red</rdf:li>
+    </rdf:Seq>
+   </avm:Spectral.ColorAssignment>
+  </rdf:Description>
+  <rdf:Description rdf:about=""
+    xmlns:crs="http://ns.adobe.com/camera-raw-settings/1.0/">
+   <crs:AlreadyApplied>True</crs:AlreadyApplied>
+  </rdf:Description>
+  <rdf:Description rdf:about=""
+    xmlns:illustrator="http://ns.adobe.com/illustrator/1.0/">
+   <illustrator:StartupProfile>Print</illustrator:StartupProfile>
+  </rdf:Description>
+  <rdf:Description rdf:about=""
+    xmlns:Iptc4xmpCore="http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/">
+   <Iptc4xmpCore:CreatorContactInfo rdf:parseType="Resource">
+    <Iptc4xmpCore:CiAdrExtadr>1200 E. California Blvd.</Iptc4xmpCore:CiAdrExtadr>
+    <Iptc4xmpCore:CiAdrCity>Pasadena</Iptc4xmpCore:CiAdrCity>
+    <Iptc4xmpCore:CiAdrRegion>CA</Iptc4xmpCore:CiAdrRegion>
+    <Iptc4xmpCore:CiAdrPcode>91125</Iptc4xmpCore:CiAdrPcode>
+    <Iptc4xmpCore:CiAdrCtry>USA</Iptc4xmpCore:CiAdrCtry>
+    <Iptc4xmpCore:CiUrlWork>http://www.spitzer.caltech.edu</Iptc4xmpCore:CiUrlWork>
+   </Iptc4xmpCore:CreatorContactInfo>
+  </rdf:Description>
+  <rdf:Description rdf:about=""
+    xmlns:xapRights="http://ns.adobe.com/xap/1.0/rights/">
+   <xapRights:UsageTerms>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">Public Domain</rdf:li>
+    </rdf:Alt>
+   </xapRights:UsageTerms>
+  </rdf:Description>
+ </rdf:RDF>
+</x:xmpmeta>
