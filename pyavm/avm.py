@@ -445,7 +445,7 @@ class AVM(AVMContainer):
         self.Spatial.ReferencePixel = wcs.wcs.crpix.tolist()
         self.Spatial.Scale = wcs.wcs.cdelt.tolist()
         try:
-            self.Spatial.Rotation, wcs.wcs.crota[1]
+            self.Spatial.Rotation = wcs.wcs.crota[1]
         except:
             pass
 
