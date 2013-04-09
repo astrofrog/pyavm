@@ -314,7 +314,7 @@ class AVM(AVMContainer):
 
             else:
 
-                print("WARNING: ignoring tag %s:%s" % (tag, name))
+                warnings.warn("ignoring tag %s:%s" % (tag, name))
 
         return self
 
@@ -341,7 +341,7 @@ class AVM(AVMContainer):
         if self.Spatial.CoordinateFrame is not None:
             ctype = self.Spatial.CoordinateFrame
         else:
-            print("WARNING: Spatial.CoordinateFrame not found, assuming ICRS")
+            warnings.warn("Spatial.CoordinateFrame not found, assuming ICRS")
             ctype = 'ICRS'
 
         wcs.wcs.radesys = ctype.encode('ascii')
