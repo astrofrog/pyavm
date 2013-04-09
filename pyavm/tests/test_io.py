@@ -24,8 +24,7 @@ XML_FILES = glob.glob(os.path.join(ROOT, 'data', '*.xml'))
 
 @pytest.mark.parametrize('xml_file', XML_FILES)
 def test_io_jpg(tmpdir, xml_file):
-    avm = AVM()
-    avm.from_xml_file(xml_file)
+    avm = AVM.from_xml_file(xml_file)
     filename_in = tmpdir.join('test_in.png').strpath
     filename_out = tmpdir.join('test_out.png').strpath
     i = Image.fromarray(np.ones((16, 16), dtype=np.uint8))

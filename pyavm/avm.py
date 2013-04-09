@@ -49,6 +49,7 @@ try:
 except ImportError:
     astropy_installed = False
 
+
 class NoSpatialInformation(Exception):
     pass
 
@@ -262,7 +263,8 @@ class AVM(AVMContainer):
         else:
             object.__setattr__(self, attribute, value)
 
-    def from_file(self, filename):
+    @classmethod
+    def from_file(cls, filename):
 
         # Get XMP data from file
         xmp = extract_xmp(filename)
@@ -274,12 +276,16 @@ class AVM(AVMContainer):
 
         # Extract XML
         xml = xmp[start:end]
-        return self.from_xml(xml)
+        return cls.from_xml(xml)
 
-    def from_xml_file(self, filename):
-        return self.from_xml(open(filename, 'rb').read())
+    @classmethod
+    def from_xml_file(cls, filename):
+        return cls.from_xml(open(filename, 'rb').read())
 
-    def from_xml(self, xml):
+    @classmethod
+    def from_xml(cls, xml):
+
+        self = cls()
 
         # Parse XML
         tree = et.parse(StringIO(xml))
@@ -309,6 +315,8 @@ class AVM(AVMContainer):
             else:
 
                 print("WARNING: ignoring tag %s:%s" % (tag, name))
+
+        return self
 
     def to_wcs(self, use_full_header=False):
         '''
@@ -391,7 +399,8 @@ class AVM(AVMContainer):
 
         return wcs
 
-    def from_header(self, header, include_full_header=True):
+    @classmethod
+    def from_header(cls, header, include_full_header=True):
         '''
         Convert a FITS header into AVM information
         '''
@@ -399,20 +408,22 @@ class AVM(AVMContainer):
         if not astropy_installed:
             raise Exception("Astropy is required to use from_wcs()")
 
+        wcs = WCS(header)
+        self = cls.from_wcs(wcs)
+
         if include_full_header:
             self.Spatial.FITSheader = utf8(header)
 
-        if astropy_installed:
-            wcs = WCS(header)
-            self.from_wcs(wcs)
-
-    def from_wcs(self, wcs):
+    @classmethod
+    def from_wcs(cls, wcs):
         '''
         Convert a astropy.wcs.WCS object into AVM information
         '''
 
         if not astropy_installed:
             raise Exception("Astropy is required to use from_wcs()")
+
+        self = cls()
 
         # Equinox
 
@@ -437,6 +448,8 @@ class AVM(AVMContainer):
             pass
 
         self.Spatial.Quality = "Full"
+
+        return self
 
     def to_xml(self):
 
