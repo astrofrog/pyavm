@@ -6,9 +6,8 @@ except:
     basestring = unicode = str
 
 import re
-import time
 import datetime
-from dateutil import parser
+import warnings
 import xml.etree.ElementTree as et
 
 from .exceptions import AVMItemNotInControlledVocabularyError, AVMListLengthError
@@ -468,7 +467,6 @@ class AVMOrderedListCV(AVMOrderedList, AVMStringCVCapitalize):
             raise AVMListLengthError("List is not the correct length.")
 
         checked_data = []
-        length = 0
         # Check data type in list
         for value in values:
             if (isinstance(value, basestring)):
