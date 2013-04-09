@@ -19,13 +19,13 @@ def embed_xmp(image_in, image_out, xmp_packet):
         xmp_segment = JPEGSegment()
 
         # APP1 marker
-        xmp_segment.bytes = "\xff\xe1"
+        xmp_segment.bytes = b"\xff\xe1"
 
         # Length of XMP packet + 2 + 29
         xmp_segment.bytes += struct.pack('>H', len(xmp_packet) + 29 + 2)
 
         # XMP Namespace URI (NULL-terminated)
-        xmp_segment.bytes += "http://ns.adobe.com/xap/1.0/\x00"
+        xmp_segment.bytes += b"http://ns.adobe.com/xap/1.0/\x00"
 
         # XMP packet
         xmp_segment.bytes += xmp_packet
@@ -94,7 +94,7 @@ def embed_xmp(image_in, image_out, xmp_packet):
         # Check if there is already XMP data in the file
         existing = []
         for chunk in png_file.chunks:
-            if chunk.type == 'iTXt':
+            if chunk.type == b'iTXt':
                 if chunk.data.startswith(b'XML:com.adobe.xmp'):
                     existing.append(chunk)
         if existing:

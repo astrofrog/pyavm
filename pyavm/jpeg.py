@@ -65,6 +65,7 @@ class JPEGFile(object):
 
         fileobj = open(filename, 'rb')
         contents = fileobj.read()
+        fileobj.close()
 
         self = cls()
 

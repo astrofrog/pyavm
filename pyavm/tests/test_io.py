@@ -57,11 +57,12 @@ def test_io_png_repeat(tmpdir, xml_file):
     i.save(filename_in)
     with warnings.catch_warnings(record=True) as w:
         avm.embed(filename_in, filename_out_1, verify=True)
-        assert w == []
+        messages = [str(x.message) for x in w]
+        assert 'Discarding existing XMP packet from PNG file' not in messages
     with warnings.catch_warnings(record=True) as w:
         avm.embed(filename_out_1, filename_out_2, verify=True)
-        assert len(w) == 1
-        assert str(w[0].message) == 'Discarding existing XMP packet from PNG file'
+        messages = [str(x.message) for x in w]
+        assert 'Discarding existing XMP packet from PNG file' in messages
 
 
 @pytest.mark.parametrize('xml_file', XML_FILES)
@@ -75,8 +76,9 @@ def test_io_jpeg_repeat(tmpdir, xml_file):
     i.save(filename_in)
     with warnings.catch_warnings(record=True) as w:
         avm.embed(filename_in, filename_out_1, verify=True)
-        assert w == []
+        messages = [str(x.message) for x in w]
+        assert 'Discarding existing XMP packet from JPEG file' not in messages
     with warnings.catch_warnings(record=True) as w:
         avm.embed(filename_out_1, filename_out_2, verify=True)
-        assert len(w) == 1
-        assert str(w[0].message) == 'Discarding existing XMP packet from JPEG file'
+        messages = [str(x.message) for x in w]
+        assert 'Discarding existing XMP packet from JPEG file' in messages

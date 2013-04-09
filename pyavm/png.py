@@ -94,6 +94,8 @@ class PNGFile(object):
             if chunk.type == b'IEND':
                 break
 
+        fileobj.close()
+
         return self
 
     def write(self, filename):
