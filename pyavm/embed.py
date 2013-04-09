@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 
 import struct
+import warnings
 
 from .jpeg import is_jpeg, JPEGFile, JPEGSegment
 from .png import is_png, PNGFile, PNGChunk
@@ -32,7 +33,16 @@ def embed_xmp(image_in, image_out, xmp_packet):
         # Read in input file
         jpeg_file = JPEGFile.read(image_in)
 
-        # Need to check there isn't alrady XMP meta-data
+        # Check if there is already XMP data in the file
+        existing = []
+        for segment in jpeg_file.segments:
+            if segment.type == 'APP1':
+                if segment.bytes[4:32] == b'http://ns.adobe.com/xap/1.0/':
+                    existing.append(segment)
+        if existing:
+            warnings.warn("Discarding existing XMP packet from JPEG file")
+            for e in existing:
+                jpeg_file.segments.remove(e)
 
         # Position at which to insert the packet
         markers = [x.type for x in jpeg_file.segments]
@@ -81,7 +91,16 @@ def embed_xmp(image_in, image_out, xmp_packet):
         # Read in input file
         png_file = PNGFile.read(image_in)
 
-        # Need to check there isn't alrady XMP meta-data
+        # Check if there is already XMP data in the file
+        existing = []
+        for chunk in png_file.chunks:
+            if chunk.type == 'iTXt':
+                if chunk.data.startswith(b'XML:com.adobe.xmp'):
+                    existing.append(chunk)
+        if existing:
+            warnings.warn("Discarding existing XMP packet from PNG file")
+            for e in existing:
+                png_file.chunks.remove(e)
 
         # Insert chunk into PNG file
         png_file.chunks.insert(1, xmp_chunk)
