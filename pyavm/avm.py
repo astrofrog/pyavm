@@ -1,5 +1,5 @@
 # PyAVM - Simple pure-python AVM meta-data handling
-# Copyright (c) 2011 Thomas P. Robitaille
+# Copyright (c) 2011-13 Thomas P. Robitaille
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -19,9 +19,22 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+from __future__ import print_function, division
+
+try:
+    unicode
+except:
+    basestring = unicode = str
+
 import warnings
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import BytesIO as StringIO
 import xml.etree.ElementTree as et
+
+from .specs import SPECS, REVERSE_SPECS
+
 
 def register_namespace(tag, uri):
     try:
@@ -30,105 +43,19 @@ def register_namespace(tag, uri):
         et._namespace_map[uri] = tag
 
 try:
-    import pywcs
-    pywcs_installed = True
-except:
-    pywcs_installed = False
+    from astropy.wcs import WCS
+    from astropy.io import fits
+    astropy_installed = True
+except ImportError:
+    astropy_installed = False
 
-try:
-    import pyfits
-    pyfits_installed = True
-except:
-    pyfits_installed = False
 
-from pyavm.embed import embed_xmp
+class NoSpatialInformation(Exception):
+    pass
 
-# Define acceptable tags to avoid reading in non-AVM meta-data
 
-tags = {}
-
-tags['photoshop'] = {}
-tags['xapRights'] = {}
-tags['Iptc4xmpCore'] = {}
-tags['dc'] = {}
-tags['avm'] = {}
-
-# Metadata Tag Definitions
-
-# Creator Metadata
-
-tags['photoshop']['Source'] = 'Creator'
-tags['Iptc4xmpCore']['CiUrlWork'] = 'CreatorURL'
-tags['dc']['creator'] = 'Contact.Name'
-tags['Iptc4xmpCore']['CiEmailWork'] = 'Contact.Email'
-tags['Iptc4xmpCore']['CiTelWork'] = 'Contact.Telephone'
-tags['Iptc4xmpCore']['CiAdrExtadr'] = 'Contact.Address'
-tags['Iptc4xmpCore']['CiAdrCity'] = 'Contact.City'
-tags['Iptc4xmpCore']['CiAdrRegion'] = 'Contact.StateProvince'
-tags['Iptc4xmpCore']['CiAdrPcode'] = 'Contact.PostalCode'
-tags['Iptc4xmpCore']['CiAdrCtry'] = 'Contact.Country'
-tags['xapRights']['UsageTerms'] = 'Rights'
-
-# Content Metadata
-
-tags['dc']['title'] = 'Title'
-tags['photoshop']['Headline'] = 'Headline'
-tags['dc']['description'] = 'Description'
-tags['avm']['Subject.Category'] = 'Subject.Category'
-tags['dc']['subject'] = 'Subject.Name'
-tags['avm']['Distance'] = 'Distance'
-tags['avm']['Distance.Notes'] = 'Distance.Notes'
-tags['avm']['ReferenceURL'] = 'ReferenceURL'
-tags['photoshop']['Credit'] = 'Credit'
-tags['photoshop']['DateCreated'] = 'Date'
-tags['avm']['ID'] = 'ID'
-tags['avm']['Type'] = 'Type'
-tags['avm']['Image.ProductQuality'] = 'Image.ProductQuality'
-
-# Observation Metadata
-
-tags['avm']['Facility'] = 'Facility'
-tags['avm']['Instrument'] = 'Instrument'
-tags['avm']['Spectral.ColorAssignment'] = 'Spectral.ColorAssignment'
-tags['avm']['Spectral.Band'] = 'Spectral.Band'
-tags['avm']['Spectral.Bandpass'] = 'Spectral.Bandpass'
-tags['avm']['Spectral.CentralWavelength'] = 'Spectral.CentralWavelength'
-tags['avm']['Spectral.Notes'] = 'Spectral.Notes'
-tags['avm']['Temporal.StartTime'] = 'Temporal.StartTime'
-tags['avm']['Temporal.IntegrationTime'] = 'Temporal.IntegrationTime'
-tags['avm']['DatasetID'] = 'DatasetID'
-
-# Coordinate Metadata
-
-tags['avm']['Spatial.CoordinateFrame'] = 'Spatial.CoordinateFrame'
-tags['avm']['Spatial.Equinox'] = 'Spatial.Equinox'
-tags['avm']['Spatial.ReferenceValue'] = 'Spatial.ReferenceValue'
-tags['avm']['Spatial.ReferenceDimension'] = 'Spatial.ReferenceDimension'
-tags['avm']['Spatial.ReferencePixel'] = 'Spatial.ReferencePixel'
-tags['avm']['Spatial.Scale'] = 'Spatial.Scale'
-tags['avm']['Spatial.Rotation'] = 'Spatial.Rotation'
-tags['avm']['Spatial.CoordsystemProjection'] = 'Spatial.CoordsystemProjection'
-tags['avm']['Spatial.Quality'] = 'Spatial.Quality'
-tags['avm']['Spatial.Notes'] = 'Spatial.Notes'
-tags['avm']['Spatial.FITSheader'] = 'Spatial.FITSheader'
-tags['avm']['Spatial.CDMatrix'] = 'Spatial.CDMatrix'
-
-# Published Metadata
-
-tags['avm']['Publisher'] = 'Publisher'
-tags['avm']['PublisherID'] = 'PublisherID'
-tags['avm']['ResourceID'] = 'ResourceID'
-tags['avm']['ResourceURL'] = 'ResourceURL'
-tags['avm']['RelatedResources'] = 'RelatedResources'
-tags['avm']['MetadataDate'] = 'MetadataDate'
-tags['avm']['MetadataVersion'] = 'MetadataVersion'
-
-# Define reverse dictionary for above tags
-
-reverse_tags = {}
-for tag in tags:
-    for name in tags[tag]:
-        reverse_tags[tags[tag][name]] = (tag, name)
+from .embed import embed_xmp
+from .extract import extract_xmp
 
 # Define namespace to tag mapping
 
@@ -167,38 +94,6 @@ def auto_type(string):
             return string
 
 
-def format_rdf_seq(parent, seq):
-
-    element = et.SubElement(parent, "rdf:Seq")
-
-    for item in seq:
-        li = et.SubElement(element, "rdf:li")
-        if type(item) is float:
-            li.text = "%.16f" % item
-        else:
-            li.text = "%s" % utf8(item)
-
-    return element
-
-
-def format_object(parent, avm_name, content):
-
-    tag, name = reverse_tags[avm_name]
-    uri = reverse_namespaces[tag]
-
-    element = et.SubElement(parent, "{%s}%s" % (uri, name))
-
-    if type(content) in [list, tuple]:
-        format_rdf_seq(element, content)
-    else:
-        if type(content) is float:
-            element.text = "%.16f" % content
-        else:
-            element.text = "%s" % utf8(content)
-
-    return element
-
-
 class AVMContainer(object):
 
     def __init__(self, allow_value=False):
@@ -230,7 +125,7 @@ class AVMContainer(object):
                 else:
                     if self.__dict__[family] is not None:
                         string += indent * " " + \
-                                  "%s: %s\n" % (family, utf8(self.__dict__[family]))
+                            "%s: %s\n" % (family, utf8(self.__dict__[family]))
 
         return string
 
@@ -254,7 +149,7 @@ def parse_avm_content(rdf):
         uri, tag = item[1:].split('}')
 
         if uri in namespaces:
-            avm_content[(namespaces[uri], tag)] = auto_type(rdf.attrib[item])
+            avm_content[(namespaces[uri], tag)] = rdf.attrib[item]
 
     for item in rdf:
 
@@ -267,11 +162,11 @@ def parse_avm_content(rdf):
                 avm_content[key] = sub_avm_content[key]
         elif uri in namespaces:
             if len(item) == 0:
-                avm_content[(namespaces[uri], tag)] = auto_type(item.text)
+                avm_content[(namespaces[uri], tag)] = item.text
             elif len(item) == 1:
                 c_uri, c_tag = item[0].tag[1:].split('}')
                 if c_uri == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#' and c_tag in ['Bag', 'Seq', 'Alt']:
-                    avm_content[(namespaces[uri], tag)] = [auto_type(x.text) for x in item[0]]
+                    avm_content[(namespaces[uri], tag)] = [x.text for x in item[0]]
                 else:
                     raise Exception("Unexpected tag %s:%s" % (c_uri, c_tag))
             elif len(item) > 1:
@@ -284,13 +179,14 @@ def parse_avm_content(rdf):
 
 class AVM(AVMContainer):
     '''
-    To parse AVM meta-data from an existing file, simply create an instance of this class using the filename of the image (or any file-like object):
+    To parse AVM meta-data from an existing file, simply create an instance of
+    this class using the filename of the image (or any file-like object):
 
         >>> avm = AVM('myexample.jpg')
 
     Then, you can view the contents by using
 
-        >>> print avm
+        >>> print(avm)
 
     or
 
@@ -304,12 +200,12 @@ class AVM(AVMContainer):
         >>> avm.Publisher
         'Chandra X-ray Observatory'
 
-    It is also possible to initialize an AVM object using a pywcs.WCS instance:
+    It is also possible to initialize an AVM object using an Astropy WCS instance:
 
-        >>> import pyfits
-        >>> import pywcs
+        >>> from astropy.io import fits
+        >>> from astropy.wcs import WCS
         >>> from pyavm import AVM
-        >>> wcs = pywcs.WCS(pyfits.getheader('image.fits'))
+        >>> wcs = WCS(fits.getheader('image.fits'))
         >>> avm = AVM(wcs)
 
     Finally, it is possible to embed AVM meta-data into an image file:
@@ -319,9 +215,12 @@ class AVM(AVMContainer):
     At this time, only JPG and PNG files are supported for embedding.
     '''
 
-    def __init__(self, *args):
+    def __init__(self, origin=None, version="1.2"):
 
-        for avm_name in reverse_tags:
+        self.__dict__['specs'] = SPECS[version]
+        self.__dict__['reverse_specs'] = REVERSE_SPECS[version]
+
+        for avm_name in self.specs:
 
             if "Distance" in avm_name:
                 if not "Distance" in self.__dict__:
@@ -338,22 +237,25 @@ class AVM(AVMContainer):
                 else:
                     self.__dict__[avm_name] = None
 
-        if len(args) == 1:
-            if type(args[0]) is str:
-                self.from_file(args[0])
-            elif pyfits_installed and isinstance(args[0], pyfits.Header):
-                self.from_header(args[0])
-            elif pywcs_installed and isinstance(args[0], pywcs.WCS):
-                self.from_wcs(args[0])
+        if origin is not None:
+            if type(origin) is str:
+                self.from_file(origin)
+            elif astropy_installed and isinstance(origin, fits.Header):
+                self.from_header(origin)
+            elif astropy_installed and isinstance(origin, WCS):
+                self.from_wcs(origin)
             else:
-                raise Exception("Unknown arguemnt type: %s" % type(args[0]))
-        elif len(args) > 1:
-            raise Exception("Too many arguments")
+                raise Exception("Unknown argument type: %s" % type(origin))
 
     def __setattr__(self, attribute, value):
-        if attribute not in self.__dict__:
+
+        if attribute not in self.specs:
             raise Exception("%s is not a valid AVM group or tag" % attribute)
-        elif isinstance(self.__dict__[attribute], AVMContainer):
+
+        avm_class = self.specs[attribute]
+        value = avm_class.check_data(value)
+
+        if isinstance(self.__dict__[attribute], AVMContainer):
             if hasattr(self.__dict__[attribute], "_value"):
                 self.__dict__[attribute]._value = value
             else:
@@ -361,24 +263,29 @@ class AVM(AVMContainer):
         else:
             object.__setattr__(self, attribute, value)
 
-    def from_file(self, filename):
+    @classmethod
+    def from_file(cls, filename):
 
-        # Read in image
-        if hasattr(filename, 'read'):
-            contents = filename.read()
-        else:
-            contents = file(filename, 'rb').read()
+        # Get XMP data from file
+        xmp = extract_xmp(filename)
 
-        # Look for XMP packets
-        start = contents.find("<?xpacket begin=")
-        if start < 0:
-            raise NoAVMPresent("No XMP packet found")
-        start = contents.index("?>", start) + 2
-        end = contents.index("</x:xmpmeta>") + 12
-        print "Found XMP packet with %i bytes" % (end - start)
+        # Extract XML
+        start = xmp.index("<?xpacket begin=")
+        start = xmp.index("?>", start) + 2
+        end = xmp.index("</x:xmpmeta>") + 12
 
-        # Extract XMP packet
-        xml = contents[start:end]
+        # Extract XML
+        xml = xmp[start:end]
+        return cls.from_xml(xml)
+
+    @classmethod
+    def from_xml_file(cls, filename):
+        return cls.from_xml(open(filename, 'rb').read())
+
+    @classmethod
+    def from_xml(cls, xml):
+
+        self = cls()
 
         # Parse XML
         tree = et.parse(StringIO(xml))
@@ -389,11 +296,13 @@ class AVM(AVMContainer):
 
             content = avm_content[(tag, name)]
 
-            if name in tags[tag]:
+            if (tag, name) in self.reverse_specs:
 
-                avm_name = tags[tag][name]
+                avm_name = self.reverse_specs[tag, name]
 
                 # Add to AVM dictionary
+                avm_class = self.specs[avm_name]
+                content = avm_class.check_data(content)
                 if "." in avm_name:
                     family, key = avm_name.split('.')
                     self.__dict__[family].__dict__[key] = content
@@ -405,32 +314,37 @@ class AVM(AVMContainer):
 
             else:
 
-                print "WARNING: ignoring tag %s:%s" % (tag, name)
+                warnings.warn("ignoring tag %s:%s" % (tag, name))
+
+        return self
 
     def to_wcs(self, use_full_header=False):
         '''
-        Convert AVM projection information into a pywcs.WCS object
+        Convert AVM projection information into a astropy.wcs.WCS object
         '''
 
-        if not pywcs_installed:
-            raise Exception("PyWCS is required to use to_wcs()")
+        if not astropy_installed:
+            raise Exception("Astropy is required to use to_wcs()")
+
+        if repr(self.Spatial) == '':
+            raise NoSpatialInformation("AVM meta-data does not contain any spatial information")
 
         if use_full_header and self.Spatial.FITSheader is not None:
-            print "Using full FITS header from Spatial.FITSheader"
-            header = pyfits.Header(txtfile=StringIO(self.Spatial.FITSheader))
-            return pywcs.WCS(header)
+            print("Using full FITS header from Spatial.FITSheader")
+            header = fits.Header(txtfile=StringIO(self.Spatial.FITSheader))
+            return WCS(header)
 
         # Initializing WCS object
-        wcs = pywcs.WCS(naxis=2)
+        wcs = WCS(naxis=2)
 
         # Find the coordinate type
         if self.Spatial.CoordinateFrame is not None:
             ctype = self.Spatial.CoordinateFrame
         else:
-            print "WARNING: Spatial.CoordinateFrame not found, assuming ICRS"
+            warnings.warn("Spatial.CoordinateFrame not found, assuming ICRS")
             ctype = 'ICRS'
 
-        wcs.wcs.radesys = ctype
+        wcs.wcs.radesys = ctype.encode('ascii')
 
         if ctype in ['ICRS', 'FK5', 'FK4']:
             xcoord = "RA--"
@@ -450,8 +364,8 @@ class AVM(AVMContainer):
         # Find the projection type
         cproj = ('%+4s' % self.Spatial.CoordsystemProjection).replace(' ', '-')
 
-        wcs.wcs.ctype[0] = xcoord + cproj
-        wcs.wcs.ctype[1] = ycoord + cproj
+        wcs.wcs.ctype[0] = (xcoord + cproj).encode('ascii')
+        wcs.wcs.ctype[1] = (ycoord + cproj).encode('ascii')
 
         # Find the equinox
         if self.Spatial.Equinox is None:
@@ -463,7 +377,10 @@ class AVM(AVMContainer):
             elif self.Spatial.Equinox == "B1950":
                 wcs.wcs.equinox = 1950.
             else:
-                raise Exception("Unknown equinox: %s" % self.Spatial.Equinox)
+                try:
+                    wcs.wcs.equinox = float(self.Spatial.Equinox)
+                except ValueError:
+                    raise ValueError("Unknown equinox: %s" % self.Spatial.Equinox)
         else:
             wcs.wcs.equinox = float(self.Spatial.Equinox)
 
@@ -482,28 +399,33 @@ class AVM(AVMContainer):
 
         return wcs
 
-    def from_header(self, header, include_full_header=True):
+    @classmethod
+    def from_header(cls, header, include_full_header=True):
         '''
         Convert a FITS header into AVM information
         '''
 
-        if not pyfits_installed:
-            raise Exception("PyWCS is required to use from_wcs()")
+        if not astropy_installed:
+            raise Exception("Astropy is required to use from_wcs()")
+
+        wcs = WCS(header)
+        self = cls.from_wcs(wcs)
 
         if include_full_header:
-            self.Spatial.FITSheader = utf8(header)
+            self.Spatial.FITSheader = str(header)
 
-        if pywcs_installed:
-            wcs = pywcs.WCS(header)
-            self.from_wcs(wcs)
+        return self
 
-    def from_wcs(self, wcs):
+    @classmethod
+    def from_wcs(cls, wcs):
         '''
-        Convert a pywcs.WCS object into AVM information
+        Convert a astropy.wcs.WCS object into AVM information
         '''
 
-        if not pywcs_installed:
-            raise Exception("PyWCS is required to use from_wcs()")
+        if not astropy_installed:
+            raise Exception("Astropy is required to use from_wcs()")
+
+        self = cls()
 
         # Equinox
 
@@ -523,13 +445,15 @@ class AVM(AVMContainer):
         self.Spatial.ReferencePixel = wcs.wcs.crpix.tolist()
         self.Spatial.Scale = wcs.wcs.cdelt.tolist()
         try:
-            self.Spatial.Rotation, wcs.wcs.crota[1]
+            self.Spatial.Rotation = wcs.wcs.crota[1]
         except:
             pass
 
         self.Spatial.Quality = "Full"
 
-    def to_xmp(self):
+        return self
+
+    def to_xml(self):
 
         # Register namespaces
         register_namespace('x', "adobe:ns:meta/")
@@ -537,16 +461,12 @@ class AVM(AVMContainer):
         for namespace in namespaces:
             register_namespace(namespaces[namespace], namespace)
 
-        # Initialize XMP packet
-        packet = '<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
-
         # Create containing structure
         root = et.Element("{adobe:ns:meta/}xmpmeta")
         trunk = et.SubElement(root, "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}RDF")
         branch = et.SubElement(trunk, "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}Description")
 
-        # Write meta-data version
-        format_object(branch, "MetadataVersion", "1.1")
+        self.MetadataVersion = 1.1
 
         # Write all the elements
         for name in self.__dict__:
@@ -554,26 +474,34 @@ class AVM(AVMContainer):
                 for key in self.__dict__[name].__dict__:
                     if self.__dict__[name].__dict__[key] is not None:
                         if key == "_value":
-                            format_object(branch, '%s' % name, self.__dict__[name]._value)
+                            avm_class = self.specs['%s' % name]
+                            avm_class.to_xml(branch, self.__dict__[name]._value)
                         else:
-                            format_object(branch, '%s.%s' % (name, key), self.__dict__[name].__dict__[key])
+                            avm_class = self.specs['%s.%s' % (name, key)]
+                            avm_class.to_xml(branch, self.__dict__[name].__dict__[key])
             else:
-                if self.__dict__[name] is not None:
-                    format_object(branch, name, self.__dict__[name])
+                if self.__dict__[name] is not None and name in self.specs:
+                    avm_class = self.specs[name]
+                    avm_class.to_xml(branch, self.__dict__[name])
 
         # Create XML Tree
         tree = et.ElementTree(root)
 
         # Need to create a StringIO object to write to
         s = StringIO()
-        tree.write(s)
+        tree.write(s, encoding='utf-8')
 
         # Rewind and read the contents
         s.seek(0)
-        packet += s.read()
+        xml_string = s.read()
 
-        # Close the XMP packet
-        packet += '<?xpacket end="w"?>'
+        return xml_string
+
+    def to_xmp(self):
+
+        packet = b'<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
+        packet += self.to_xml()
+        packet += b'<?xpacket end="w"?>'
 
         return packet
 
@@ -584,6 +512,12 @@ class AVM(AVMContainer):
 
         # Verify file if needed
         if verify:
-            import Image
+            try:
+                from PIL import Image
+            except ImportError:
+                try:
+                    import Image
+                except ImportError:
+                    raise ImportError("PIL is required for the verify= option")
             image = Image.open(filename_out)
             image.verify()
