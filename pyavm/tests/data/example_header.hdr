@@ -1,0 +1,24 @@
+SIMPLE  =                    T
+BITPIX  =                  -64
+NAXIS   =                    2
+NAXIS1  =                  599
+NAXIS2  =                  599
+EXTEND  =                    T / FITS dataset may contain extensions
+COMMENT   FITS (Flexible Image Transport System) format is defined in 'Astronomy
+COMMENT   and Astrophysics', volume 376, page 359; bibcode: 2001A&A...376..359H
+CRPIX1  =              299.628
+CRVAL1  =          0.000000000
+CDELT1  =      -0.001666666707
+CTYPE1  = 'GLON-CAR'
+CRPIX2  =              299.394
+CRVAL2  =          0.000000000
+CDELT2  =       0.001666666707
+CTYPE2  = 'GLAT-CAR'
+CROTA2  =          0.000000000
+LONPOLE =          0.000000000
+WAVELENG=          2.13400E-05
+BUNIT   = 'W/m^2-sr'
+TELESCOP= 'MSX     '
+INSTRUME= 'SPIRITIII'
+ORIGIN  = 'AFRL-VSBC'
+END

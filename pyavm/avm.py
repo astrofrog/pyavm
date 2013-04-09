@@ -414,6 +414,8 @@ class AVM(AVMContainer):
         if include_full_header:
             self.Spatial.FITSheader = utf8(header)
 
+        return self
+
     @classmethod
     def from_wcs(cls, wcs):
         '''
