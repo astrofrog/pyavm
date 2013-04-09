@@ -1,3 +1,10 @@
+from __future__ import print_function, division
+
+try:
+    unicode
+except:
+    basestring = unicode = str
+
 import os
 import pytest
 
@@ -13,7 +20,7 @@ def test_from_header():
     assert isinstance(a.Spatial.FITSheader, basestring)
     assert a.Spatial.FITSheader == header
     # assert a.Spatial.Equinox == 2000.  # returns NaN at the moment
-    assert a.Spatial.CoordsystemProjection == 'CAR'
+    assert a.Spatial.CoordsystemProjection == b'CAR'
     assert a.Spatial.ReferenceDimension[0] == 599
     assert a.Spatial.ReferenceDimension[1] == 599
     assert a.Spatial.ReferenceValue[0] == 0.
