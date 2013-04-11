@@ -444,6 +444,18 @@ class AVM(AVMContainer):
         self.Spatial.ReferenceValue = wcs.wcs.crval.tolist()
         self.Spatial.ReferencePixel = wcs.wcs.crpix.tolist()
         self.Spatial.Scale = wcs.wcs.cdelt.tolist()
+
+        if 'RA--' == wcs.wcs.ctype[0][:4] and 'DEC-' == wcs.wcs.ctype[1][:4]:
+            self.Spatial.CoordinateFrame = 'ICRS' # or 'FK5', 'FK4'?   How to determine?
+        elif 'ELON' == wcs.wcs.ctype[0][:4] and 'ELAT' == wcs.wcs.ctype[1][:4]:
+            self.Spatial.CoordinateFrame = 'ECL'
+        elif 'GLON' == wcs.wcs.ctype[0][:4] and 'GLAT' == wcs.wcs.ctype[1][:4]:
+            self.Spatial.CoordinateFrame = 'GAL'
+        elif 'SLON' == wcs.wcs.ctype[0][:4] and 'SLAT' == wcs.wcs.ctype[1][:4]:
+            self.Spatial.CoordinateFrame = 'SGAL'
+        else:
+            raise Exception("Unknown coordinate system: %s,%s" % wcs.wcs.ctype)
+
         try:
             self.Spatial.Rotation = wcs.wcs.crota[1]
         except:
