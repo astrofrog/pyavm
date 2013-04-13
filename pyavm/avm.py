@@ -98,34 +98,35 @@ class AVMContainer(object):
 
     def __init__(self, allow_value=False):
         if allow_value:
-            self.__dict__["_value"] = None
+            self.value = None
+        self.items = {}
 
     def __str__(self, indent=0):
 
         string = ""
-        for family in self.__dict__:
+        for family in self.items:
 
             if family.startswith('_'):
                 continue
 
-            if type(self.__dict__[family]) is AVMContainer:
-                substring = self.__dict__[family].__str__(indent + 3)
+            if type(self.items[family]) is AVMContainer:
+                substring = self.items[family].__str__(indent + 3)
                 if substring != "":
-                    if hasattr(self.__dict__[family], '_value'):
-                        string += indent * " " + "%s: %s\n" % (family, utf8(self.__dict__[family]._value))
+                    if hasattr(self.items[family], 'value'):
+                        string += indent * " " + "%s: %s\n" % (family, utf8(self.items[family].value))
                     else:
                         string += indent * " " + "%s:\n" % family
                     string += substring
             else:
-                if type(self.__dict__[family]) is list:
+                if type(self.items[family]) is list:
                     string += indent * " " + "%s:\n" % family
-                    for elem in self.__dict__[family]:
+                    for elem in self.items[family]:
                         if elem is not None:
                             string += indent * " " + "   * %s\n" % utf8(elem)
                 else:
-                    if self.__dict__[family] is not None:
+                    if self.items[family] is not None:
                         string += indent * " " + \
-                            "%s: %s\n" % (family, utf8(self.__dict__[family]))
+                            "%s: %s\n" % (family, utf8(self.items[family]))
 
         return string
 
@@ -133,10 +134,19 @@ class AVMContainer(object):
         return self.__str__()
 
     def __setattr__(self, attribute, value):
-        if attribute not in self.__dict__:
+        if attribute in ['items', 'value']:
+            object.__setattr__(self, attribute, value)
+            return
+        if attribute not in self.items:
             raise Exception("%s is not a valid AVM tag" % attribute)
         else:
             object.__setattr__(self, attribute, value)
+
+    def __getattr__(self, attribute):
+        if attribute in self.items:
+            return self.items[attribute]
+        else:
+            return object.__getattr__(self, attribute)
 
 
 def parse_avm_content(rdf):
@@ -215,56 +225,80 @@ class AVM(AVMContainer):
     At this time, only JPG and PNG files are supported for embedding.
     '''
 
-    def __init__(self, origin=None, version="1.2"):
+    def __init__(self, origin=None, version=1.2):
 
-        self.__dict__['specs'] = SPECS[version]
-        self.__dict__['reverse_specs'] = REVERSE_SPECS[version]
+        self.items = {}
 
-        for avm_name in self.specs:
+        self.MetadataVersion = version
+
+        for avm_name in self._specs:
+
+            if avm_name == "MetadataVersion":
+                continue
 
             if "Distance" in avm_name:
-                if not "Distance" in self.__dict__:
-                    self.__dict__["Distance"] = AVMContainer(allow_value=True)
+                if not "Distance" in self.items:
+                    self.items['Distance'] = AVMContainer(allow_value=True)
 
             if "." in avm_name:
                 family, key = avm_name.split('.')
-                if not family in self.__dict__:
-                    self.__dict__[family] = AVMContainer()
-                self.__dict__[family].__dict__[key] = None
+                if not family in self.items:
+                    self.items[family] = AVMContainer()
+                self.items[family].items[key] = None
             else:
-                if avm_name in self.__dict__ and hasattr(self.__dict__[avm_name], '_value'):
-                    self.__dict__[avm_name]._value = None
+                if avm_name in self.items and hasattr(self.items[avm_name], 'value'):
+                    self.items[avm_name].value = None
                 else:
-                    self.__dict__[avm_name] = None
+                    self.items[avm_name] = None
 
-        if origin is not None:
-            if type(origin) is str:
-                self.from_file(origin)
-            elif astropy_installed and isinstance(origin, fits.Header):
-                self.from_header(origin)
-            elif astropy_installed and isinstance(origin, WCS):
-                self.from_wcs(origin)
-            else:
-                raise Exception("Unknown argument type: %s" % type(origin))
+    @property
+    def _specs(self):
+        return SPECS[self.MetadataVersion]
+
+    @property
+    def _reverse_specs(self):
+        return REVERSE_SPECS[self.MetadataVersion]
+
+    @property
+    def MetadataVersion(self):
+        if 'MetadataVersion' in self.items:
+            return self.items['MetadataVersion']
+        else:
+            return None
+
+    @MetadataVersion.setter
+    def MetadataVersion(self, value):
+        self.items['MetadataVersion'] = value
+        # TODO: update available properties, and warn on dropping existing ones that are set
 
     def __setattr__(self, attribute, value):
 
-        if attribute not in self.specs:
+        if attribute in ['items', 'MetadataVersion']:
+            object.__setattr__(self, attribute, value)
+            return
+
+        if attribute not in self._specs:
             raise Exception("%s is not a valid AVM group or tag" % attribute)
 
-        avm_class = self.specs[attribute]
+        avm_class = self._specs[attribute]
         value = avm_class.check_data(value)
 
-        if isinstance(self.__dict__[attribute], AVMContainer):
-            if hasattr(self.__dict__[attribute], "_value"):
-                self.__dict__[attribute]._value = value
+        if attribute in self.items and isinstance(self.items[attribute], AVMContainer):
+            if hasattr(self.items[attribute], "value"):
+                self.items[attribute].value = value
             else:
                 raise Exception("%s is an AVM group, not a tag" % attribute)
         else:
-            object.__setattr__(self, attribute, value)
+            self.items[attribute] = value
+
+    def __getattr__(self, attribute):
+        if attribute in self.items:
+            return self.items[attribute]
+        else:
+            return object.__getattr__(self, attribute)
 
     @classmethod
-    def from_file(cls, filename):
+    def from_image(cls, filename):
 
         # Get XMP data from file
         xmp = extract_xmp(filename)
@@ -296,21 +330,21 @@ class AVM(AVMContainer):
 
             content = avm_content[(tag, name)]
 
-            if (tag, name) in self.reverse_specs:
+            if (tag, name) in self._reverse_specs:
 
-                avm_name = self.reverse_specs[tag, name]
+                avm_name = self._reverse_specs[tag, name]
 
                 # Add to AVM dictionary
-                avm_class = self.specs[avm_name]
+                avm_class = self._specs[avm_name]
                 content = avm_class.check_data(content)
                 if "." in avm_name:
                     family, key = avm_name.split('.')
-                    self.__dict__[family].__dict__[key] = content
+                    self.items[family].items[key] = content
                 else:
-                    if hasattr(self.__dict__[avm_name], '_value'):
-                        self.__dict__[avm_name]._value = content
+                    if hasattr(self.items[avm_name], 'value'):
+                        self.items[avm_name].value = content
                     else:
-                        self.__dict__[avm_name] = content
+                        self.items[avm_name] = content
 
             else:
 
@@ -469,20 +503,20 @@ class AVM(AVMContainer):
         self.MetadataVersion = 1.1
 
         # Write all the elements
-        for name in self.__dict__:
-            if isinstance(self.__dict__[name], AVMContainer):
-                for key in self.__dict__[name].__dict__:
-                    if self.__dict__[name].__dict__[key] is not None:
-                        if key == "_value":
-                            avm_class = self.specs['%s' % name]
-                            avm_class.to_xml(branch, self.__dict__[name]._value)
+        for name in self.items:
+            if isinstance(self.items[name], AVMContainer):
+                for key in self.items[name].items:
+                    if self.items[name].items[key] is not None:
+                        if key == "value":
+                            avm_class = self._specs['%s' % name]
+                            avm_class.to_xml(branch, self.items[name].value)
                         else:
-                            avm_class = self.specs['%s.%s' % (name, key)]
-                            avm_class.to_xml(branch, self.__dict__[name].__dict__[key])
+                            avm_class = self._specs['%s.%s' % (name, key)]
+                            avm_class.to_xml(branch, self.items[name].items[key])
             else:
-                if self.__dict__[name] is not None and name in self.specs:
-                    avm_class = self.specs[name]
-                    avm_class.to_xml(branch, self.__dict__[name])
+                if self.items[name] is not None and name in self._specs:
+                    avm_class = self._specs[name]
+                    avm_class.to_xml(branch, self.items[name])
 
         # Create XML Tree
         tree = et.ElementTree(root)

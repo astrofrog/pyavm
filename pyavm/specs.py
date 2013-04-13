@@ -4,8 +4,6 @@ from __future__ import print_function, division
 
 """
 Specification for various versions of AVM
-
-.. todo:: Write specification for version 1.0
 """
 
 from .datatypes import *
@@ -13,7 +11,7 @@ from .cv import *
 
 SPECS = {}
 
-SPECS['1.1'] = {
+SPECS[1.1] = {
 
     # Creator Metadata
     'Creator': AVMString('photoshop:Source'),
@@ -89,13 +87,16 @@ SPECS['1.1'] = {
     'FL.StretchFunction': AVMOrderedListCV('avm:FL.StretchFunction', STRETCH_FUNCTION_CHOICES)
 }
 
-SPECS['1.2'] = SPECS['1.1']
+# TODO: write specification for version 1.0
+SPECS[1.0] = SPECS[1.1]
+
+SPECS[1.2] = SPECS[1.1]
 
 # Content Metadata
 
-SPECS['1.2']['PublicationID'] = AVMUnorderedStringList('avm:PublicationID')
-SPECS['1.2']['ProposalID'] = AVMUnorderedStringList('avm:ProposalID')
-SPECS['1.2']["RelatedResources"] = AVMUnorderedStringList('avm:RelatedResources', deprecated=True)
+SPECS[1.2]['PublicationID'] = AVMUnorderedStringList('avm:PublicationID')
+SPECS[1.2]['ProposalID'] = AVMUnorderedStringList('avm:ProposalID')
+SPECS[1.2]["RelatedResources"] = AVMUnorderedStringList('avm:RelatedResources', deprecated=True)
 
 # Create reverse lookup
 
