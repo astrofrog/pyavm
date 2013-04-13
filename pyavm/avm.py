@@ -225,16 +225,16 @@ class AVM(AVMContainer):
     At this time, only JPG and PNG files are supported for embedding.
     '''
 
-    def __init__(self, origin=None, version="1.2"):
+    def __init__(self, origin=None, version=1.2):
 
         self.items = {}
-
-        self._specs = SPECS[version]
-        self._reverse_specs = REVERSE_SPECS[version]
 
         self.MetadataVersion = version
 
         for avm_name in self._specs:
+
+            if avm_name == "MetadataVersion":
+                continue
 
             if "Distance" in avm_name:
                 if not "Distance" in self.items:
@@ -251,19 +251,29 @@ class AVM(AVMContainer):
                 else:
                     self.items[avm_name] = None
 
-        if origin is not None:
-            if type(origin) is str:
-                self.from_file(origin)
-            elif astropy_installed and isinstance(origin, fits.Header):
-                self.from_header(origin)
-            elif astropy_installed and isinstance(origin, WCS):
-                self.from_wcs(origin)
-            else:
-                raise Exception("Unknown argument type: %s" % type(origin))
+    @property
+    def _specs(self):
+        return SPECS[self.MetadataVersion]
+
+    @property
+    def _reverse_specs(self):
+        return REVERSE_SPECS[self.MetadataVersion]
+
+    @property
+    def MetadataVersion(self):
+        if 'MetadataVersion' in self.items:
+            return self.items['MetadataVersion']
+        else:
+            return None
+
+    @MetadataVersion.setter
+    def MetadataVersion(self, value):
+        self.items['MetadataVersion'] = value
+        # TODO: update available properties, and warn on dropping existing ones that are set
 
     def __setattr__(self, attribute, value):
 
-        if attribute in ['_specs', '_reverse_specs', 'items']:
+        if attribute in ['items', 'MetadataVersion']:
             object.__setattr__(self, attribute, value)
             return
 
@@ -288,7 +298,7 @@ class AVM(AVMContainer):
             return object.__getattr__(self, attribute)
 
     @classmethod
-    def from_file(cls, filename):
+    def from_image(cls, filename):
 
         # Get XMP data from file
         xmp = extract_xmp(filename)
