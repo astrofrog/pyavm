@@ -22,7 +22,7 @@ def extract_xmp(image):
         # No XMP data was found
         raise Exception("No XMP packet present in file")
 
-    elif is_png(image_in):
+    elif is_png(image):
 
         # Read in input file
         png_file = PNGFile.read(image)
