@@ -446,7 +446,10 @@ class AVM(AVMContainer):
         self.Spatial.Scale = wcs.wcs.cdelt.tolist()
 
         if b'RA--' == wcs.wcs.ctype[0][:4] and b'DEC-' == wcs.wcs.ctype[1][:4]:
-            self.Spatial.CoordinateFrame = 'ICRS' # or 'FK5', 'FK4'?   How to determine?
+            if wcs.wcs.radesys in (b'ICRS',b'FK5',b'FK4'):
+                self.Spatial.CoordinateFrame = str(wcs.wcs.radesys)
+            else: # assume epoch-independent coordinate system
+                self.Spatial.CoordinateFrame = 'ICRS'
         elif b'ELON' == wcs.wcs.ctype[0][:4] and b'ELAT' == wcs.wcs.ctype[1][:4]:
             self.Spatial.CoordinateFrame = 'ECL'
         elif b'GLON' == wcs.wcs.ctype[0][:4] and b'GLAT' == wcs.wcs.ctype[1][:4]:
