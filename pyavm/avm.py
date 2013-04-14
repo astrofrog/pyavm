@@ -454,7 +454,7 @@ class AVM(AVMContainer):
         elif 'SLON' == wcs.wcs.ctype[0][:4] and 'SLAT' == wcs.wcs.ctype[1][:4]:
             self.Spatial.CoordinateFrame = 'SGAL'
         else:
-            raise Exception("Unknown coordinate system: %s,%s" % wcs.wcs.ctype)
+            raise Exception("Unknown coordinate system: %s" % wcs.wcs.ctype)
 
         try:
             self.Spatial.Rotation = wcs.wcs.crota[1]
