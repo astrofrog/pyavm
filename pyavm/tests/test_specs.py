@@ -98,7 +98,6 @@ def test_specs(version):
     b = AVM.from_xml(x)
 
     for key in a._items:
-        print(key)
         if isinstance(a._items[key], AVMContainer):
             for subkey in a._items[key]._items:
                 assert a._items[key]._items[subkey] == b._items[key]._items[subkey]
