@@ -6,6 +6,8 @@ from __future__ import print_function, division
 Specification for various versions of AVM
 """
 
+from copy import deepcopy
+
 from .datatypes import *
 from .cv import *
 
@@ -24,7 +26,7 @@ SPECS[1.1] = {
     'Contact.StateProvince': AVMString('Iptc4xmpCore:CreatorContactInfo.CiAdrRegion'),
     'Contact.PostalCode': AVMString('Iptc4xmpCore:CreatorContactInfo.CiAdrPcode'),
     'Contact.Country': AVMString('Iptc4xmpCore:CreatorContactInfo.CiAdrCtry'),
-    'Rights': AVMLocalizedString('xmpRights:UsageTerms'),
+    'Rights': AVMLocalizedString('xapRights:UsageTerms'),
 
     # Content Metadata
     'Title': AVMLocalizedString('dc:title'),
@@ -88,9 +90,9 @@ SPECS[1.1] = {
 }
 
 # TODO: write specification for version 1.0
-SPECS[1.0] = SPECS[1.1]
+SPECS[1.0] = deepcopy(SPECS[1.1])
 
-SPECS[1.2] = SPECS[1.1]
+SPECS[1.2] = deepcopy(SPECS[1.1])
 
 # Content Metadata
 

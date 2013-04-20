@@ -36,6 +36,11 @@ MARKERS[b'\xe9'] = 'APP9'
 MARKERS[b'\xfe'] = 'COM'
 MARKERS[b'\xd9'] = 'EOI'
 
+# Define some markers which are always followed by variable-length data
+
+VARIABLE = ['APP0', 'APP1', 'APP2', 'APP3', 'APP4',
+            'APP5', 'APP6', 'APP7', 'APP8', 'APP9']
+
 
 def is_jpeg(filename):
     with open(filename, 'rb') as f:
@@ -76,7 +81,10 @@ class JPEGFile(object):
 
         start = end = 0
         while True:
-            end = contents.find(b'\xff', end + 1)
+            if contents[start+1:start+2] in MARKERS and MARKERS[contents[start+1:start+2]] in VARIABLE:
+                end = contents.find(b'\xff', end + 4)
+            else:
+                end = contents.find(b'\xff', end + 1)
             if end == -1 or contents[end + 1:end + 2] not in [b'\xff', b'\x00']:
                 if end == -1:
                     end = len(contents) + 1

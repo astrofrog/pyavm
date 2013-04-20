@@ -35,7 +35,7 @@ namespaces['http://www.communicatingastronomy.org/avm/1.0/'] = 'avm'
 namespaces['http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/'] = 'Iptc4xmpCore'
 namespaces['http://purl.org/dc/elements/1.1/'] = 'dc'
 namespaces['http://ns.adobe.com/photoshop/1.0/'] = 'photoshop'
-namespaces['http://ns.adobe.com/xap/1.0/rights/'] = 'xmpRights'
+namespaces['http://ns.adobe.com/xap/1.0/rights/'] = 'xapRights'
 
 reverse_namespaces = {}
 for key in namespaces:

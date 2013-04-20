@@ -231,25 +231,72 @@ class AVM(AVMContainer):
 
         self.MetadataVersion = version
 
-        for avm_name in self._specs:
+        self.update_attributes()
 
-            if avm_name == "MetadataVersion":
-                continue
+    def update_attributes(self):
 
-            if "Distance" in avm_name:
-                if not "Distance" in self._items:
-                    self._items['Distance'] = AVMContainer(allow_value=True)
+        # Remove attributes that are no longer in the specs
 
-            if "." in avm_name:
-                family, key = avm_name.split('.')
-                if not family in self._items:
-                    self._items[family] = AVMContainer()
-                self._items[family]._items[key] = None
+        remove_base = []
+        for avm_name in self._items:
+            item = self._items[avm_name]
+            if isinstance(item, AVMContainer):
+                remove_sub = []
+                for avm_subset in item._items:
+                    full_name = '{0}.{1}'.format(avm_name, avm_subset)
+                    if not full_name in self._specs:
+                        if item._items[avm_subset] is not None:
+                            warnings.warn("{0} is not defined in format specification {1} and will be deleted".format(full_name, self.MetadataVersion))
+                        remove_sub.append(avm_subset)
+                for key in remove_sub:
+                    item._items.pop(key)
             else:
-                if avm_name in self._items and hasattr(self._items[avm_name], 'value'):
-                    self._items[avm_name].value = None
-                else:
-                    self._items[avm_name] = None
+                if not avm_name in self._specs:
+                    if self._items[avm_name] is not None:
+                        warnings.warn("{0} is not defined in format specification {1} and will be deleted".format(avm_name, self.MetadataVersion))
+                    remove_base.append(avm_name)
+        for key in remove_base:
+            self._items.pop(key)
+
+        # Add any missing ones
+
+        # First pass for root-level attributes, second pass for nested ones
+        for iteration in range(2):
+            for avm_name in self._specs:
+
+                if avm_name == "MetadataVersion":
+                    continue
+
+                if "Distance" in avm_name:
+                    if not "Distance" in self._items:
+                        self._items['Distance'] = AVMContainer(allow_value=True)
+
+                if iteration == 0 and not '.' in avm_name:
+
+                    if avm_name not in self._items:
+                        if "Distance" in avm_name:
+                            self._items[avm_name] = AVMContainer(allow_value=True)
+                        else:
+                            self._items[avm_name] = None
+
+                elif iteration == 1 and '.' in avm_name:
+
+                    family, key = avm_name.split('.')
+                    if not family in self._items:
+                        self._items[family] = AVMContainer()
+                    if not key in self._items[family]._items:
+                        self._items[family]._items[key] = None
+
+    def __dir__(self):
+        attributes = []
+        for key in self._items:
+            if '.' in key:
+                attribute = key.split('.')[0]
+            else:
+                attribute = key
+            if not key in attributes:
+                attributes.append(key)
+        return attributes
 
     @property
     def _specs(self):
@@ -269,7 +316,7 @@ class AVM(AVMContainer):
     @MetadataVersion.setter
     def MetadataVersion(self, value):
         self._items['MetadataVersion'] = value
-        # TODO: update available properties, and warn on dropping existing ones that are set
+        self.update_attributes()
 
     def __setattr__(self, attribute, value):
 
@@ -278,7 +325,7 @@ class AVM(AVMContainer):
             return
 
         if attribute not in self._specs:
-            raise Exception("%s is not a valid AVM group or tag" % attribute)
+            raise AttributeError("{0} is not a valid AVM group or tag in the {1} standard".format(attribute, self.MetadataVersion))
 
         avm_class = self._specs[attribute]
         value = avm_class.check_data(value)
@@ -287,7 +334,7 @@ class AVM(AVMContainer):
             if hasattr(self._items[attribute], "value"):
                 self._items[attribute].value = value
             else:
-                raise Exception("%s is an AVM group, not a tag" % attribute)
+                raise AttributeError("{0} is an AVM group, not a tag".format(attribute))
         else:
             self._items[attribute] = value
 
