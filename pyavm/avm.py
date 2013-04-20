@@ -325,7 +325,7 @@ class AVM(AVMContainer):
             return
 
         if attribute not in self._specs:
-            raise Exception("%s is not a valid AVM group or tag" % attribute)
+            raise AttributeError("{0} is not a valid AVM group or tag in the {1} standard".format(attribute, self.MetadataVersion))
 
         avm_class = self._specs[attribute]
         value = avm_class.check_data(value)
@@ -334,7 +334,7 @@ class AVM(AVMContainer):
             if hasattr(self._items[attribute], "value"):
                 self._items[attribute].value = value
             else:
-                raise Exception("%s is an AVM group, not a tag" % attribute)
+                raise AttributeError("{0} is an AVM group, not a tag".format(attribute))
         else:
             self._items[attribute] = value
 

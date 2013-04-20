@@ -26,7 +26,7 @@ SPECS[1.1] = {
     'Contact.StateProvince': AVMString('Iptc4xmpCore:CreatorContactInfo.CiAdrRegion'),
     'Contact.PostalCode': AVMString('Iptc4xmpCore:CreatorContactInfo.CiAdrPcode'),
     'Contact.Country': AVMString('Iptc4xmpCore:CreatorContactInfo.CiAdrCtry'),
-    'Rights': AVMLocalizedString('xmpRights:UsageTerms'),
+    'Rights': AVMLocalizedString('xapRights:UsageTerms'),
 
     # Content Metadata
     'Title': AVMLocalizedString('dc:title'),
