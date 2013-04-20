@@ -83,6 +83,13 @@ def utf8(value):
     return unicode(value).encode('utf-8')
 
 
+def decode_ascii(string):
+    try:
+        return string.decode('ascii')
+    except AttributeError:  # already a string
+        return string
+
+
 def auto_type(string):
     '''Try and convert a string to an integer or float'''
     try:
@@ -140,7 +147,7 @@ class AVMContainer(object):
         if attribute not in self._items:
             raise Exception("%s is not a valid AVM tag" % attribute)
         else:
-            object.__setattr__(self, attribute, value)
+            self._items[attribute] = value
 
     def __getattr__(self, attribute):
         if attribute in self._items:
@@ -294,8 +301,8 @@ class AVM(AVMContainer):
                 attribute = key.split('.')[0]
             else:
                 attribute = key
-            if not key in attributes:
-                attributes.append(key)
+            if not attribute in attributes:
+                attributes.append(attribute)
         return attributes
 
     @property
@@ -526,19 +533,23 @@ class AVM(AVMContainer):
         self.Spatial.ReferencePixel = wcs.wcs.crpix.tolist()
         self.Spatial.Scale = wcs.wcs.cdelt.tolist()
 
-        if b'RA--' == wcs.wcs.ctype[0][:4] and b'DEC-' == wcs.wcs.ctype[1][:4]:
-            if wcs.wcs.radesys in (b'ICRS',b'FK5',b'FK4'):
+        xcoord = decode_ascii(wcs.wcs.ctype[0][:4])
+        ycoord = decode_ascii(wcs.wcs.ctype[1][:4])
+
+        if xcoord == 'RA--' and ycoord == 'DEC-':
+            if wcs.wcs.radesys in ('ICRS', 'FK5', 'FK4'):
                 self.Spatial.CoordinateFrame = str(wcs.wcs.radesys)
             else: # assume epoch-independent coordinate system
+                warnings.warn("RADESYS header keyword not found, assuming ICRS")
                 self.Spatial.CoordinateFrame = 'ICRS'
-        elif b'ELON' == wcs.wcs.ctype[0][:4] and b'ELAT' == wcs.wcs.ctype[1][:4]:
+        elif xcoord == 'ELON' and ycoord == 'ELAT':
             self.Spatial.CoordinateFrame = 'ECL'
-        elif b'GLON' == wcs.wcs.ctype[0][:4] and b'GLAT' == wcs.wcs.ctype[1][:4]:
+        elif xcoord == 'GLON' and ycoord == 'GLAT':
             self.Spatial.CoordinateFrame = 'GAL'
-        elif b'SLON' == wcs.wcs.ctype[0][:4] and b'SLAT' == wcs.wcs.ctype[1][:4]:
+        elif xcoord == 'SLON' and ycoord == 'SLAT':
             self.Spatial.CoordinateFrame = 'SGAL'
         else:
-            raise Exception("Unknown coordinate system: %s" % wcs.wcs.ctype)
+            raise Exception("Unknown coordinate system: {0}/{1}".format(xcoord, ycoord))
 
         try:
             self.Spatial.Rotation = wcs.wcs.crota[1]
