@@ -44,7 +44,8 @@ PyAVM provides the ``AVM`` class to represent AVM meta-data, and is imported as 
 
 ### Parsing files
 
-To parse AVM meta-data from an existing file, simply call the ``from_image`` class method using the filename of the image (or any file-like object):
+To parse AVM meta-data from an existing image, simply call the ``from_image``
+class method using the filename of the image (or any file-like object):
 
     >>> avm = AVM.from_image('myexample.jpg')
 
