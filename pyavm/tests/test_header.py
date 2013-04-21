@@ -57,9 +57,13 @@ def test_wcs_2():
     a = WCS(header)
     b = AVM.from_wcs(a).to_wcs()
     # assert a.wcs.equinox == b.wcs.equinox
-    assert a.wcs.ctype == b.wcs.ctype
-    assert a.wcs.crval == b.wcs.crval
-    assert a.wcs.crpix == b.wcs.crpix
-    assert a.wcs.cdelt == b.wcs.cdelt
+    assert a.wcs.ctype[0] == b.wcs.ctype[0]
+    assert a.wcs.ctype[1] == b.wcs.ctype[1]
+    assert a.wcs.crval[0] == b.wcs.crval[0]
+    assert a.wcs.crval[1] == b.wcs.crval[1]
+    assert a.wcs.crpix[0] == b.wcs.crpix[0]
+    assert a.wcs.crpix[1] == b.wcs.crpix[1]
+    assert a.wcs.cdelt[0] == b.wcs.cdelt[0]
+    assert a.wcs.cdelt[1] == b.wcs.cdelt[1]
     assert a.wcs.crota == b.wcs.crota
     assert a.wcs.radesys == b.wcs.radesys
