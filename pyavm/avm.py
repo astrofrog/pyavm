@@ -523,7 +523,7 @@ class AVM(AVMContainer):
         proj1 = wcs.wcs.ctype[0][-3:]
         proj2 = wcs.wcs.ctype[1][-3:]
         if proj1 == proj2:
-            self.Spatial.CoordsystemProjection = proj1
+            self.Spatial.CoordsystemProjection = decode_ascii(proj1)
         else:
             raise Exception("Projections do not agree: %s / %s" % (proj1, proj2))
 
