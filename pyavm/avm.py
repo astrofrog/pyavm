@@ -91,7 +91,9 @@ def decode_ascii(string):
 
 
 def auto_type(string):
-    '''Try and convert a string to an integer or float'''
+    """
+    Try and convert a string to an integer or float
+    """
     try:
         return int(string)
     except:
@@ -195,42 +197,52 @@ def parse_avm_content(rdf):
 
 
 class AVM(AVMContainer):
-    '''
-    To parse AVM meta-data from an existing file, simply create an instance of
-    this class using the filename of the image (or any file-like object):
+    """
+    There are several ways to initialize an AVM object:
 
-        >>> avm = AVM('myexample.jpg')
+    * Initialize an empty AVM object:
 
-    Then, you can view the contents by using
+        >>> avm = AVM()
+
+    * Parse AVM meta-data from an existing image:
+
+        >>> avm = AVM.from_image('myexample.jpg')
+
+    * Create an AVM object from a FITS header:
+
+        >>> from astropy.io import fits
+        >>> header = fits.getheader('image.fits')
+        >>> avm = AVM.from_header(header)
+
+    * Create an AVM meta-data object from an Astropy WCS instance:
+
+        >>> from astropy.wcs import WCS
+        >>> from pyavm import AVM
+        >>> wcs = WCS('image.fits')
+        >>> avm = AVM.from_wcs(wcs)
+
+    View the contents of the AVM object:
 
         >>> print(avm)
-
-    or
-
-        >>> avm
 
     The AVM meta-data can be accessed using the attribute notation:
 
         >>> avm.Spatial.Equinox
         'J2000'
-
         >>> avm.Publisher
         'Chandra X-ray Observatory'
 
-    It is also possible to initialize an AVM object using an Astropy WCS instance:
+    Tags can be modified:
 
-        >>> from astropy.io import fits
-        >>> from astropy.wcs import WCS
-        >>> from pyavm import AVM
-        >>> wcs = WCS(fits.getheader('image.fits'))
-        >>> avm = AVM(wcs)
+        >>> avm.Spatial.Equinox = "B1950"
+        >>> avm.Spatial.Notes = "The WCS information was updated on 04/02/2010"
 
     Finally, it is possible to embed AVM meta-data into an image file:
 
         >>> avm.embed('original_image.jpg', 'tagged_image.jpg')
 
-    At this time, only JPG and PNG files are supported for embedding.
-    '''
+    At this time, only JPG and PNG files are supported.
+    """
 
     def __init__(self, origin=None, version=1.2):
 
@@ -238,9 +250,9 @@ class AVM(AVMContainer):
 
         self.MetadataVersion = version
 
-        self.update_attributes()
+        self._update_attributes()
 
-    def update_attributes(self):
+    def _update_attributes(self):
 
         # Remove attributes that are no longer in the specs
 
@@ -323,7 +335,7 @@ class AVM(AVMContainer):
     @MetadataVersion.setter
     def MetadataVersion(self, value):
         self._items['MetadataVersion'] = value
-        self.update_attributes()
+        self._update_attributes()
 
     def __setattr__(self, attribute, value):
 
@@ -353,6 +365,9 @@ class AVM(AVMContainer):
 
     @classmethod
     def from_image(cls, filename):
+        """
+        Instantiate an AVM object from an existing image.
+        """
 
         # Get XMP data from file
         xmp = extract_xmp(filename)
@@ -368,10 +383,16 @@ class AVM(AVMContainer):
 
     @classmethod
     def from_xml_file(cls, filename):
+        """
+        Instantiate an AVM object from an xml file.
+        """
         return cls.from_xml(open(filename, 'rb').read())
 
     @classmethod
     def from_xml(cls, xml):
+        """
+        Instantiate an AVM object from an XML string
+        """
 
         self = cls()
 
@@ -407,9 +428,9 @@ class AVM(AVMContainer):
         return self
 
     def to_wcs(self, use_full_header=False):
-        '''
-        Convert AVM projection information into a astropy.wcs.WCS object
-        '''
+        """
+        Convert AVM projection information into a Astropy WCS object
+        """
 
         if not astropy_installed:
             raise Exception("Astropy is required to use to_wcs()")
@@ -488,9 +509,9 @@ class AVM(AVMContainer):
 
     @classmethod
     def from_header(cls, header, include_full_header=True):
-        '''
-        Convert a FITS header into AVM information
-        '''
+        """
+        Instantiate an AVM object from a FITS header
+        """
 
         if not astropy_installed:
             raise Exception("Astropy is required to use from_wcs()")
@@ -505,9 +526,9 @@ class AVM(AVMContainer):
 
     @classmethod
     def from_wcs(cls, wcs):
-        '''
-        Convert a astropy.wcs.WCS object into AVM information
-        '''
+        """
+        Instantiate an AVM object from a WCS transformation
+        """
 
         if not astropy_installed:
             raise Exception("Astropy is required to use from_wcs()")
@@ -560,6 +581,9 @@ class AVM(AVMContainer):
         return self
 
     def to_xml(self):
+        """
+        Convert the AVM meta-data to an XML string
+        """
 
         # Register namespaces
         register_namespace('x', "adobe:ns:meta/")
@@ -604,7 +628,9 @@ class AVM(AVMContainer):
         return xml_string
 
     def to_xmp(self):
-
+        """
+        Convert the AVM meta-data to an XMP packet
+        """
         packet = b'<?xpacket begin="\xef\xbb\xbf" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
         packet += self.to_xml()
         packet += b'<?xpacket end="w"?>'
@@ -612,6 +638,9 @@ class AVM(AVMContainer):
         return packet
 
     def embed(self, filename_in, filename_out, verify=False):
+        """
+        Embed the AVM meta-data in an image file
+        """
 
         # Embed XMP packet into file
         embed_xmp(filename_in, filename_out, self.to_xmp())
