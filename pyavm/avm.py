@@ -539,7 +539,7 @@ class AVM(AVMContainer):
         if xcoord == 'RA--' and ycoord == 'DEC-':
             if wcs.wcs.radesys in ('ICRS', 'FK5', 'FK4'):
                 self.Spatial.CoordinateFrame = str(wcs.wcs.radesys)
-            else: # assume epoch-independent coordinate system
+            else:  # assume epoch-independent coordinate system
                 warnings.warn("RADESYS header keyword not found, assuming ICRS")
                 self.Spatial.CoordinateFrame = 'ICRS'
         elif xcoord == 'ELON' and ycoord == 'ELAT':

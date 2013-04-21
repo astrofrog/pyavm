@@ -4,6 +4,7 @@ warnings.filterwarnings('always')
 
 from ..avm import AVM, AVMContainer
 
+
 @pytest.mark.parametrize('version', [1.1, 1.2])
 def test_specs(version):
 

@@ -18,7 +18,7 @@ def extract_xmp(image):
             if segment.type == 'APP1':
                 if segment.bytes[4:32] == b'http://ns.adobe.com/xap/1.0/':
                     return segment.bytes[32:]
-        
+
         # No XMP data was found
         raise Exception("No XMP packet present in file")
 

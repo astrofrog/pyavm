@@ -31,6 +31,7 @@ def test_from_header():
     assert a.Spatial.Scale[1] == +0.001666666707
     assert a.Spatial.Quality == 'Full'
 
+
 def test_wcs_1():
     from astropy.io import fits
     header = fits.Header.fromtextfile(os.path.join(ROOT, 'data', 'example_header.hdr'))
@@ -47,6 +48,7 @@ def test_wcs_1():
     assert a.Spatial.Scale[0] == b.Spatial.Scale[0]
     assert a.Spatial.Scale[1] == b.Spatial.Scale[1]
     assert a.Spatial.Quality == b.Spatial.Quality
+
 
 def test_wcs_2():
     from astropy.io import fits

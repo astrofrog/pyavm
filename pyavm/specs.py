@@ -77,7 +77,7 @@ SPECS[1.1] = {
     'RelatedResources': AVMUnorderedStringList('avm:RelatedResources'),
     'MetadataDate': AVMDateTime('avm:MetadataDate'),
     'MetadataVersion': AVMFloat('avm:MetadataVersion'),
-    
+
     # FITS Liberator Metadata
 
     'FL.BackgroundLevel': AVMOrderedFloatList('avm:FL.BackgroundLevel'),
