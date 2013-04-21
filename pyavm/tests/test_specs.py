@@ -4,6 +4,7 @@ warnings.filterwarnings('always')
 
 from ..avm import AVM, AVMContainer
 
+
 @pytest.mark.parametrize('version', [1.1, 1.2])
 def test_specs(version):
 
@@ -12,7 +13,7 @@ def test_specs(version):
     # Creator Metadata
     a.Creator = "PyAVM"
     a.CreatorURL = "http://www.github.com"
-    a.Contact.Name = "Thomas Robitaille"
+    a.Contact.Name = ["Thomas Robitaille"]
     a.Contact.Email = "thomas.robitaille@gmail.com"
     a.Contact.Address = "None of your business"
     a.Contact.Telephone = "I think we're getting a little too personal"
@@ -26,8 +27,8 @@ def test_specs(version):
     a.Title = "A very thorough test"
     a.Headline = "What I said above"
     a.Description = "Um, I guess there's not much more to say about this!"
-    a.Subject.Category = "Tests"
-    a.Subject.Name = "PyAVM"
+    a.Subject.Category = ["Tests"]
+    a.Subject.Name = ["PyAVM"]
     a.Distance = ["3"]
     a.Distance.Notes = "Not much to say, really"
     a.ReferenceURL = "http://www.github.com"
@@ -35,17 +36,17 @@ def test_specs(version):
     a.Date = "10 April 2013"
     a.ID = "123123123"
     a.Type = "Simulation"
-    a.Image.ProductQuality = "Quite good"
+    a.Image.ProductQuality = "Moderate"
 
     # Observation Metadata
     a.Facility = ["Python"]
     a.Instrument = ["CPython"]
-    a.Spectral.ColorAssignment = ["Success"]
-    a.Spectral.Band = ["Green"]
+    a.Spectral.ColorAssignment = ["Purple"]
+    a.Spectral.Band = ["Optical"]
     a.Spectral.Bandpass = ["Arbitrary"]
     a.Spectral.CentralWavelength = [5.]
     a.Spectral.Notes = "Still testing"
-    a.Temporal.StartTime = "5 Feb 2011"
+    a.Temporal.StartTime = ["5 Feb 2011"]
     a.Temporal.IntegrationTime = [4.4]
     a.DatasetID = ["12421412"]
 
@@ -58,7 +59,7 @@ def test_specs(version):
     a.Spatial.Scale = [0.2, 0.3]
     a.Spatial.Rotation = 122.
     a.Spatial.CoordsystemProjection = "CAR"
-    a.Spatial.Quality = "Good"
+    a.Spatial.Quality = "Full"
     a.Spatial.Notes = "Not much to say"
     a.Spatial.FITSheader = "SIMPLE = T"
     a.Spatial.CDMatrix = [3.4, 3.3, 5.5, 2.1]
