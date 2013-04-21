@@ -40,7 +40,9 @@
 
         <h2>About</h2>
 
-<p>PyAVM is a module to represent, read, and write metadata following the <a href="http://www.virtualastronomy.org/"><em>Astronomy Visualization Metadata</em></a> (AVM) standard.</p>
+<p>PyAVM is a module to represent, read, and write metadata following the
+<a href="http://www.virtualastronomy.org/avm_metadata.php"><em>Astronomy Visualization Metadata</em></a>
+(AVM) standard.</p>
 
 <h2>Requirements</h2>
 
@@ -83,7 +85,8 @@ python setup.py install
 
 <h3>Parsing files</h3>
 
-<p>To parse AVM meta-data from an existing file, simply call the <code>from_image</code> class method using the filename of the image (or any file-like object):</p>
+<p>To parse AVM meta-data from an existing image, simply call the <code>from_image</code>
+class method using the filename of the image (or any file-like object):</p>
 
 <pre><code>&gt;&gt;&gt; avm = AVM.from_image('myexample.jpg')
 </code></pre>
