@@ -1,10 +1,11 @@
 from __future__ import print_function, division
 
 import struct
+import warnings
 
 from .jpeg import is_jpeg, JPEGFile, JPEGSegment
 from .png import is_png, PNGFile, PNGChunk
-
+from .exceptions import NoXMPPacketFound
 
 def extract_xmp(image):
 
@@ -20,7 +21,7 @@ def extract_xmp(image):
                     return segment.bytes[32:]
 
         # No XMP data was found
-        raise Exception("No XMP packet present in file")
+        raise NoXMPPacketFound("No XMP packet present in file")
 
     elif is_png(image):
 
@@ -34,8 +35,19 @@ def extract_xmp(image):
                     return chunk.data[22:]
 
         # No XMP data was found
-        raise Exception("No XMP packet present in file")
+        raise NoXMPPacketFound("No XMP packet present in file")
 
     else:
 
-        raise Exception("Only JPG and PNG files are supported at this time")
+        warnings.warn("Only PNG and JPEG files can be properly parsed - scanning file contents for XMP packet")
+
+        with open(image, 'rb') as fileobj:
+            contents = fileobj.read()
+
+        try:
+            start = contents.index(b"<?xpacket begin=")
+            end = contents.index(b"</x:xmpmeta>") + 12
+        except ValueError:
+            raise NoXMPPacketFound("No XMP packet present in file")
+
+        return contents[start:end]

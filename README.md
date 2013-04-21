@@ -9,7 +9,7 @@ Requirements
 ------------
 
 PyAVM supports Python 2.6, 2.7, 3.1, 3.2, and 3.3. No other dependencies are
-needed simply to access AVM data from PNG and JPEG images.
+needed simply to read and embed AVM meta-data.
 
 However, the following optional dependencies are needed for more advanced
 functionality:
@@ -25,13 +25,15 @@ To install PyAVM, you can simply do:
 
     pip install pyavm
 
-if you have ``pip`` installed. Otherwise, download the [latest tar file](https://pypi.python.org/pypi/PyAVM/), then install using:
+if you have ``pip`` installed. Otherwise, download the
+[latest tar file](https://pypi.python.org/pypi/PyAVM/), then install using:
 
     tar xvzf PyAVM-x.x.x.tar.gz
     cd PyAVM-x.x.x
     python setup.py install
 
-Please report any issues you encounter via the [issue tracker](https://github.com/astrofrog/pyavm/issues) on GitHub.
+Please report any issues you encounter via the
+[issue tracker](https://github.com/astrofrog/pyavm/issues) on GitHub.
 
 Using PyAVM
 -----------
@@ -48,6 +50,11 @@ To parse AVM meta-data from an existing image, simply call the ``from_image``
 class method using the filename of the image (or any file-like object):
 
     >>> avm = AVM.from_image('myexample.jpg')
+
+Only JPEG and PNG files are properly supported in that the parsing follows the
+JPEG and PNG specification. For other file formats, PyAVM will simply scan the
+contents of the file, looking for an XMP packet. This method is less reliable,
+but should work in most real-life cases.
 
 ### Accessing and setting the meta-data
 
@@ -120,4 +127,4 @@ It is possible to embed AVM meta-data into an image file:
 
     >>> avm.embed('original_image.jpg', 'tagged_image.jpg')
 
-At this time, only JPG and PNG files are supported.
+At this time, only JPG and PNG files are supported for embedding.
