@@ -432,11 +432,10 @@ class AVM(AVMContainer):
             warnings.warn("Spatial.CoordinateFrame not found, assuming ICRS")
             ctype = 'ICRS'
 
-        wcs.wcs.radesys = ctype.encode('ascii')
-
         if ctype in ['ICRS', 'FK5', 'FK4']:
             xcoord = "RA--"
             ycoord = "DEC-"
+            wcs.wcs.radesys = ctype.encode('ascii')
         elif ctype in ['ECL']:
             xcoord = "ELON"
             ycoord = "ELAT"
