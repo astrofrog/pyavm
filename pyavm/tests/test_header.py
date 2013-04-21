@@ -65,5 +65,6 @@ def test_wcs_2():
     assert a.wcs.crpix[1] == b.wcs.crpix[1]
     assert a.wcs.cdelt[0] == b.wcs.cdelt[0]
     assert a.wcs.cdelt[1] == b.wcs.cdelt[1]
-    assert a.wcs.crota == b.wcs.crota
+    assert a.wcs.crota[0] == b.wcs.crota[0]
+    assert a.wcs.crota[1] == b.wcs.crota[1]
     assert a.wcs.radesys == b.wcs.radesys
