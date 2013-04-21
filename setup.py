@@ -7,23 +7,22 @@ try:  # Python 3.x
 except ImportError:  # Python 2.x
     from distutils.command.build_py import build_py
 
-version = '0.1.4'
+version = '0.9.0'
 
 setup(name='PyAVM',
       version=version,
-      description='Simple pure-python AVM meta-data parsing',
+      description='Simple pure-python AVM meta-data handling',
       author='Thomas Robitaille',
       author_email='thomas.robitaille@gmail.com',
       license='MIT',
-      url='https://github.com/astrofrog/pyavm',
-      download_url='https://github.com/downloads/astrofrog/pyavm/PyAVM-%s.tar.gz' % version,
+      url='http://astrofrog.github.io/pyavm/',
       packages=['pyavm'],
       provides=['pyavm'],
       cmdclass={'build_py': build_py},
       keywords=['Scientific/Engineering'],
       long_description=open('README.md', 'r').read(),
       classifiers=[
-      "Development Status :: 3 - Alpha",
+      "Development Status :: 4 - Beta",
       "Programming Language :: Python",
       "License :: OSI Approved :: MIT License",
       ],
