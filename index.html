@@ -21,7 +21,9 @@
       <div id="header">
         <nav>
           <li class="fork"><a href="https://github.com/astrofrog/pyavm">View On GitHub</a></li>
-          <li class="downloads"><a href="https://pypi.python.org/pypi/PyAVM">Download from PyPI</a></li>
+          <li class="downloads"><a href="https://github.com/astrofrog/pyavm/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/astrofrog/pyavm/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
         </nav>
       </div><!-- end header -->
 
@@ -45,7 +47,7 @@
 <h2>Requirements</h2>
 
 <p>PyAVM supports Python 2.6, 2.7, 3.1, 3.2, and 3.3. No other dependencies are
-needed simply to access AVM data from PNG and JPEG images.</p>
+needed simply to read and embed AVM meta-data.</p>
 
 <p>However, the following optional dependencies are needed for more advanced
 functionality:</p>
@@ -63,14 +65,16 @@ functionality:</p>
 <pre><code>pip install pyavm
 </code></pre>
 
-<p>if you have <code>pip</code> installed. Otherwise, download the <a href="https://pypi.python.org/pypi/PyAVM/">latest tar file</a>, then install using:</p>
+<p>if you have <code>pip</code> installed. Otherwise, download the
+<a href="https://pypi.python.org/pypi/PyAVM/">latest tar file</a>, then install using:</p>
 
 <pre><code>tar xvzf PyAVM-x.x.x.tar.gz
 cd PyAVM-x.x.x
 python setup.py install
 </code></pre>
 
-<p>Please report any issues you encounter via the <a href="https://github.com/astrofrog/pyavm/issues">issue tracker</a> on GitHub.</p>
+<p>Please report any issues you encounter via the
+<a href="https://github.com/astrofrog/pyavm/issues">issue tracker</a> on GitHub.</p>
 
 <h2>Using PyAVM</h2>
 
@@ -88,6 +92,11 @@ class method using the filename of the image (or any file-like object):</p>
 
 <pre><code>&gt;&gt;&gt; avm = AVM.from_image('myexample.jpg')
 </code></pre>
+
+<p>Only JPEG and PNG files are properly supported in that the parsing follows the
+JPEG and PNG specification. For other file formats, PyAVM will simply scan the
+contents of the file, looking for an XMP packet. This method is less reliable,
+but should work in most real-life cases.</p>
 
 <h3>Accessing and setting the meta-data</h3>
 
@@ -171,7 +180,7 @@ disabled with:</p>
 <pre><code>&gt;&gt;&gt; avm.embed('original_image.jpg', 'tagged_image.jpg')
 </code></pre>
 
-<p>At this time, only JPG and PNG files are supported.</p>
+<p>At this time, only JPG and PNG files are supported for embedding.</p>
       </section>
 
     </div>
