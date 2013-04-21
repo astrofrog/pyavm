@@ -81,7 +81,7 @@ class JPEGFile(object):
 
         start = end = 0
         while True:
-            if contents[start+1:start+2] in MARKERS and MARKERS[contents[start+1:start+2]] in VARIABLE:
+            if contents[start + 1:start + 2] in MARKERS and MARKERS[contents[start + 1:start + 2]] in VARIABLE:
                 end = contents.find(b'\xff', end + 4)
             else:
                 end = contents.find(b'\xff', end + 1)

@@ -1,6 +1,12 @@
 CHANGES
 --------
 
+Version 0.1.5
+
+    Complete re-factoring. Embedding for PNG and JPEG is now
+    standard-compliant. Initialization from headers, WCS objects, and images
+    is now done via class methods (see README.md).
+
 Version 0.1.4
 
     Now write XMP packet using ElementTree to ensure XML compliance
