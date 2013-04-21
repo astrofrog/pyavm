@@ -21,7 +21,7 @@ setup(name='PyAVM',
       provides=['pyavm'],
       cmdclass={'build_py': build_py},
       keywords=['Scientific/Engineering'],
-      long_description=open('README.md', 'r').read(),
+      long_description="PyAVM is a module to represent, read, and write metadata following the `Astronomy Visualization Metadata <http://www.virtualastronomy.org/avm_metadata.php>`_ (AVM) standard.",
       classifiers=[
       "Development Status :: 4 - Beta",
       "Programming Language :: Python",
