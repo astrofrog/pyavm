@@ -1,7 +1,9 @@
 About
 -----
 
-PyAVM is a module to represent, read, and write metadata following the [*Astronomy Visualization Metadata*](http://www.virtualastronomy.org/) (AVM) standard.
+PyAVM is a module to represent, read, and write metadata following the
+[*Astronomy Visualization Metadata*](http://www.virtualastronomy.org/avm_metadata.php)
+(AVM) standard.
 
 Requirements
 ------------
