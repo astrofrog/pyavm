@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>PyAVM by astrofrog</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/astrofrog/pyavm">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/astrofrog/pyavm/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/astrofrog/pyavm/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>PyAVM</h1>
+          <p>Pure-python AVM library</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/astrofrog">astrofrog</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h2>About</h2>
+
+<p>PyAVM is a module to represent, read, and write metadata following the <a href="http://www.virtualastronomy.org/"><em>Astronomy Visualization Metadata</em></a> (AVM) standard.</p>
+
+<h2>Requirements</h2>
+
+<p>PyAVM supports Python 2.6, 2.7, 3.1, 3.2, and 3.3. No other dependencies are
+needed simply to access AVM data from PNG and JPEG images.</p>
+
+<p>However, the following optional dependencies are needed for more advanced
+functionality:</p>
+
+<ul>
+<li>
+<a href="http://www.astropy.org">Astropy</a> to handle WCS objects and FITS headers</li>
+<li>
+<a href="http://www.pytest.org">py.test</a> and
+<a href="http://www.pythonware.com/products/pil/">PIL</a> for tests</li>
+</ul><h2>Installing and Reporting issues</h2>
+
+<p>To install PyAVM, you can simply do:</p>
+
+<pre><code>pip install pyavm
+</code></pre>
+
+<p>if you have <code>pip</code> installed. Otherwise, download the <a href="https://pypi.python.org/pypi/PyAVM/">latest tar file</a>, then install using:</p>
+
+<pre><code>tar xvzf PyAVM-x.x.x.tar.gz
+cd PyAVM-x.x.x
+python setup.py install
+</code></pre>
+
+<p>Please report any issues you encounter via the <a href="https://github.com/astrofrog/pyavm/issues">issue tracker</a> on GitHub.</p>
+
+<h2>Using PyAVM</h2>
+
+<h3>Importing</h3>
+
+<p>PyAVM provides the <code>AVM</code> class to represent AVM meta-data, and is imported as follows:</p>
+
+<pre><code>&gt;&gt;&gt; from pyavm import AVM
+</code></pre>
+
+<h3>Parsing files</h3>
+
+<p>To parse AVM meta-data from an existing file, simply call the <code>from_image</code> class method using the filename of the image (or any file-like object):</p>
+
+<pre><code>&gt;&gt;&gt; avm = AVM.from_image('myexample.jpg')
+</code></pre>
+
+<h3>Accessing and setting the meta-data</h3>
+
+<p>You can view the contents of the AVM object by using</p>
+
+<pre><code>&gt;&gt;&gt; print(avm)
+</code></pre>
+
+<p>The AVM meta-data can be accessed using the attribute notation:</p>
+
+<pre><code>&gt;&gt;&gt; avm.Spatial.Equinox
+'J2000'
+&gt;&gt;&gt; avm.Publisher
+'Chandra X-ray Observatory'
+</code></pre>
+
+<p>Tags can be modified:</p>
+
+<pre><code>&gt;&gt;&gt; avm.Spatial.Equinox = "B1950"
+&gt;&gt;&gt; avm.Spatial.Notes = "The WCS information was updated on 04/02/2010"
+</code></pre>
+
+<h3>Creating an AVM object from scratch</h3>
+
+<p>To create an empty AVM meta-data holder, simply call <code>AVM()</code> without any
+arguments:</p>
+
+<pre><code>&gt;&gt;&gt; avm = AVM()
+</code></pre>
+
+<p>Note that this will create an AVM object following the 1.2 specification. If necessary, you can specify which version of the standard to use:</p>
+
+<pre><code>&gt;&gt;&gt; avm = AVM(version=1.1)
+</code></pre>
+
+<h3>Converting to a WCS object</h3>
+
+<p>It is possible to create an Astropy WCS object from the AVM meta-data:</p>
+
+<pre><code>&gt;&gt;&gt; wcs = avm.to_wcs()
+</code></pre>
+
+<p>By default, <code>Spatial.FITSheader</code> will be used if available, but if not, the WCS
+information is extracted from the other <code>Spatial.*</code> tags. To force PyAVM to not
+try <code>Spatial.FITSheader</code>, use:</p>
+
+<pre><code>&gt;&gt;&gt; wcs = avm.to_wcs(use_full_header=False)
+</code></pre>
+
+<h3>Initializing from a FITS header</h3>
+
+<p>To create an AVM meta-data object from a FITS header, simply pass the header
+(as an Astropy Header instance) to the <code>from_header</code> class method:</p>
+
+<pre><code>&gt;&gt;&gt; from astropy.io import fits
+&gt;&gt;&gt; header = fits.getheader('image.fits')
+&gt;&gt;&gt; avm = AVM.from_header(header)
+</code></pre>
+
+<p>By default, the AVM tag <code>Spatial.FITSheader</code> will be created, containing the
+full header (in addition to the other <code>Spatial.*</code> tags). This can be
+disabled with:</p>
+
+<pre><code>&gt;&gt;&gt; avm = AVM.from_header(header, include_full_header=False)
+</code></pre>
+
+<h3>Initializing from a WCS object</h3>
+
+<p>Similarly, it is possible to create an AVM meta-data object from an Astropy WCS instance:</p>
+
+<pre><code>&gt;&gt;&gt; from astropy.wcs import WCS
+&gt;&gt;&gt; from pyavm import AVM
+&gt;&gt;&gt; wcs = WCS('image.fits')
+&gt;&gt;&gt; avm = AVM.from_wcs(wcs)
+</code></pre>
+
+<h3>Tagging images with AVM meta-data</h3>
+
+<p>It is possible to embed AVM meta-data into an image file:</p>
+
+<pre><code>&gt;&gt;&gt; avm.embed('original_image.jpg', 'tagged_image.jpg')
+</code></pre>
+
+<p>At this time, only JPG and PNG files are supported.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
