@@ -35,6 +35,8 @@ import xml.etree.ElementTree as et
 
 from .specs import SPECS, REVERSE_SPECS
 
+import numpy as np
+
 
 def register_namespace(tag, uri):
     try:
@@ -551,7 +553,18 @@ class AVM(AVMContainer):
         self.Spatial.ReferenceDimension = [wcs.naxis1, wcs.naxis2]
         self.Spatial.ReferenceValue = wcs.wcs.crval.tolist()
         self.Spatial.ReferencePixel = wcs.wcs.crpix.tolist()
-        self.Spatial.Scale = wcs.wcs.cdelt.tolist()
+
+        # if crota, cd missing, attribute errors will be raised (no anonymous exceptions)
+        try:
+            self.Spatial.Scale = wcs.wcs.cd.diagonal()
+            # cd = [ [ cos(crota), -sin(crota) ] , [ sin(crota), cos(crota)] ] 
+            self.Spatial.Rotation = np.arctan2(-wcs.wcs.cd[0,1],wcs.wcs.cd[0,0])
+        except AttributeError:  
+            self.Spatial.Scale = wcs.wcs.cdelt.tolist()
+            try:
+                self.Spatial.Rotation = wcs.wcs.crota[1]
+            except AttributeError:
+                pass
 
         xcoord = decode_ascii(wcs.wcs.ctype[0][:4])
         ycoord = decode_ascii(wcs.wcs.ctype[1][:4])
@@ -570,11 +583,6 @@ class AVM(AVMContainer):
             self.Spatial.CoordinateFrame = 'SGAL'
         else:
             raise Exception("Unknown coordinate system: {0}/{1}".format(xcoord, ycoord))
-
-        try:
-            self.Spatial.Rotation = wcs.wcs.crota[1]
-        except:
-            pass
 
         self.Spatial.Quality = "Full"
 
