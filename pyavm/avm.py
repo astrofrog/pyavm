@@ -554,12 +554,9 @@ class AVM(AVMContainer):
         self.Spatial.ReferenceValue = wcs.wcs.crval.tolist()
         self.Spatial.ReferencePixel = wcs.wcs.crpix.tolist()
 
-        # if crota, cd missing, attribute errors will be raised (no anonymous exceptions)
-        try:
-            self.Spatial.Scale = wcs.wcs.cd.diagonal()
-            # cd = [ [ cos(crota), -sin(crota) ] , [ sin(crota), cos(crota)] ] 
-            self.Spatial.Rotation = np.arctan2(-wcs.wcs.cd[0,1],wcs.wcs.cd[0,0])
-        except AttributeError:  
+        if hasattr(wcs.wcs, 'cd'):
+            self.Spatial.CDMatrix = wcs.wcs.cd.ravel()
+        else:
             self.Spatial.Scale = wcs.wcs.cdelt.tolist()
             try:
                 self.Spatial.Rotation = wcs.wcs.crota[1]
