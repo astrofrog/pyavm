@@ -83,6 +83,7 @@ METADATA_VERSION_CHOICES = [
 STRETCH_FUNCTION_CHOICES = [
     'Linear',
     'Log',
+    'Log(x)',
     'Arcsinh(x)',
     'X^(1/2)'
 ]
