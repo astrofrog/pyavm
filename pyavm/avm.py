@@ -427,9 +427,21 @@ class AVM(AVMContainer):
 
         return self
 
-    def to_wcs(self, use_full_header=False):
+    def to_wcs(self, use_full_header=False, target_image=None):
         """
-        Convert AVM projection information into a Astropy WCS object
+        Convert AVM projection information into a Astropy WCS object.
+
+        Parameters
+        ----------
+        use_full_header : bool, optional
+            Whether to use the full embedded Header if available. If set to
+            `False`, the WCS is determined from the regular AVM keywords.
+        target_image : str, optional
+            In some cases, the dimensions of the image containing the AVM/WCS
+            information is different from the dimensions of the image for which
+            the AVM was defined. The `target_image` option can be used to pass
+            the path of an image from which the size will be used to re-scale
+            the WCS.
         """
 
         if not astropy_installed:
@@ -504,6 +516,29 @@ class AVM(AVMContainer):
             wcs.wcs.cdelt = self.Spatial.Scale
             if self.Spatial.Rotation is not None:
                 wcs.wcs.crota = self.Spatial.Rotation, self.Spatial.Rotation
+
+        # If `target_image` is set, we have to rescale the reference pixel and
+        # the scale
+        if target_image is not None:
+
+            # Find target image size
+            from PIL import Image
+            nx, ny = Image.open(target_image).size
+
+            # Find scale in x and y
+            scale_x = nx / float(wcs.naxis1)
+            scale_y = ny / float(wcs.naxis2)
+
+            # Check that scales are consistent
+            if abs(scale_x - scale_y) / (scale_x + scale_y) * 2. < 0.01:
+                scale = scale_x
+            else:
+                raise ValueError("Cannot scale WCS to target image consistently in x and y direction")
+
+            wcs.naxis1 = nx
+            wcs.naxis2 = ny
+            wcs.wcs.cdelt /= scale
+            wcs.wcs.crpix *= scale
 
         return wcs
 
