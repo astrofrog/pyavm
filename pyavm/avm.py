@@ -513,7 +513,20 @@ class AVM(AVMContainer):
             wcs.wcs.cd = [self.Spatial.CDMatrix[0:2],
                           self.Spatial.CDMatrix[2:4]]
         elif self.Spatial.Scale is not None:
-            wcs.wcs.cdelt = self.Spatial.Scale
+            # AVM Standard 1.2:
+            #
+            # "The scale should follow the standard FITS convention for sky
+            # projections in which the first element is negative (indicating
+            # increasing RA/longitude to the left) and the second is positive.
+            # In practice, only the absolute value of the first term should be
+            # necessary to identify the pixel scale since images should always
+            # be presented in an undistorted 1:1 aspect ratio as they appear in
+            # the sky when viewed from Earth.This field can be populated from
+            # the FITS keywords: CDELT1, CDELT2 (or derived from CD matrix)."
+            #
+            # Therefore, we have to enforce the sign of CDELT:
+            wcs.wcs.cdelt[0] = - abs(self.Spatial.Scale[0])
+            wcs.wcs.cdelt[1] = + abs(self.Spatial.Scale[1])
             if self.Spatial.Rotation is not None:
                 wcs.wcs.crota = self.Spatial.Rotation, self.Spatial.Rotation
 
