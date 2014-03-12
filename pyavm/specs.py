@@ -86,7 +86,7 @@ SPECS[1.1] = {
     'FL.PeakLevel': AVMOrderedFloatList('avm:FL.PeakLevel'),
     'FL.WhiteLevel': AVMOrderedFloatList('avm:FL.WhiteLevel'),
     'FL.ScaledBackgroundLevel': AVMOrderedFloatList('avm:FL.ScaledBackgroundLevel'),
-    'FL.StretchFunction': AVMOrderedListCV('avm:FL.StretchFunction', STRETCH_FUNCTION_CHOICES)
+    'FL.StretchFunction': AVMOrderedList('avm:FL.StretchFunction')
 }
 
 # TODO: write specification for version 1.0

@@ -79,10 +79,3 @@ METADATA_VERSION_CHOICES = [
     1.1,
     1.0,
 ]
-
-STRETCH_FUNCTION_CHOICES = [
-    'Linear',
-    'Log',
-    'Arcsinh(x)',
-    'X^(1/2)'
-]
