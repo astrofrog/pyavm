@@ -599,7 +599,13 @@ class AVM(AVMContainer):
         self.Spatial.ReferenceDimension = [wcs.naxis1, wcs.naxis2]
         self.Spatial.ReferenceValue = wcs.wcs.crval.tolist()
         self.Spatial.ReferencePixel = wcs.wcs.crpix.tolist()
-        self.Spatial.Scale = wcs.wcs.cdelt.tolist()
+
+        # The following is required to cover all cases of CDELT/PC/CD
+        import numpy as np  # will be installed if Astropy is present
+        cdelt = np.matrix(wcs.wcs.get_cdelt())
+        pc = np.matrix(wcs.wcs.get_pc())
+        scale = np.array(cdelt * pc)[0,:].tolist()
+        self.Spatial.Scale = scale
 
         xcoord = decode_ascii(wcs.wcs.ctype[0][:4])
         ycoord = decode_ascii(wcs.wcs.ctype[1][:4])
