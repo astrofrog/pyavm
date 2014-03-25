@@ -364,13 +364,22 @@ class AVM(AVMContainer):
             return object.__getattr__(self, attribute)
 
     @classmethod
-    def from_image(cls, filename):
+    def from_image(cls, filename, xmp_packet_index=0):
         """
         Instantiate an AVM object from an existing image.
+
+        Parameters
+        ----------
+        filename : str
+            The filename of the image to read the AVM meta-data from
+        xmp_packet_index : int, optional
+            In cases where multiple XMP packets are present in the file, this
+            can be used to indicate which one to use. If not specified, this
+            defaults to the first XMP packet found.
         """
 
         # Get XMP data from file
-        xmp = extract_xmp(filename)
+        xmp = extract_xmp(filename, xmp_packet_index=xmp_packet_index)
 
         # Extract XML
         start = xmp.index("<?xpacket begin=")
