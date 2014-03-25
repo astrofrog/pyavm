@@ -79,6 +79,8 @@ class AVMString(AVMData):
             value = value[0]
         if isinstance(value, basestring):
             return value
+        elif value is None:
+            return None
         else:
             raise TypeError("{0:s} is not a string or unicode".format(self.tag))
 
@@ -326,6 +328,10 @@ class AVMUnorderedList(AVMData):
         # Check data type
         if not isinstance(values, list):
             raise TypeError("Data needs to be a Python List.")
+
+        # Check if all are None
+        if all([v is None for v in values]):
+            return None
 
         # Check length
         if not self.check_length(values):
