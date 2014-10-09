@@ -565,7 +565,8 @@ class AVM(AVMContainer):
             raise Exception("Astropy is required to use from_wcs()")
 
         wcs = WCS(header)
-        self = cls.from_wcs(wcs)
+        shape = (header['NAXIS2'], header['NAXIS1'])
+        self = cls.from_wcs(wcs, shape=shape)
 
         if include_full_header:
             self.Spatial.FITSheader = str(header)
@@ -573,9 +574,16 @@ class AVM(AVMContainer):
         return self
 
     @classmethod
-    def from_wcs(cls, wcs):
+    def from_wcs(cls, wcs, shape=None):
         """
         Instantiate an AVM object from a WCS transformation
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS` instance
+            The WCS to convert to AVM
+        shape : tuple
+            The shape of the image (using Numpy y, x order)
         """
 
         if not astropy_installed:
@@ -596,7 +604,14 @@ class AVM(AVMContainer):
         else:
             raise Exception("Projections do not agree: %s / %s" % (proj1, proj2))
 
-        self.Spatial.ReferenceDimension = [wcs.naxis1, wcs.naxis2]
+        try:
+            self.Spatial.ReferenceDimension = [wcs.naxis1, wcs.naxis2]
+        except:
+            if shape is None:
+                raise ValueError("The image shape should be passed to from_wcs")
+            else:
+                self.Spatial.ReferenceDimension = [shape[1], shape[0]]
+
         self.Spatial.ReferenceValue = wcs.wcs.crval.tolist()
         self.Spatial.ReferencePixel = wcs.wcs.crpix.tolist()
 

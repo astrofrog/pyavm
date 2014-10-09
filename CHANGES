@@ -1,6 +1,11 @@
 CHANGES
 --------
 
+Version 0.9.2
+
+    Fix compatibility with latest Astropy version. AVM.from_wcs now requires an
+    image shape to be passed for recent versions of Astropy.
+
 Version 0.9.1
 
     Allow AVM meta-data to be read from any file format by simply searching
