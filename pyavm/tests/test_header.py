@@ -76,7 +76,7 @@ def test_wcs_2():
     from astropy.wcs import WCS
     header = fits.Header.fromtextfile(os.path.join(ROOT, 'data', 'example_header.hdr'))
     a = WCS(header)
-    b = AVM.from_wcs(a).to_wcs()
+    b = AVM.from_wcs(a, shape=(header['NAXIS2'], header['NAXIS1'])).to_wcs()
     # assert a.wcs.equinox == b.wcs.equinox
     assert a.wcs.ctype[0] == b.wcs.ctype[0]
     assert a.wcs.ctype[1] == b.wcs.ctype[1]
