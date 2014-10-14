@@ -506,7 +506,12 @@ class AVM(AVMContainer):
 
         # Set standard WCS parameters
         if self.Spatial.ReferenceDimension is not None:
-            wcs.naxis1, wcs.naxis2 = self.Spatial.ReferenceDimension
+            wcs_naxis1, wcs_naxis2 = self.Spatial.ReferenceDimension
+            if hasattr(wcs, 'naxis1'):  # PyWCS and Astropy < 0.4
+                wcs.naxis1, wcs.naxis2 = wcs_naxis1, wcs_naxis2
+        else:
+            wcs_naxis1, wcs_naxis2 = None, None
+
         wcs.wcs.crval = self.Spatial.ReferenceValue
         wcs.wcs.crpix = self.Spatial.ReferencePixel
 
@@ -543,8 +548,8 @@ class AVM(AVMContainer):
                 raise ValueError("Spatial.ReferenceDimension should be set in order to determine scale in target image")
 
             # Find scale in x and y
-            scale_x = nx / float(wcs.naxis1)
-            scale_y = ny / float(wcs.naxis2)
+            scale_x = nx / float(wcs_naxis1)
+            scale_y = ny / float(wcs_naxis2)
 
             # Check that scales are consistent
             if abs(scale_x - scale_y) / (scale_x + scale_y) * 2. < 0.01:
@@ -552,10 +557,12 @@ class AVM(AVMContainer):
             else:
                 raise ValueError("Cannot scale WCS to target image consistently in x and y direction")
 
-            wcs.naxis1 = nx
-            wcs.naxis2 = ny
             wcs.wcs.cdelt /= scale
             wcs.wcs.crpix *= scale
+
+            if hasattr(wcs, 'naxis1'):  # PyWCS and Astropy < 0.4
+                wcs.naxis1 = nx
+                wcs.naxis2 = ny
 
         return wcs
 
