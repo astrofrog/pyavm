@@ -505,7 +505,7 @@ class AVM(AVMContainer):
             wcs.wcs.equinox = float(self.Spatial.Equinox)
 
         # Set standard WCS parameters
-        if self.Spatial.ReferenceDimension is not None:        
+        if self.Spatial.ReferenceDimension is not None:
             wcs.naxis1, wcs.naxis2 = self.Spatial.ReferenceDimension
         wcs.wcs.crval = self.Spatial.ReferenceValue
         wcs.wcs.crpix = self.Spatial.ReferencePixel
@@ -538,6 +538,9 @@ class AVM(AVMContainer):
             # Find target image size
             from PIL import Image
             nx, ny = Image.open(target_image).size
+
+            if self.Spatial.ReferenceDimension is None:
+                raise ValueError("Spatial.ReferenceDimension should be set in order to determine scale in target image")
 
             # Find scale in x and y
             scale_x = nx / float(wcs.naxis1)
