@@ -505,7 +505,8 @@ class AVM(AVMContainer):
             wcs.wcs.equinox = float(self.Spatial.Equinox)
 
         # Set standard WCS parameters
-        wcs.naxis1, wcs.naxis2 = self.Spatial.ReferenceDimension
+        if self.Spatial.ReferenceDimension is not None:        
+            wcs.naxis1, wcs.naxis2 = self.Spatial.ReferenceDimension
         wcs.wcs.crval = self.Spatial.ReferenceValue
         wcs.wcs.crpix = self.Spatial.ReferencePixel
 
@@ -582,7 +583,7 @@ class AVM(AVMContainer):
         ----------
         wcs : `~astropy.wcs.WCS` instance
             The WCS to convert to AVM
-        shape : tuple
+        shape : tuple, optional
             The shape of the image (using Numpy y, x order)
         """
 
@@ -608,7 +609,7 @@ class AVM(AVMContainer):
             self.Spatial.ReferenceDimension = [wcs.naxis1, wcs.naxis2]
         except:
             if shape is None:
-                raise ValueError("The image shape should be passed to from_wcs")
+                warnings.warn("no shape specified, so Spatial.ReferenceDimension will not be set")
             else:
                 self.Spatial.ReferenceDimension = [shape[1], shape[0]]
 
