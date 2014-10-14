@@ -505,7 +505,13 @@ class AVM(AVMContainer):
             wcs.wcs.equinox = float(self.Spatial.Equinox)
 
         # Set standard WCS parameters
-        wcs.naxis1, wcs.naxis2 = self.Spatial.ReferenceDimension
+        if self.Spatial.ReferenceDimension is not None:
+            wcs_naxis1, wcs_naxis2 = self.Spatial.ReferenceDimension
+            if hasattr(wcs, 'naxis1'):  # PyWCS and Astropy < 0.4
+                wcs.naxis1, wcs.naxis2 = wcs_naxis1, wcs_naxis2
+        else:
+            wcs_naxis1, wcs_naxis2 = None, None
+
         wcs.wcs.crval = self.Spatial.ReferenceValue
         wcs.wcs.crpix = self.Spatial.ReferencePixel
 
@@ -538,9 +544,12 @@ class AVM(AVMContainer):
             from PIL import Image
             nx, ny = Image.open(target_image).size
 
+            if self.Spatial.ReferenceDimension is None:
+                raise ValueError("Spatial.ReferenceDimension should be set in order to determine scale in target image")
+
             # Find scale in x and y
-            scale_x = nx / float(wcs.naxis1)
-            scale_y = ny / float(wcs.naxis2)
+            scale_x = nx / float(wcs_naxis1)
+            scale_y = ny / float(wcs_naxis2)
 
             # Check that scales are consistent
             if abs(scale_x - scale_y) / (scale_x + scale_y) * 2. < 0.01:
@@ -548,10 +557,12 @@ class AVM(AVMContainer):
             else:
                 raise ValueError("Cannot scale WCS to target image consistently in x and y direction")
 
-            wcs.naxis1 = nx
-            wcs.naxis2 = ny
             wcs.wcs.cdelt /= scale
             wcs.wcs.crpix *= scale
+
+            if hasattr(wcs, 'naxis1'):  # PyWCS and Astropy < 0.4
+                wcs.naxis1 = nx
+                wcs.naxis2 = ny
 
         return wcs
 
@@ -565,7 +576,8 @@ class AVM(AVMContainer):
             raise Exception("Astropy is required to use from_wcs()")
 
         wcs = WCS(header)
-        self = cls.from_wcs(wcs)
+        shape = (header['NAXIS2'], header['NAXIS1'])
+        self = cls.from_wcs(wcs, shape=shape)
 
         if include_full_header:
             self.Spatial.FITSheader = str(header)
@@ -573,9 +585,16 @@ class AVM(AVMContainer):
         return self
 
     @classmethod
-    def from_wcs(cls, wcs):
+    def from_wcs(cls, wcs, shape=None):
         """
         Instantiate an AVM object from a WCS transformation
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS` instance
+            The WCS to convert to AVM
+        shape : tuple, optional
+            The shape of the image (using Numpy y, x order)
         """
 
         if not astropy_installed:
@@ -596,7 +615,14 @@ class AVM(AVMContainer):
         else:
             raise Exception("Projections do not agree: %s / %s" % (proj1, proj2))
 
-        self.Spatial.ReferenceDimension = [wcs.naxis1, wcs.naxis2]
+        try:
+            self.Spatial.ReferenceDimension = [wcs.naxis1, wcs.naxis2]
+        except:
+            if shape is None:
+                warnings.warn("no shape specified, so Spatial.ReferenceDimension will not be set")
+            else:
+                self.Spatial.ReferenceDimension = [shape[1], shape[0]]
+
         self.Spatial.ReferenceValue = wcs.wcs.crval.tolist()
         self.Spatial.ReferencePixel = wcs.wcs.crpix.tolist()
 

@@ -57,7 +57,7 @@ def test_wcs_1():
     from astropy.io import fits
     header = fits.Header.fromtextfile(os.path.join(ROOT, 'data', 'example_header.hdr'))
     a = AVM.from_header(header)
-    b = AVM.from_wcs(a.to_wcs())
+    b = AVM.from_wcs(a.to_wcs(), shape=(header['NAXIS2'], header['NAXIS1']))
     # assert a.Spatial.Equinox == b.Spatial.Equinox  # returns NaN at the moment
     assert a.Spatial.CoordsystemProjection == b.Spatial.CoordsystemProjection
     assert a.Spatial.ReferenceDimension[0] == b.Spatial.ReferenceDimension[0]
