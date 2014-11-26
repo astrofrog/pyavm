@@ -7,7 +7,7 @@ try:  # Python 3.x
 except ImportError:  # Python 2.x
     from distutils.command.build_py import build_py
 
-version = '0.9.1'
+version = '0.9.2'
 
 setup(name='PyAVM',
       version=version,
