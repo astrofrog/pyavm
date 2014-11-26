@@ -1,6 +1,10 @@
 CHANGES
 --------
 
+Version 0.9.3
+
+    No changes yet
+
 Version 0.9.2
 
     Fix compatibility with latest Astropy version. AVM.from_wcs now requires an
