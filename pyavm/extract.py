@@ -30,7 +30,7 @@ def extract_xmp(image):
 
         # Loop through chunks and search for XMP packet
         for chunk in png_file.chunks:
-            if chunk.type == 'iTXt':
+            if chunk.type == b'iTXt':
                 if chunk.data.startswith(b'XML:com.adobe.xmp'):
                     return chunk.data[22:]
 
