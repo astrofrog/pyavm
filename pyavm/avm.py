@@ -381,9 +381,9 @@ class AVM(AVMContainer):
         print(xmp)
 
         # Extract XML
-        start = xmp.index("<?xpacket begin=")
-        start = xmp.index("?>", start) + 2
-        end = xmp.index("</x:xmpmeta>") + 12
+        start = xmp.index(b"<?xpacket begin=")
+        start = xmp.index(b"?>", start) + 2
+        end = xmp.index(b"</x:xmpmeta>") + 12
 
         # Extract XML
         xml = xmp[start:end]
