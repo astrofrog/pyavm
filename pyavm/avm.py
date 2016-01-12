@@ -27,10 +27,7 @@ except:
     basestring = unicode = str
 
 import warnings
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import BytesIO as StringIO
+from astropy.extern.six import BytesIO
 import xml.etree.ElementTree as et
 
 from .specs import SPECS, REVERSE_SPECS
@@ -408,7 +405,7 @@ class AVM(AVMContainer):
         self = cls()
 
         # Parse XML
-        tree = et.parse(StringIO(xml))
+        tree = et.parse(BytesIO(xml))
         root = tree.getroot()
         avm_content = parse_avm_content(root)
 
@@ -463,7 +460,7 @@ class AVM(AVMContainer):
 
         if use_full_header and self.Spatial.FITSheader is not None:
             print("Using full FITS header from Spatial.FITSheader")
-            header = fits.Header(txtfile=StringIO(self.Spatial.FITSheader))
+            header = fits.Header(txtfile=BytesIO(self.Spatial.FITSheader))
             return WCS(header)
 
         # Initializing WCS object
@@ -708,8 +705,8 @@ class AVM(AVMContainer):
         # Create XML Tree
         tree = et.ElementTree(root)
 
-        # Need to create a StringIO object to write to
-        s = StringIO()
+        # Need to create a BytesIO object to write to
+        s = BytesIO()
         tree.write(s, encoding='utf-8')
 
         # Rewind and read the contents
