@@ -13,4 +13,4 @@ install:
    - pip install pytest pillow numpy astropy
 
 script:
-   - py.test pyavm
+   - py.test pyavm -p no:warnings
