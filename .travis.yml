@@ -9,6 +9,7 @@ python:
 
 install:
    - export PYTHONIOENCODING=UTF8 # just in case
+   - pip install pip --upgrade
    - pip install pytest pillow numpy astropy
 
 script:
