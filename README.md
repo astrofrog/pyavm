@@ -8,7 +8,7 @@ PyAVM is a module to represent, read, and write metadata following the
 Requirements
 ------------
 
-PyAVM supports Python 2.6, 2.7, 3.1, 3.2, and 3.3. No other dependencies are
+PyAVM supports Python 2.7 and 3.5+. No other dependencies are
 needed simply to read and embed AVM meta-data.
 
 However, the following optional dependencies are needed for more advanced

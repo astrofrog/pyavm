@@ -32,6 +32,10 @@ def extract_xmp(image, xmp_packet_index=None):
                                   "xmp_packet_index was not specified, assuming "
                                   "xmp_packet_index=0")
                 xmp_packet_index = 0
+            elif xmp_packet_index >= len(xmp_segments):
+                raise IndexError("xmp_packet was set to {0} but only {1} "
+                                 "packets are present".format(xmp_packet_index,
+                                                              len(xmp_segments)))
             return xmp_segments[xmp_packet_index]
         else:  # No XMP data was found
             raise NoXMPPacketFound("No XMP packet present in file")
@@ -56,6 +60,10 @@ def extract_xmp(image, xmp_packet_index=None):
                                   "xmp_packet_index was not specified, assuming "
                                   "xmp_packet_index=0")
                 xmp_packet_index = 0
+            elif xmp_packet_index >= len(xmp_chunks):
+                raise IndexError("xmp_packet was set to {0} but only {1} "
+                                 "packets are present".format(xmp_packet_index,
+                                                              len(xmp_chunks)))
             return xmp_chunks[xmp_packet_index]
         else:  # No XMP data was found
             raise NoXMPPacketFound("No XMP packet present in file")
@@ -77,6 +85,10 @@ def extract_xmp(image, xmp_packet_index=None):
                                   "xmp_packet_index was not specified, assuming "
                                   "xmp_packet_index=0")
                 xmp_packet_index = 0
+            elif xmp_packet_index >= len(start_positions):
+                raise IndexError("xmp_packet was set to {0} but only {1} "
+                                 "packets are present".format(xmp_packet_index,
+                                                              len(start_positions)))
             start = start_positions[xmp_packet_index] - 2
             end = contents.index(b"</x:xmpmeta>", start) + 12
         else:
