@@ -1,21 +1,16 @@
 language: python
 
-python:
-    - 2.6
-    - 2.7
-    - 3.2
-    - 3.3
+sudo: false
 
-before_install:
-   # We do this to make sure we get the dependencies so pip works below
-   - sudo apt-get update -qq
+python:
+    - 2.7
+    - 3.5
+    - 3.6
 
 install:
    - export PYTHONIOENCODING=UTF8 # just in case
-   - pip install pytest -q --use-mirrors
-   - pip install pillow -q --use-mirrors
-   - pip install numpy -q --use-mirrors
-   - pip install astropy -q --use-mirrors
+   - pip install pip --upgrade
+   - pip install pytest pillow numpy astropy
 
 script:
-   - py.test pyavm
+   - py.test pyavm -p no:warnings

@@ -46,14 +46,13 @@ def test_to_wcs(filename):
 @pytest.mark.parametrize('filename', XML_FILES_WCS)
 def test_to_wcs_target_image(filename, tmpdir):
     from PIL import Image
-    image = Image.fromstring(data=b"1111", size=(2,2), mode="L")
+    image = Image.frombytes(data=b"1111", size=(2, 2), mode="L")
     image_file = tmpdir.join('test.png').strpath
     image.save(image_file)
     image.close()
     a = AVM.from_xml_file(filename)
     a.Spatial.ReferenceDimension = (30, 30)
     a.to_wcs(target_image=image_file)
-
 
 
 @pytest.mark.parametrize('filename', NO_WCS)
