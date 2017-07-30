@@ -8,13 +8,17 @@ except:
 import os
 import pytest
 
+pytest.importorskip('astropy')
+
+from astropy.io import fits
+from astropy.wcs import WCS
+
 from ..avm import AVM, NoSpatialInformation
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_from_header():
-    from astropy.io import fits
     header = fits.Header.fromtextfile(os.path.join(ROOT, 'data', 'example_header.hdr'))
     a = AVM.from_header(header)
     assert isinstance(a.Spatial.FITSheader, basestring)
@@ -33,7 +37,6 @@ def test_from_header():
 
 
 def test_from_header_cd():
-    from astropy.io import fits
     header = fits.Header.fromtextfile(os.path.join(ROOT, 'data', 'example_header.hdr'))
     header['CD1_1'] = header.pop('CDELT1')
     header['CD2_2'] = header.pop('CDELT2')
@@ -54,7 +57,6 @@ def test_from_header_cd():
 
 
 def test_wcs_1():
-    from astropy.io import fits
     header = fits.Header.fromtextfile(os.path.join(ROOT, 'data', 'example_header.hdr'))
     a = AVM.from_header(header)
     b = AVM.from_wcs(a.to_wcs(), shape=(header['NAXIS2'], header['NAXIS1']))
@@ -72,8 +74,6 @@ def test_wcs_1():
 
 
 def test_wcs_2():
-    from astropy.io import fits
-    from astropy.wcs import WCS
     header = fits.Header.fromtextfile(os.path.join(ROOT, 'data', 'example_header.hdr'))
     a = WCS(header)
     b = AVM.from_wcs(a).to_wcs()

@@ -7,10 +7,18 @@ python:
     - 3.5
     - 3.6
 
+env:
+  matrix:
+    - PIP_DEPENDENCIES='pytest coveralls pytest-cov pillow numpy astropy'
+    - PIP_DEPENDENCIES='pytest coveralls pytest-cov'
+
 install:
    - export PYTHONIOENCODING=UTF8 # just in case
    - pip install pip --upgrade
-   - pip install pytest pillow numpy astropy
+   - pip install $PIP_DEPENDENCIES
 
 script:
-   - py.test pyavm -p no:warnings
+   - py.test pyavm -p no:warnings --cov pyavm
+
+after_success:
+   - coveralls

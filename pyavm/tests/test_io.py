@@ -6,24 +6,17 @@ import warnings
 
 import pytest
 
-try:
-    from PIL import Image
-except ImportError:
-    try:
-        import Image
-    except ImportError:
-        pytest.skip()
+pytest.importorskip('PIL')
+pytest.importorskip('numpy')
 
-try:
-    import numpy as np
-except ImportError:
-    pytest.skip()
+from PIL import Image
+import numpy as np
 
 from .. import AVM
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
-XML_FILES = glob.glob(os.path.join(ROOT, 'data', '*.xml'))
+XML_FILES = glob.glob(os.path.join(ROOT, '*.xml'))
 
 
 @pytest.mark.parametrize('xml_file', XML_FILES)

@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
-
-try:  # Python 3.x
-    from distutils.command.build_py import build_py_2to3 as build_py
-except ImportError:  # Python 2.x
-    from distutils.command.build_py import build_py
+from setuptools import setup
 
 version = '0.9.3.dev'
 
@@ -19,7 +14,6 @@ setup(name='PyAVM',
       packages=['pyavm', 'pyavm.tests'],
       package_data={'pyavm.tests':['data/*.xml', 'data/*.hdr']},
       provides=['pyavm'],
-      cmdclass={'build_py': build_py},
       keywords=['Scientific/Engineering'],
       long_description="PyAVM is a module to represent, read, and write metadata following the `Astronomy Visualization Metadata <http://www.virtualastronomy.org/avm_metadata.php>`_ (AVM) standard.",
       classifiers=[
