@@ -39,6 +39,7 @@ XML_FILES_WCS = [x for x in XML_FILES if x not in NO_WCS]
 
 @pytest.mark.parametrize('filename', XML_FILES_WCS)
 def test_to_wcs(filename):
+    pytest.importorskip('astropy')
     a = AVM.from_xml_file(filename)
     a.to_wcs()
 
@@ -46,6 +47,7 @@ def test_to_wcs(filename):
 @pytest.mark.parametrize('filename', XML_FILES_WCS)
 def test_to_wcs_target_image(filename, tmpdir):
     pytest.importorskip('PIL')
+    pytest.importorskip('astropy')
     from PIL import Image
     image = Image.frombytes(data=b"1111", size=(2, 2), mode="L")
     image_file = tmpdir.join('test.png').strpath
@@ -58,6 +60,7 @@ def test_to_wcs_target_image(filename, tmpdir):
 
 @pytest.mark.parametrize('filename', NO_WCS)
 def test_to_wcs_nowcs(filename):
+    pytest.importorskip('astropy')
     a = AVM.from_xml_file(filename)
     with pytest.raises(NoSpatialInformation):
         a.to_wcs()
