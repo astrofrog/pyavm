@@ -21,9 +21,9 @@ except ImportError:
 
 from .. import AVM
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
-XML_FILES = glob.glob(os.path.join(ROOT, 'data', '*.xml'))
+XML_FILES = glob.glob(os.path.join(ROOT, '*.xml'))
 
 
 @pytest.mark.parametrize('xml_file', XML_FILES)

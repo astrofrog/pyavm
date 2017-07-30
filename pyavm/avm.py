@@ -364,7 +364,7 @@ class AVM(AVMContainer):
             return object.__getattr__(self, attribute)
 
     @classmethod
-    def from_image(cls, filename, xmp_packet_index=0):
+    def from_image(cls, filename, xmp_packet_index=None):
         """
         Instantiate an AVM object from an existing image.
 
@@ -380,6 +380,8 @@ class AVM(AVMContainer):
 
         # Get XMP data from file
         xmp = extract_xmp(filename, xmp_packet_index=xmp_packet_index)
+
+        print(xmp)
 
         # Extract XML
         start = xmp.index("<?xpacket begin=")
