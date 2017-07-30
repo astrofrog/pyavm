@@ -9,8 +9,8 @@ python:
 
 env:
   matrix:
-    - PIP_DEPENDENCIES='pytest pillow numpy astropy'
-    - PIP_DEPENDENCIES='pytest'
+    - PIP_DEPENDENCIES='pytest coveralls pytest-cov pillow numpy astropy'
+    - PIP_DEPENDENCIES='pytest coveralls pytest-cov'
 
 install:
    - export PYTHONIOENCODING=UTF8 # just in case
@@ -18,4 +18,7 @@ install:
    - pip install $PIP_DEPENDENCIES
 
 script:
-   - py.test pyavm -p no:warnings
+   - py.test pyavm -p no:warnings --cov pyavm
+
+after_success:
+   - coveralls
