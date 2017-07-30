@@ -1,1 +1,3 @@
-include README.md CHANGES LICENSE
+include README.rst
+include CHANGES
+include LICENSE
