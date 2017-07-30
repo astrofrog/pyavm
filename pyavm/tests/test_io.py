@@ -6,18 +6,11 @@ import warnings
 
 import pytest
 
-try:
-    from PIL import Image
-except ImportError:
-    try:
-        import Image
-    except ImportError:
-        pytest.skip()
+pytest.importorskip('PIL')
+pytest.importorskip('numpy')
 
-try:
-    import numpy as np
-except ImportError:
-    pytest.skip()
+from PIL import Image
+import numpy as np
 
 from .. import AVM
 

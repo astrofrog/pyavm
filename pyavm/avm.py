@@ -27,7 +27,7 @@ except:
     basestring = unicode = str
 
 import warnings
-from astropy.extern.six import BytesIO
+from io import BytesIO
 import xml.etree.ElementTree as et
 
 from .specs import SPECS, REVERSE_SPECS

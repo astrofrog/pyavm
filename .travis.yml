@@ -7,10 +7,15 @@ python:
     - 3.5
     - 3.6
 
+env:
+  matrix:
+    - PIP_DEPENDENCIES='pytest pillow numpy astropy'
+    - PIP_DEPENDENCIES='pytest'
+
 install:
    - export PYTHONIOENCODING=UTF8 # just in case
    - pip install pip --upgrade
-   - pip install pytest pillow numpy astropy
+   - pip install $PIP_DEPENDENCIES
 
 script:
    - py.test pyavm -p no:warnings
