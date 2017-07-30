@@ -10,7 +10,7 @@ def test_from_image_jpg():
 
 
 def test_from_image_png():
-    avm = AVM.from_image(os.path.join(ROOT, 'eso_eso1723a_320.jpg'))
+    avm = AVM.from_image(os.path.join(ROOT, 'eso_eso1723a_320.png'))
     assert avm.ID == 'eso1723a'
 
 
