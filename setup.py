@@ -2,7 +2,10 @@
 
 from setuptools import setup
 
-version = '0.9.3.dev'
+version = '0.9.3.dev0'
+
+with open('README.rst') as f:
+    LONG_DESCRIPTION = f.read()
 
 setup(name='PyAVM',
       version=version,
@@ -12,10 +15,10 @@ setup(name='PyAVM',
       license='MIT',
       url='http://astrofrog.github.io/pyavm/',
       packages=['pyavm', 'pyavm.tests'],
-      package_data={'pyavm.tests':['data/*.xml', 'data/*.hdr']},
+      package_data={'pyavm.tests': ['data/*.xml', 'data/*.hdr']},
       provides=['pyavm'],
       keywords=['Scientific/Engineering'],
-      long_description="PyAVM is a module to represent, read, and write metadata following the `Astronomy Visualization Metadata <http://www.virtualastronomy.org/avm_metadata.php>`_ (AVM) standard.",
+      long_description=LONG_DESCRIPTION,
       classifiers=[
       "Development Status :: 4 - Beta",
       "Programming Language :: Python",
