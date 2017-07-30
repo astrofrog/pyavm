@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/astrofrog/pyavm.svg?branch=master)](https://travis-ci.org/astrofrog/pyavm)
+[![Coverage Status](https://coveralls.io/repos/astrofrog/pyavm/badge.svg?branch=master)](https://coveralls.io/r/astrofrog/pyavm?branch=master)
+[![Documentation Status](https://readthedocs.org/projects/pyavm/badge/?version=latest)](https://readthedocs.org/projects/pyavm/?badge=latest)
+
 About
 -----
 
@@ -129,12 +133,4 @@ It is possible to embed AVM meta-data into an image file:
 
 At this time, only JPG and PNG files are supported for embedding.
 
-Build and coverage status
-=========================
-
-[![Build Status](https://travis-ci.org/astrofrog/pyavm.png?branch=master)](https://travis-ci.org/astrofrog/pyavm)
-
-[![Coverage Status](https://coveralls.io/repos/astrofrog/pyavm/badge.png?branch=master)](https://coveralls.io/r/astrofrog/pyavm?branch=master)
-
-[![Documentation Status](https://readthedocs.org/projects/pyavm/badge/?version=latest)](https://readthedocs.org/projects/pyavm/?badge=latest)
 
