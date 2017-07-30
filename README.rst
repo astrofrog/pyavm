@@ -170,5 +170,3 @@ At this time, only JPG and PNG files are supported for embedding.
    :target: https://travis-ci.org/astrofrog/pyavm
 .. |Coverage Status| image:: https://coveralls.io/repos/astrofrog/pyavm/badge.svg?branch=master
    :target: https://coveralls.io/r/astrofrog/pyavm?branch=master
-.. |Documentation Status| image:: https://readthedocs.org/projects/pyavm/badge/?version=latest
-   :target: https://readthedocs.org/projects/pyavm/?badge=latest
