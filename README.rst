@@ -17,10 +17,10 @@ simply to read and embed AVM meta-data.
 However, the following optional dependencies are needed for more
 advanced functionality:
 
-- `Numpy <http://www.numpy.org>`__ 1.10 or later
-- `Astropy <http://www.astropy.org>`__ to handle WCS objects and FITS
+-  `Numpy <http://www.numpy.org>`__ 1.10 or later
+-  `Astropy <http://www.astropy.org>`__ to handle WCS objects and FITS
    headers
-- `py.test <http://www.pytest.org>`__ and
+-  `py.test <http://www.pytest.org>`__ and
   `PIL <http://www.pythonware.com/products/pil/>`__ for tests
 
 Installing and Reporting issues
