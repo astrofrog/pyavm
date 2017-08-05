@@ -3,7 +3,7 @@ CHANGES
 
 Version 0.9.4
 
-    No changes yet.
+    Properly extract scale and rotation for arbitrary WCS objects.
 
 Version 0.9.3
 
