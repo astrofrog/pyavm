@@ -21,7 +21,7 @@ advanced functionality:
 -  `Astropy <http://www.astropy.org>`__ to handle WCS objects and FITS
    headers
 -  `py.test <http://www.pytest.org>`__ and
-  `PIL <http://www.pythonware.com/products/pil/>`__ for tests
+   `PIL <http://www.pythonware.com/products/pil/>`__ for tests
 
 Installing and Reporting issues
 -------------------------------
