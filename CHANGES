@@ -1,6 +1,10 @@
 CHANGES
 -------
 
+Version 0.9.5
+
+    No changes yet
+
 Version 0.9.4
 
     Properly extract scale and rotation for arbitrary WCS objects.
