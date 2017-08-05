@@ -9,7 +9,7 @@ python:
 
 env:
   matrix:
-    - PIP_DEPENDENCIES='pytest coveralls pytest-cov pillow numpy astropy'
+    - PIP_DEPENDENCIES='pytest coveralls pytest-cov pillow numpy>=1.10 astropy'
     - PIP_DEPENDENCIES='pytest coveralls pytest-cov'
 
 install:

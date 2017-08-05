@@ -31,6 +31,7 @@ from io import BytesIO
 import xml.etree.ElementTree as et
 
 from .specs import SPECS, REVERSE_SPECS
+from .wcs_utils import get_cdelt_crota, get_cd
 
 
 def register_namespace(tag, uri):
@@ -634,12 +635,14 @@ class AVM(AVMContainer):
         self.Spatial.ReferenceValue = wcs.wcs.crval.tolist()
         self.Spatial.ReferencePixel = wcs.wcs.crpix.tolist()
 
-        # The following is required to cover all cases of CDELT/PC/CD
-        import numpy as np  # will be installed if Astropy is present
-        cdelt = np.matrix(wcs.wcs.get_cdelt())
-        pc = np.matrix(wcs.wcs.get_pc())
-        scale = np.array(cdelt * pc)[0,:].tolist()
-        self.Spatial.Scale = scale
+        try:
+            cdelt1, cdelt2, crota2 = get_cdelt_crota(wcs)
+            self.Spatial.Scale = cdelt1, cdelt2
+            self.Spatial.Rotation = crota2
+        except ValueError:
+            warnings.warn("cannot represent WCS as a Scale and Rotation, using deprecated CDMatrix instead")
+            cd = get_cd(wcs)
+            self.Spatial.CDMatrix = cd
 
         xcoord = decode_ascii(wcs.wcs.ctype[0][:4])
         ycoord = decode_ascii(wcs.wcs.ctype[1][:4])
@@ -658,11 +661,6 @@ class AVM(AVMContainer):
             self.Spatial.CoordinateFrame = 'SGAL'
         else:
             raise Exception("Unknown coordinate system: {0}/{1}".format(xcoord, ycoord))
-
-        try:
-            self.Spatial.Rotation = wcs.wcs.crota[1]
-        except:
-            pass
 
         self.Spatial.Quality = "Full"
 
