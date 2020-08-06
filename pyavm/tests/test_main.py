@@ -58,6 +58,15 @@ def test_to_wcs_target_image(filename, tmpdir):
     a.to_wcs(target_image=image_file)
 
 
+@pytest.mark.parametrize('filename', XML_FILES_WCS)
+def test_to_wcs_target_shape(filename, tmpdir):
+    pytest.importorskip('PIL')
+    pytest.importorskip('astropy')
+    a = AVM.from_xml_file(filename)
+    a.Spatial.ReferenceDimension = (30, 30)
+    a.to_wcs(target_shape=(2, 2))
+
+
 @pytest.mark.parametrize('filename', NO_WCS)
 def test_to_wcs_nowcs(filename):
     pytest.importorskip('astropy')

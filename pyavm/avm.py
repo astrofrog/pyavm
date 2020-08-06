@@ -436,7 +436,7 @@ class AVM(AVMContainer):
 
         return self
 
-    def to_wcs(self, use_full_header=False, target_image=None):
+    def to_wcs(self, use_full_header=False, target_image=None, target_shape=None):
         """
         Convert AVM projection information into a Astropy WCS object.
 
@@ -451,6 +451,11 @@ class AVM(AVMContainer):
             the AVM was defined. The `target_image` option can be used to pass
             the path of an image from which the size will be used to re-scale
             the WCS.
+        target_shape : tuple of ``(nx: int, ny: int)``, optional
+            Serves the same function as `target_image`, but for cases where the
+            target dimensions are known without having to open and read an image
+            file. If both this and `target_image` are specified, `target_image`
+            takes precedence.
         """
 
         if not astropy_installed:
@@ -548,17 +553,16 @@ class AVM(AVMContainer):
         # If `target_image` is set, we have to rescale the reference pixel and
         # the scale
         if target_image is not None:
-
-            # Find target image size
             from PIL import Image
-            nx, ny = Image.open(target_image).size
+            target_shape = Image.open(target_image).size
 
+        if target_shape is not None:
             if self.Spatial.ReferenceDimension is None:
                 raise ValueError("Spatial.ReferenceDimension should be set in order to determine scale in target image")
 
             # Find scale in x and y
-            scale_x = nx / float(wcs_naxis1)
-            scale_y = ny / float(wcs_naxis2)
+            scale_x = target_shape[0] / float(wcs_naxis1)
+            scale_y = target_shape[1] / float(wcs_naxis2)
 
             # Check that scales are consistent
             if abs(scale_x - scale_y) / (scale_x + scale_y) * 2. < 0.01:
@@ -570,8 +574,8 @@ class AVM(AVMContainer):
             wcs.wcs.crpix *= scale
 
             if hasattr(wcs, 'naxis1'):  # PyWCS and Astropy < 0.4
-                wcs.naxis1 = nx
-                wcs.naxis2 = ny
+                wcs.naxis1 = target_shape[0]
+                wcs.naxis2 = target_shape[1]
 
         return wcs
 
