@@ -3,7 +3,9 @@ CHANGES
 
 Version 0.9.5
 
-    No changes yet
+    Add `target_shape` argument to `AVM.to_wcs()`
+  
+    Fix compatibility with Python 3.8
 
 Version 0.9.4
 
