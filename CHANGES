@@ -1,6 +1,10 @@
 CHANGES
 -------
 
+Version 0.9.6
+
+    No changes yet
+
 Version 0.9.5
 
     Add `target_shape` argument to `AVM.to_wcs()`
