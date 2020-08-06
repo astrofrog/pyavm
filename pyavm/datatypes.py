@@ -344,7 +344,7 @@ class AVMUnorderedList(AVMData):
         for value in values:
             value = value
             length += len(value)
-            if value is "":
+            if value == "":
                 value = "-"
             checked_data.append(value)
 
