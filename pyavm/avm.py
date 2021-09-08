@@ -379,8 +379,6 @@ class AVM(AVMContainer):
         # Get XMP data from file
         xmp = extract_xmp(filename, xmp_packet_index=xmp_packet_index)
 
-        print(xmp)
-
         # Extract XML
         start = xmp.index(b"<?xpacket begin=")
         start = xmp.index(b"?>", start) + 2
