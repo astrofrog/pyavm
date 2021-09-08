@@ -393,7 +393,8 @@ class AVM(AVMContainer):
         """
         Instantiate an AVM object from an xml file.
         """
-        return cls.from_xml(open(filename, 'rb').read())
+        with open(filename, 'rb') as f:
+            return cls.from_xml(f.read())
 
     @classmethod
     def from_xml(cls, xml):
