@@ -460,7 +460,6 @@ class AVM(AVMContainer):
             raise NoSpatialInformation("AVM meta-data does not contain any spatial information")
 
         if use_full_header and self.Spatial.FITSheader is not None:
-            print("Using full FITS header from Spatial.FITSheader")
             header = fits.Header(txtfile=BytesIO(self.Spatial.FITSheader))
             return WCS(header)
 
