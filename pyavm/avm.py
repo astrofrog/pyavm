@@ -429,10 +429,6 @@ class AVM(AVMContainer):
                     else:
                         self._items[avm_name] = content
 
-            else:
-
-                warnings.warn("ignoring tag %s:%s" % (tag, name))
-
         return self
 
     def to_wcs(self, use_full_header=False, target_image=None, target_shape=None):
