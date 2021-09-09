@@ -379,8 +379,6 @@ class AVM(AVMContainer):
         # Get XMP data from file
         xmp = extract_xmp(filename, xmp_packet_index=xmp_packet_index)
 
-        print(xmp)
-
         # Extract XML
         start = xmp.index(b"<?xpacket begin=")
         start = xmp.index(b"?>", start) + 2
@@ -395,7 +393,8 @@ class AVM(AVMContainer):
         """
         Instantiate an AVM object from an xml file.
         """
-        return cls.from_xml(open(filename, 'rb').read())
+        with open(filename, 'rb') as f:
+            return cls.from_xml(f.read())
 
     @classmethod
     def from_xml(cls, xml):
@@ -430,10 +429,6 @@ class AVM(AVMContainer):
                     else:
                         self._items[avm_name] = content
 
-            else:
-
-                warnings.warn("ignoring tag %s:%s" % (tag, name))
-
         return self
 
     def to_wcs(self, use_full_header=False, target_image=None, target_shape=None):
@@ -465,7 +460,6 @@ class AVM(AVMContainer):
             raise NoSpatialInformation("AVM meta-data does not contain any spatial information")
 
         if use_full_header and self.Spatial.FITSheader is not None:
-            print("Using full FITS header from Spatial.FITSheader")
             header = fits.Header(txtfile=BytesIO(self.Spatial.FITSheader))
             return WCS(header)
 
