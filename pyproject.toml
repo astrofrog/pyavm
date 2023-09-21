@@ -1,0 +1,68 @@
+[project]
+ name = "PyAVM"
+ description = "Simple pure-python AVM meta-data handling"
+ readme = "README.rst"
+ keywords = [
+  "Scientific/Engineering",
+]
+ license = { text = "MIT" }
+ authors = [
+     { name = "Thomas Robitaille", email = "thomas.robitaille@gmail.com" }
+ ]
+ requires-python = ">=3.8"
+ classifiers = [
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+ dynamic = [
+  "version",
+]
+ [project.optional-dependencies]
+ test = [
+  "pytest",
+  "pytest-cov",
+]
+ testall = [
+  "astropy",
+  "numpy",
+  "pillow",
+]
+[project.urls]
+documentation = "http://astrofrog.github.io/pyavm/"
+homepage = "http://astrofrog.github.io/pyavm/"
+repository = "https://github.com/astrofrog/pyavm"
+
+[build-system]
+build-backend = 'setuptools.build_meta'
+requires = [
+  "setuptools",
+  "setuptools_scm",
+  "wheel",
+]
+
+[tool.setuptools]
+include-package-data = true
+license-files = ["LICENSE"]
+
+[tool.setuptools.packages.find]
+include = ["pyavm", "pyavm.tests", "pyavm.tests.data"]
+namespaces = false
+
+[tool.setuptools.package-data]
+"pyavm.tests" = [
+    "data/*",
+    "data/*.jpg",
+    "data/*.png",
+    "data/*.xml",
+    "data/*.hdr"
+]
+
+[tool.setuptools_scm]
+write_to = "pyavm/_version.py"

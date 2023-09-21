@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  tests:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      coverage: codecov
+      envs: |
+        # Minimal dependencies
+        - linux: py38-test
+        - windows: py39-test
+        - macos: py310-test
+        - linux: py311-test
+        - windows: py312-test
+
+        # All dependencies
+        - linux: py38-test-all
+        - windows: py39-test-all
+        - macos: py310-test-all
+        - linux: py311-test-all
+        - windows: py312-test-all
+
+  publish:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@v1
+    with:
+      test_extras: test
+      test_command: pytest --pyargs pyavm
+    secrets:
+      pypi_token: ${{ secrets.PYPI_TOKEN }}
