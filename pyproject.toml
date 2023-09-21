@@ -21,7 +21,8 @@
 
  [project.optional-dependencies]
  test = [
-    "pytest"
+    "pytest",
+    "pytest-cov"
  ]
  testall = [
     "numpy",
