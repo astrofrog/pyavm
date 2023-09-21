@@ -44,7 +44,7 @@
 
 <h2>Requirements</h2>
 
-<p>PyAVM supports Python 2.6, 2.7, 3.1, 3.2, and 3.3. No other dependencies are
+<p>PyAVM supports Python 3.8 and later. No other dependencies are
 needed simply to read and embed AVM meta-data.</p>
 
 <p>However, the following optional dependencies are needed for more advanced
@@ -52,23 +52,17 @@ functionality:</p>
 
 <ul>
 <li>
+<a href="http://www.numpy.org">Numpy</a></li>
+<li>
 <a href="http://www.astropy.org">Astropy</a> to handle WCS objects and FITS headers</li>
 <li>
-<a href="http://www.pytest.org">py.test</a> and
-<a href="http://www.pythonware.com/products/pil/">PIL</a> for tests</li>
+<a href="http://www.pytest.org">pytest</a> and
+<a href="https://pillow.readthedocs.io/en/stable/">pillow</a> for tests</li>
 </ul><h2>Installing and Reporting issues</h2>
 
 <p>To install PyAVM, you can simply do:</p>
 
 <pre><code>pip install pyavm
-</code></pre>
-
-<p>if you have <code>pip</code> installed. Otherwise, download the
-<a href="https://pypi.python.org/pypi/PyAVM/">latest tar file</a>, then install using:</p>
-
-<pre><code>tar xvzf PyAVM-x.x.x.tar.gz
-cd PyAVM-x.x.x
-python setup.py install
 </code></pre>
 
 <p>Please report any issues you encounter via the
@@ -183,6 +177,6 @@ disabled with:</p>
 
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
+
   </body>
 </html>
