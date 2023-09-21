@@ -734,9 +734,6 @@ class AVM(AVMContainer):
             try:
                 from PIL import Image
             except ImportError:
-                try:
-                    import Image
-                except ImportError:
-                    raise ImportError("PIL is required for the verify= option")
+                raise ImportError("PIL is required for the verify= option")
             image = Image.open(filename_out)
             image.verify()

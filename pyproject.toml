@@ -1,0 +1,61 @@
+[project]
+ name = "PyAVM"
+ dynamic = [
+     "version"
+ ]
+ description = "Simple pure-python AVM meta-data handling"
+ readme = "README.rst"
+ authors = [
+     { name = "Thomas Robitaille", email = "thomas.robitaille@gmail.com" }
+ ]
+ license = { text = "MIT" }
+ requires-python = ">=3.8"
+ classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "License :: OSI Approved :: MIT License",
+ ]
+ keywords = [
+    "Scientific/Engineering"
+ ]
+
+ [project.optional-dependencies]
+ test = [
+    "pytest"
+ ]
+ testall = [
+    "numpy",
+    "astropy",
+    "pillow"
+ ]
+
+[project.urls]
+homepage = "http://astrofrog.github.io/pyavm/"
+documentation = "http://astrofrog.github.io/pyavm/"
+repository = "https://github.com/astrofrog/pyavm"
+
+[build-system]
+requires = ["setuptools",
+            "setuptools_scm",
+            "wheel"]
+build-backend = 'setuptools.build_meta'
+
+[tool.setuptools]
+include-package-data = true
+license-files = ["LICENSE"]
+
+[tool.setuptools.packages.find]
+include = ["pyavm", "pyavm.tests", "pyavm.tests.data"]
+namespaces = false
+
+[tool.setuptools.package-data]
+"pyavm.tests" = [
+    "data/*",
+    "data/*.jpg",
+    "data/*.png",
+    "data/*.xml",
+    "data/*.hdr"
+]
+
+[tool.setuptools_scm]
+write_to = "pyavm/_version.py"
