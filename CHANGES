@@ -3,7 +3,11 @@ CHANGES
 
 Version 0.9.6
 
-    No changes yet
+    Fix header initialization when ``use_full_header=True``
+
+    Updated package infrastructure
+
+    Remove unecessary print statement and reduce warnings
 
 Version 0.9.5
 
