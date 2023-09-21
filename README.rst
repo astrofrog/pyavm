@@ -11,7 +11,7 @@ standard.
 Requirements
 ------------
 
-PyAVM supports Python 2.7 and 3.5+. No other dependencies are needed
+PyAVM supports Python 3.8 and later. No other dependencies are needed
 simply to read and embed AVM meta-data.
 
 However, the following optional dependencies are needed for more
@@ -167,7 +167,7 @@ It is possible to embed AVM meta-data into an image file:
 
 At this time, only JPG and PNG files are supported for embedding.
 
-.. |Build Status| image:: https://travis-ci.org/astrofrog/pyavm.svg?branch=master
-   :target: https://travis-ci.org/astrofrog/pyavm
+.. |Build Status| image:: https://github.com/astrofrog/pyavm/actions/workflows/main.yml/badge.svg
+   :target: https://github.com/astrofrog/pyavm/actions/workflows/main.yml
 .. |Coverage Status| image:: https://coveralls.io/repos/astrofrog/pyavm/badge.svg?branch=master
    :target: https://coveralls.io/r/astrofrog/pyavm?branch=master
