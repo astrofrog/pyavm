@@ -540,7 +540,7 @@ class AVMOrderedFloatList(AVMOrderedList):
         uri = reverse_namespaces[self.namespace]
         element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
 
-        subelement = et.SubElement(element, "rdf:Bag")
+        subelement = et.SubElement(element, "rdf:Seq")
 
         for item in values:
             li = et.SubElement(subelement, "rdf:li")
