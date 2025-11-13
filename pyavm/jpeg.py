@@ -44,7 +44,7 @@ VARIABLE = ['APP0', 'APP1', 'APP2', 'APP3', 'APP4',
 
 def is_jpeg(filename):
     with open(filename, 'rb') as f:
-        return f.read(4) == b'\xff\xd8\xff\xe0'
+        return f.read(3) == b'\xff\xd8\xff'
 
 
 class JPEGSegment(object):
