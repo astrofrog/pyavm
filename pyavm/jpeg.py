@@ -1,8 +1,6 @@
 # Pure-python JPEG parser
 # Copyright (c) 2013 Thomas P. Robitaille
 
-from __future__ import print_function, division
-
 import struct
 
 # Define common markers
@@ -47,7 +45,7 @@ def is_jpeg(filename):
         return f.read(3) == b'\xff\xd8\xff'
 
 
-class JPEGSegment(object):
+class JPEGSegment:
 
     @classmethod
     def from_bytes(cls, bytes):
@@ -63,7 +61,7 @@ class JPEGSegment(object):
         fileobj.write(self.bytes)
 
 
-class JPEGFile(object):
+class JPEGFile:
 
     @classmethod
     def read(cls, filename):

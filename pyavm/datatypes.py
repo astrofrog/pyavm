@@ -1,5 +1,3 @@
-from __future__ import print_function, division
-
 try:
     unicode
 except:
@@ -42,7 +40,7 @@ for key in namespaces:
     reverse_namespaces[namespaces[key]] = key
 
 
-class AVMData(object):
+class AVMData:
     """
     Abstract AVM data class.  All other data classes inherit from AVMData.
     """

@@ -1,8 +1,6 @@
 # Pure-python PNG parser
 # Copyright (c) 2013 Thomas P. Robitaille
 
-from __future__ import print_function, division
-
 import struct
 
 PNG_SIGNATURE = b'\x89\x50\x4e\x47\x0d\x0a\x1a\x0a'
@@ -13,7 +11,7 @@ def is_png(filename):
         return f.read(8) == b'\x89\x50\x4e\x47\x0d\x0a\x1a\x0a'
 
 
-class PNGChunk(object):
+class PNGChunk:
 
     @classmethod
     def read(cls, fileobj):
@@ -71,7 +69,7 @@ class PNGChunk(object):
         return len(self.data)
 
 
-class PNGFile(object):
+class PNGFile:
 
     @classmethod
     def read(cls, filename):
