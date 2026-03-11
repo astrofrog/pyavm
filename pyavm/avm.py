@@ -19,11 +19,6 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-try:
-    unicode
-except:
-    basestring = unicode = str
-
 import warnings
 from io import BytesIO
 import xml.etree.ElementTree as et
@@ -33,10 +28,7 @@ from .wcs_utils import get_cdelt_crota, get_cd
 
 
 def register_namespace(tag, uri):
-    try:
-        et.register_namespace(tag, uri)
-    except:
-        et._namespace_map[uri] = tag
+    et.register_namespace(tag, uri)
 
 try:
     from astropy.wcs import WCS
@@ -76,7 +68,7 @@ def capitalize(string):
 
 
 def utf8(value):
-    return unicode(value).encode('utf-8')
+    return str(value).encode('utf-8')
 
 
 def decode_ascii(string):
@@ -513,8 +505,6 @@ class AVM(AVMContainer):
         # Set standard WCS parameters
         if self.Spatial.ReferenceDimension is not None:
             wcs_naxis1, wcs_naxis2 = self.Spatial.ReferenceDimension
-            if hasattr(wcs, 'naxis1'):  # PyWCS and Astropy < 0.4
-                wcs.naxis1, wcs.naxis2 = wcs_naxis1, wcs_naxis2
         else:
             wcs_naxis1, wcs_naxis2 = None, None
 
@@ -564,10 +554,6 @@ class AVM(AVMContainer):
 
             wcs.wcs.cdelt /= scale
             wcs.wcs.crpix *= scale
-
-            if hasattr(wcs, 'naxis1'):  # PyWCS and Astropy < 0.4
-                wcs.naxis1 = target_shape[0]
-                wcs.naxis2 = target_shape[1]
 
         return wcs
 

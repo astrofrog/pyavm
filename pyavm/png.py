@@ -55,12 +55,6 @@ class PNGChunk:
 
     @property
     def crc(self):
-        # Note from Python docs: "To generate the same numeric value across all
-        # Python versions and platforms use crc32(data) & 0xffffffff. If you
-        # are only using the checksum in packed binary format this is not
-        # necessary as the return value is the correct 32bit binary
-        # representation regardless of sign."
-        # This is indeed true, I see different values in Python 2 and 3.
         from zlib import crc32
         return crc32(self.type + self.data) & 0xffffffff
 

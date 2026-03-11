@@ -1,8 +1,3 @@
-try:
-    unicode
-except:
-    basestring = unicode = str
-
 import re
 import datetime
 import warnings
@@ -75,7 +70,7 @@ class AVMString(AVMData):
             return None
         if isinstance(value, (list, tuple)) and len(value) == 1:
             value = value[0]
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             return value
         elif value is None:
             return None
@@ -107,7 +102,7 @@ class AVMURL(AVMString):
         if not value:
             return None
 
-        if not (isinstance(value, basestring)):
+        if not (isinstance(value, str)):
             raise TypeError("{0:s} is not a string or unicode".format(self.tag))
 
         value = value
@@ -144,7 +139,7 @@ class AVMEmail(AVMString):
 
         :return: String (UTF-8)
         """
-        if not (isinstance(value, basestring)):
+        if not (isinstance(value, str)):
             raise TypeError("{0:s} is not a string or unicode".format(self.tag))
 
         value = value
@@ -196,7 +191,7 @@ class AVMStringCV(AVMString):
         if not value:
             return None
 
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             value = value
             value = self.format_data(value)
 
@@ -391,7 +386,7 @@ class AVMUnorderedStringList(AVMUnorderedList):
         checked_data = []
         # Check data type in list
         for value in values:
-            if (isinstance(value, basestring)):
+            if (isinstance(value, str)):
                 value = value
                 checked_data.append(value)
             else:
@@ -473,7 +468,7 @@ class AVMOrderedListCV(AVMOrderedList, AVMStringCVCapitalize):
         checked_data = []
         # Check data type in list
         for value in values:
-            if (isinstance(value, basestring)):
+            if (isinstance(value, str)):
                 value = value
                 value = self.format_data(value)
 
@@ -574,7 +569,7 @@ class AVMDateTimeList(AVMOrderedList):
                 if (isinstance(value, datetime.date) or isinstance(value, datetime.datetime)):
                     value = value.isoformat()
                     checked_data.append(value)
-                elif isinstance(value, basestring):
+                elif isinstance(value, str):
                     value = value
                     checked_data.append(value)
                 else:
