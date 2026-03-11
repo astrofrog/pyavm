@@ -78,8 +78,8 @@ class AVMString(AVMData):
 
     def to_xml(self, parent, value):
         uri = reverse_namespaces[self.namespace]
-        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
-        element.text = "%s" % value
+        element = et.SubElement(parent, f"{{{uri}}}{self.tag}")
+        element.text = f"{value}"
         return element
 
 
@@ -105,7 +105,7 @@ class AVMURL(AVMString):
             raise TypeError(f"{self.tag:s} is not a string or unicode")
 
         if value and "://" not in value:
-            value = "http://%s" % value
+            value = f"http://{value}"
 
         url_re = re.compile(
             r"^https?://"  # http:// or https://
@@ -222,10 +222,10 @@ class AVMStringCVUpper(AVMStringCV):
 class AVMLocalizedString(AVMString):
     def to_xml(self, parent, value):
         uri = reverse_namespaces[self.namespace]
-        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
+        element = et.SubElement(parent, f"{{{uri}}}{self.tag}")
         subelement = et.SubElement(element, "rdf:Alt")
         li = et.SubElement(subelement, "rdf:li")
-        li.text = "%s" % value
+        li.text = f"{value}"
         li.attrib["xml:lang"] = "x-default"
         return element
 
@@ -258,8 +258,8 @@ class AVMFloat(AVMData):
 
     def to_xml(self, parent, value):
         uri = reverse_namespaces[self.namespace]
-        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
-        element.text = "%.16f" % value
+        element = et.SubElement(parent, f"{{{uri}}}{self.tag}")
+        element.text = f"{value:.16f}"
         return element
 
 
@@ -317,16 +317,16 @@ class AVMUnorderedList(AVMData):
 
     def to_xml(self, parent, values):
         uri = reverse_namespaces[self.namespace]
-        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
+        element = et.SubElement(parent, f"{{{uri}}}{self.tag}")
 
         subelement = et.SubElement(element, "rdf:Bag")
 
         for item in values:
             li = et.SubElement(subelement, "rdf:li")
             if isinstance(item, float):
-                li.text = "%.16f" % item
+                li.text = f"{item:.16f}"
             else:
-                li.text = "%s" % item
+                li.text = f"{item}"
 
         return element
 
@@ -360,13 +360,13 @@ class AVMUnorderedStringList(AVMUnorderedList):
 
     def to_xml(self, parent, values):
         uri = reverse_namespaces[self.namespace]
-        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
+        element = et.SubElement(parent, f"{{{uri}}}{self.tag}")
 
         subelement = et.SubElement(element, "rdf:Bag")
 
         for item in values:
             li = et.SubElement(subelement, "rdf:li")
-            li.text = "%s" % item
+            li.text = f"{item}"
 
         return element
 
@@ -378,16 +378,16 @@ class AVMOrderedList(AVMUnorderedList):
 
     def to_xml(self, parent, values):
         uri = reverse_namespaces[self.namespace]
-        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
+        element = et.SubElement(parent, f"{{{uri}}}{self.tag}")
 
         subelement = et.SubElement(element, "rdf:Seq")
 
         for item in values:
             li = et.SubElement(subelement, "rdf:li")
             if isinstance(item, float):
-                li.text = "%.16f" % item
+                li.text = f"{item:.16f}"
             else:
-                li.text = "%s" % item
+                li.text = f"{item}"
 
         return element
 
@@ -482,7 +482,7 @@ class AVMOrderedFloatList(AVMOrderedList):
 
     def to_xml(self, parent, values):
         uri = reverse_namespaces[self.namespace]
-        element = et.SubElement(parent, "{%s}%s" % (uri, self.tag))
+        element = et.SubElement(parent, f"{{{uri}}}{self.tag}")
 
         subelement = et.SubElement(element, "rdf:Seq")
 
@@ -491,7 +491,7 @@ class AVMOrderedFloatList(AVMOrderedList):
             if item is None:
                 li.text = "-"
             else:
-                li.text = "%.16f" % item
+                li.text = f"{item:.16f}"
 
         return element
 

@@ -4,8 +4,30 @@ Specification for various versions of AVM
 
 from copy import deepcopy
 
-from .cv import *
-from .datatypes import *
+from .cv import (
+    IMAGE_PRODUCT_QUALITY_CHOICES,
+    SPATIAL_COORDINATE_FRAME_CHOICES,
+    SPATIAL_COORDSYSTEM_PROJECTION_CHOICES,
+    SPATIAL_QUALITY_CHOICES,
+    SPECTRAL_BAND_CHOICES,
+    SPECTRAL_COLOR_ASSIGNMENT_CHOICES,
+    TYPE_CHOICES,
+)
+from .datatypes import (
+    AVMURL,
+    AVMDateTime,
+    AVMDateTimeList,
+    AVMEmail,
+    AVMFloat,
+    AVMLocalizedString,
+    AVMOrderedFloatList,
+    AVMOrderedList,
+    AVMOrderedListCV,
+    AVMString,
+    AVMStringCVCapitalize,
+    AVMStringCVUpper,
+    AVMUnorderedStringList,
+)
 
 SPECS = {}
 

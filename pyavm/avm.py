@@ -65,7 +65,7 @@ class NoAVMPresent(Exception):
 
 
 def capitalize(string):
-    return string[0].upper() + string[1:]
+    return string[:1].upper() + string[1:]
 
 
 def utf8(value):
@@ -108,22 +108,19 @@ class AVMContainer:
                 substring = self._items[family].__str__(indent + 3)
                 if substring != "":
                     if hasattr(self._items[family], "value"):
-                        string += indent * " " + "%s: %s\n" % (
-                            family,
-                            utf8(self._items[family].value),
-                        )
+                        string += " " * indent + f"{family}: {utf8(self._items[family].value)}\n"
                     else:
-                        string += indent * " " + "%s:\n" % family
+                        string += " " * indent + f"{family}:\n"
                     string += substring
             else:
                 if isinstance(self._items[family], list):
-                    string += indent * " " + "%s:\n" % family
+                    string += " " * indent + f"{family}:\n"
                     for elem in self._items[family]:
                         if elem is not None:
-                            string += indent * " " + "   * %s\n" % utf8(elem)
+                            string += " " * indent + f"   * {utf8(elem)}\n"
                 else:
                     if self._items[family] is not None:
-                        string += indent * " " + "%s: %s\n" % (family, utf8(self._items[family]))
+                        string += " " * indent + f"{family}: {utf8(self._items[family])}\n"
 
         return string
 
@@ -135,7 +132,7 @@ class AVMContainer:
             object.__setattr__(self, attribute, value)
             return
         if attribute not in self._items:
-            raise Exception("%s is not a valid AVM tag" % attribute)
+            raise AttributeError(f"{attribute} is not a valid AVM tag")
         else:
             self._items[attribute] = value
 
@@ -176,7 +173,7 @@ def parse_avm_content(rdf):
                 ]:
                     avm_content[(namespaces[uri], tag)] = [x.text for x in item[0]]
                 else:
-                    raise Exception("Unexpected tag %s:%s" % (c_uri, c_tag))
+                    raise ValueError(f"Unexpected tag {c_uri}:{c_tag}")
             elif len(item) > 1:
                 sub_avm_content = parse_avm_content(item)
                 for key in sub_avm_content:
@@ -295,15 +292,7 @@ class AVM(AVMContainer):
                         self._items[family]._items[key] = None
 
     def __dir__(self):
-        attributes = []
-        for key in self._items:
-            if "." in key:
-                attribute = key.split(".")[0]
-            else:
-                attribute = key
-            if attribute not in attributes:
-                attributes.append(attribute)
-        return attributes
+        return list(self._items.keys())
 
     @property
     def _specs(self):
@@ -440,7 +429,7 @@ class AVM(AVMContainer):
         """
 
         if not astropy_installed:
-            raise Exception("Astropy is required to use to_wcs()")
+            raise ImportError("Astropy is required to use to_wcs()")
 
         if repr(self.Spatial) == "":
             raise NoSpatialInformation("AVM meta-data does not contain any spatial information")
@@ -459,24 +448,22 @@ class AVM(AVMContainer):
             warnings.warn("Spatial.CoordinateFrame not found, assuming ICRS")
             ctype = "ICRS"
 
-        if ctype in ["ICRS", "FK5", "FK4"]:
-            xcoord = "RA--"
-            ycoord = "DEC-"
+        coord_mappings = {
+            "ICRS": ("RA--", "DEC-"),
+            "FK5": ("RA--", "DEC-"),
+            "FK4": ("RA--", "DEC-"),
+            "ECL": ("ELON", "ELAT"),
+            "GAL": ("GLON", "GLAT"),
+            "SGAL": ("SLON", "SLAT"),
+        }
+        if ctype not in coord_mappings:
+            raise ValueError(f"Unknown coordinate system: {ctype}")
+        xcoord, ycoord = coord_mappings[ctype]
+        if ctype in ("ICRS", "FK5", "FK4"):
             wcs.wcs.radesys = ctype.encode("ascii")
-        elif ctype in ["ECL"]:
-            xcoord = "ELON"
-            ycoord = "ELAT"
-        elif ctype in ["GAL"]:
-            xcoord = "GLON"
-            ycoord = "GLAT"
-        elif ctype in ["SGAL"]:
-            xcoord = "SLON"
-            ycoord = "SLAT"
-        else:
-            raise Exception("Unknown coordinate system: %s" % ctype)
 
         # Find the projection type
-        cproj = ("%+4s" % self.Spatial.CoordsystemProjection).replace(" ", "-")
+        cproj = f"{self.Spatial.CoordsystemProjection:>4s}".replace(" ", "-")
 
         wcs.wcs.ctype[0] = (xcoord + cproj).encode("ascii")
         wcs.wcs.ctype[1] = (ycoord + cproj).encode("ascii")
@@ -494,7 +481,7 @@ class AVM(AVMContainer):
                 try:
                     wcs.wcs.equinox = float(self.Spatial.Equinox)
                 except ValueError:
-                    raise ValueError("Unknown equinox: %s" % self.Spatial.Equinox)
+                    raise ValueError(f"Unknown equinox: {self.Spatial.Equinox}")
         else:
             wcs.wcs.equinox = float(self.Spatial.Equinox)
 
@@ -564,7 +551,7 @@ class AVM(AVMContainer):
         """
 
         if not astropy_installed:
-            raise Exception("Astropy is required to use from_wcs()")
+            raise ImportError("Astropy is required to use from_header()")
 
         wcs = WCS(header)
         shape = (header["NAXIS2"], header["NAXIS1"])
@@ -589,7 +576,7 @@ class AVM(AVMContainer):
         """
 
         if not astropy_installed:
-            raise Exception("Astropy is required to use from_wcs()")
+            raise ImportError("Astropy is required to use from_wcs()")
 
         self = cls()
 
@@ -604,7 +591,7 @@ class AVM(AVMContainer):
         if proj1 == proj2:
             self.Spatial.CoordsystemProjection = decode_ascii(proj1)
         else:
-            raise Exception("Projections do not agree: %s / %s" % (proj1, proj2))
+            raise ValueError(f"Projections do not agree: {proj1} / {proj2}")
 
         try:
             self.Spatial.ReferenceDimension = [wcs.naxis1, wcs.naxis2]
@@ -674,10 +661,10 @@ class AVM(AVMContainer):
                 for key in self._items[name]._items:
                     if self._items[name]._items[key] is not None:
                         if key == "value":
-                            avm_class = self._specs["%s" % name]
+                            avm_class = self._specs[name]
                             avm_class.to_xml(branch, self._items[name].value)
                         else:
-                            avm_class = self._specs["%s.%s" % (name, key)]
+                            avm_class = self._specs[f"{name}.{key}"]
                             avm_class.to_xml(branch, self._items[name]._items[key])
             else:
                 if self._items[name] is not None and name in self._specs:
