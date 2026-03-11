@@ -2,6 +2,7 @@
 # Copyright (c) 2013 Thomas P. Robitaille
 
 import struct
+from zlib import crc32
 
 PNG_SIGNATURE = b"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a"
 
@@ -54,8 +55,6 @@ class PNGChunk:
 
     @property
     def crc(self):
-        from zlib import crc32
-
         return crc32(self.type + self.data) & 0xFFFFFFFF
 
     @property
@@ -66,34 +65,28 @@ class PNGChunk:
 class PNGFile:
     @classmethod
     def read(cls, filename):
-        fileobj = open(filename, "rb")
+        with open(filename, "rb") as fileobj:
+            self = cls()
 
-        self = cls()
+            # Read signature
+            sig = fileobj.read(8)
 
-        # Read signature
-        sig = fileobj.read(8)
+            if sig != PNG_SIGNATURE:
+                raise ValueError(f"Signature ({sig}) does match expected ({PNG_SIGNATURE})")
 
-        if sig != PNG_SIGNATURE:
-            raise ValueError(f"Signature ({sig}) does match expected ({PNG_SIGNATURE})")
+            self.chunks = []
 
-        self.chunks = []
-
-        while True:
-            chunk = PNGChunk.read(fileobj)
-            self.chunks.append(chunk)
-            if chunk.type == b"IEND":
-                break
-
-        fileobj.close()
+            while True:
+                chunk = PNGChunk.read(fileobj)
+                self.chunks.append(chunk)
+                if chunk.type == b"IEND":
+                    break
 
         return self
 
     def write(self, filename):
-        fileobj = open(filename, "wb")
+        with open(filename, "wb") as fileobj:
+            fileobj.write(PNG_SIGNATURE)
 
-        fileobj.write(PNG_SIGNATURE)
-
-        for chunk in self.chunks:
-            chunk.write(fileobj)
-
-        fileobj.close()
+            for chunk in self.chunks:
+                chunk.write(fileobj)

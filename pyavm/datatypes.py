@@ -23,16 +23,15 @@ __all__ = [
 ]
 
 
-namespaces = {}
-namespaces["http://www.communicatingastronomy.org/avm/1.0/"] = "avm"
-namespaces["http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/"] = "Iptc4xmpCore"
-namespaces["http://purl.org/dc/elements/1.1/"] = "dc"
-namespaces["http://ns.adobe.com/photoshop/1.0/"] = "photoshop"
-namespaces["http://ns.adobe.com/xap/1.0/rights/"] = "xapRights"
+namespaces = {
+    "http://www.communicatingastronomy.org/avm/1.0/": "avm",
+    "http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/": "Iptc4xmpCore",
+    "http://purl.org/dc/elements/1.1/": "dc",
+    "http://ns.adobe.com/photoshop/1.0/": "photoshop",
+    "http://ns.adobe.com/xap/1.0/rights/": "xapRights",
+}
 
-reverse_namespaces = {}
-for key in namespaces:
-    reverse_namespaces[namespaces[key]] = key
+reverse_namespaces = {v: k for k, v in namespaces.items()}
 
 
 class AVMData:
@@ -102,10 +101,8 @@ class AVMURL(AVMString):
         if not value:
             return None
 
-        if not (isinstance(value, str)):
+        if not isinstance(value, str):
             raise TypeError(f"{self.tag:s} is not a string or unicode")
-
-        value = value
 
         if value and "://" not in value:
             value = "http://%s" % value
@@ -141,10 +138,8 @@ class AVMEmail(AVMString):
 
         :return: String (UTF-8)
         """
-        if not (isinstance(value, str)):
+        if not isinstance(value, str):
             raise TypeError(f"{self.tag:s} is not a string or unicode")
-
-        value = value
 
         email_re = re.compile(
             r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
@@ -164,7 +159,7 @@ class AVMStringCV(AVMString):
 
     def __init__(self, path, cv, **kwargs):
         self.controlled_vocabulary = cv
-        super(AVMStringCV, self).__init__(path, **kwargs)
+        super().__init__(path, **kwargs)
 
     def format_data(self, value):
         """
@@ -179,10 +174,7 @@ class AVMStringCV(AVMString):
 
         :return: Boolean
         """
-        if value in self.controlled_vocabulary:
-            return True
-        else:
-            return False
+        return value in self.controlled_vocabulary
 
     def check_data(self, value):
         """
@@ -195,7 +187,6 @@ class AVMStringCV(AVMString):
             return None
 
         if isinstance(value, str):
-            value = value
             value = self.format_data(value)
 
             if self.check_cv(value):
@@ -260,7 +251,7 @@ class AVMFloat(AVMData):
 
         try:
             value = float(value)
-        except:
+        except (ValueError, TypeError):
             raise TypeError("Enter a value that can be represented as a number.")
 
         return value
@@ -278,18 +269,9 @@ class AVMUnorderedList(AVMData):
     """
 
     def __init__(self, path, **kwargs):
-        # Optional keyword arguments
-        if "length" in kwargs:
-            self.length = kwargs["length"]
-        else:
-            self.length = False
-
-        if "strict_length" in kwargs:
-            self.strict_length = kwargs["strict_length"]
-        else:
-            self.strict_length = False
-
-        super(AVMUnorderedList, self).__init__(path, **kwargs)
+        self.length = kwargs.get("length", False)
+        self.strict_length = kwargs.get("strict_length", False)
+        super().__init__(path, **kwargs)
 
     def check_length(self, values):
         """
@@ -298,17 +280,10 @@ class AVMUnorderedList(AVMData):
         :return: Boolean
         """
         if self.strict_length:
-            if len(values) is self.length:
-                return True
-            else:
-                return False
+            return len(values) == self.length
         elif self.length:
-            if len(values) <= self.length:
-                return True
-            else:
-                return False
-        else:
-            return True
+            return len(values) <= self.length
+        return True
 
     def check_data(self, values):
         """
@@ -325,7 +300,7 @@ class AVMUnorderedList(AVMData):
             raise TypeError("Data needs to be a Python List.")
 
         # Check if all are None
-        if all([v is None for v in values]):
+        if all(v is None for v in values):
             return None
 
         # Check length
@@ -333,15 +308,7 @@ class AVMUnorderedList(AVMData):
             raise AVMListLengthError("Data is not the correct length.")
 
         # Convert to UTF-8
-        checked_data = []
-        length = 0
-
-        for value in values:
-            value = value
-            length += len(value)
-            if value == "":
-                value = "-"
-            checked_data.append(value)
+        checked_data = ["-" if v == "" else v for v in values]
 
         if len(set(checked_data)) == 1 and checked_data[0] == "-":
             checked_data = []
@@ -356,7 +323,7 @@ class AVMUnorderedList(AVMData):
 
         for item in values:
             li = et.SubElement(subelement, "rdf:li")
-            if type(item) is float:
+            if isinstance(item, float):
                 li.text = "%.16f" % item
             else:
                 li.text = "%s" % item
@@ -384,16 +351,12 @@ class AVMUnorderedStringList(AVMUnorderedList):
         if not self.check_length(values):
             raise AVMListLengthError("Data is not the correct length.")
 
-        checked_data = []
         # Check data type in list
         for value in values:
-            if isinstance(value, str):
-                value = value
-                checked_data.append(value)
-            else:
+            if not isinstance(value, str):
                 raise TypeError("Elements of list need to be string or unicode.")
 
-        return checked_data
+        return list(values)
 
     def to_xml(self, parent, values):
         uri = reverse_namespaces[self.namespace]
@@ -421,7 +384,7 @@ class AVMOrderedList(AVMUnorderedList):
 
         for item in values:
             li = et.SubElement(subelement, "rdf:li")
-            if type(item) is float:
+            if isinstance(item, float):
                 li.text = "%.16f" % item
             else:
                 li.text = "%s" % item
@@ -438,17 +401,8 @@ class AVMOrderedListCV(AVMOrderedList, AVMStringCVCapitalize):
         self.namespace, self.tag = path.split(":")
         self.deprecated = deprecated
         self.controlled_vocabulary = cv
-
-        # Optional keyword arguments
-        if "length" in kwargs:
-            self.length = kwargs["length"]
-        else:
-            self.length = False
-
-        if "strict_length" in kwargs:
-            self.strict_length = kwargs["strict_length"]
-        else:
-            self.strict_length = False
+        self.length = kwargs.get("length", False)
+        self.strict_length = kwargs.get("strict_length", False)
 
     def check_data(self, values):
         """
@@ -468,7 +422,6 @@ class AVMOrderedListCV(AVMOrderedList, AVMStringCVCapitalize):
         # Check data type in list
         for value in values:
             if isinstance(value, str):
-                value = value
                 value = self.format_data(value)
 
                 if self.check_cv(value):
@@ -517,10 +470,9 @@ class AVMOrderedFloatList(AVMOrderedList):
                 if value.strip() == "-":
                     checked_data.append(None)
                 else:
-                    value = value
                     try:
                         checked_data.append(float(value))
-                    except Exception:
+                    except (ValueError, TypeError):
                         raise TypeError("Enter a string that can be represented as a number.")
 
             if len(set(checked_data)) == 1 and checked_data[0] == "-":
@@ -566,11 +518,10 @@ class AVMDateTimeList(AVMOrderedList):
         # Check data type in list
         for value in values:
             if value:
-                if isinstance(value, datetime.date) or isinstance(value, datetime.datetime):
-                    value = value.isoformat()
-                    checked_data.append(value)
+                if isinstance(value, datetime.date):
+                    # datetime.datetime is a subclass of datetime.date
+                    checked_data.append(value.isoformat())
                 elif isinstance(value, str):
-                    value = value
                     checked_data.append(value)
                 else:
                     raise TypeError(

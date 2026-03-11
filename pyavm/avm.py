@@ -49,16 +49,15 @@ from .extract import extract_xmp
 
 # Define namespace to tag mapping
 
-namespaces = {}
-namespaces["http://www.communicatingastronomy.org/avm/1.0/"] = "avm"
-namespaces["http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/"] = "Iptc4xmpCore"
-namespaces["http://purl.org/dc/elements/1.1/"] = "dc"
-namespaces["http://ns.adobe.com/photoshop/1.0/"] = "photoshop"
-namespaces["http://ns.adobe.com/xap/1.0/rights/"] = "xapRights"
+namespaces = {
+    "http://www.communicatingastronomy.org/avm/1.0/": "avm",
+    "http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/": "Iptc4xmpCore",
+    "http://purl.org/dc/elements/1.1/": "dc",
+    "http://ns.adobe.com/photoshop/1.0/": "photoshop",
+    "http://ns.adobe.com/xap/1.0/rights/": "xapRights",
+}
 
-reverse_namespaces = {}
-for key in namespaces:
-    reverse_namespaces[namespaces[key]] = key
+reverse_namespaces = {v: k for k, v in namespaces.items()}
 
 
 class NoAVMPresent(Exception):
@@ -86,10 +85,10 @@ def auto_type(string):
     """
     try:
         return int(string)
-    except:
+    except (ValueError, TypeError):
         try:
             return float(string)
-        except:
+        except (ValueError, TypeError):
             return string
 
 
@@ -105,7 +104,7 @@ class AVMContainer:
             if family.startswith("_"):
                 continue
 
-            if type(self._items[family]) is AVMContainer:
+            if isinstance(self._items[family], AVMContainer):
                 substring = self._items[family].__str__(indent + 3)
                 if substring != "":
                     if hasattr(self._items[family], "value"):
@@ -117,7 +116,7 @@ class AVMContainer:
                         string += indent * " " + "%s:\n" % family
                     string += substring
             else:
-                if type(self._items[family]) is list:
+                if isinstance(self._items[family], list):
                     string += indent * " " + "%s:\n" % family
                     for elem in self._items[family]:
                         if elem is not None:
@@ -316,10 +315,7 @@ class AVM(AVMContainer):
 
     @property
     def MetadataVersion(self):
-        if "MetadataVersion" in self._items:
-            return self._items["MetadataVersion"]
-        else:
-            return None
+        return self._items.get("MetadataVersion")
 
     @MetadataVersion.setter
     def MetadataVersion(self, value):
@@ -489,7 +485,7 @@ class AVM(AVMContainer):
         if self.Spatial.Equinox is None:
             warnings.warn("Spatial.Equinox is not present, assuming 2000")
             wcs.wcs.equinox = 2000.0
-        elif type(self.Spatial.Equinox) is str:
+        elif isinstance(self.Spatial.Equinox, str):
             if self.Spatial.Equinox == "J2000":
                 wcs.wcs.equinox = 2000.0
             elif self.Spatial.Equinox == "B1950":
@@ -612,7 +608,7 @@ class AVM(AVMContainer):
 
         try:
             self.Spatial.ReferenceDimension = [wcs.naxis1, wcs.naxis2]
-        except:
+        except AttributeError:
             if shape is None:
                 warnings.warn("no shape specified, so Spatial.ReferenceDimension will not be set")
             else:

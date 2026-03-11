@@ -4,34 +4,35 @@
 
 # Define common markers
 
-MARKERS = {}
-MARKERS[b"\xd8"] = "SOI"
-MARKERS[b"\xc0"] = "SOF0"
-MARKERS[b"\xc2"] = "SOF2"
-MARKERS[b"\xc4"] = "DHT"
-MARKERS[b"\xdb"] = "DQT"
-MARKERS[b"\xdd"] = "DRI"
-MARKERS[b"\xda"] = "SOS"
-MARKERS[b"\xd0"] = "RST0"
-MARKERS[b"\xd1"] = "RST1"
-MARKERS[b"\xd2"] = "RST2"
-MARKERS[b"\xd3"] = "RST3"
-MARKERS[b"\xd4"] = "RST4"
-MARKERS[b"\xd5"] = "RST5"
-MARKERS[b"\xd6"] = "RST6"
-MARKERS[b"\xd7"] = "RST7"
-MARKERS[b"\xe0"] = "APP0"
-MARKERS[b"\xe1"] = "APP1"
-MARKERS[b"\xe2"] = "APP2"
-MARKERS[b"\xe3"] = "APP3"
-MARKERS[b"\xe4"] = "APP4"
-MARKERS[b"\xe5"] = "APP5"
-MARKERS[b"\xe6"] = "APP6"
-MARKERS[b"\xe7"] = "APP7"
-MARKERS[b"\xe8"] = "APP8"
-MARKERS[b"\xe9"] = "APP9"
-MARKERS[b"\xfe"] = "COM"
-MARKERS[b"\xd9"] = "EOI"
+MARKERS = {
+    b"\xd8": "SOI",
+    b"\xc0": "SOF0",
+    b"\xc2": "SOF2",
+    b"\xc4": "DHT",
+    b"\xdb": "DQT",
+    b"\xdd": "DRI",
+    b"\xda": "SOS",
+    b"\xd0": "RST0",
+    b"\xd1": "RST1",
+    b"\xd2": "RST2",
+    b"\xd3": "RST3",
+    b"\xd4": "RST4",
+    b"\xd5": "RST5",
+    b"\xd6": "RST6",
+    b"\xd7": "RST7",
+    b"\xe0": "APP0",
+    b"\xe1": "APP1",
+    b"\xe2": "APP2",
+    b"\xe3": "APP3",
+    b"\xe4": "APP4",
+    b"\xe5": "APP5",
+    b"\xe6": "APP6",
+    b"\xe7": "APP7",
+    b"\xe8": "APP8",
+    b"\xe9": "APP9",
+    b"\xfe": "COM",
+    b"\xd9": "EOI",
+}
 
 # Define some markers which are always followed by variable-length data
 
@@ -61,9 +62,8 @@ class JPEGSegment:
 class JPEGFile:
     @classmethod
     def read(cls, filename):
-        fileobj = open(filename, "rb")
-        contents = fileobj.read()
-        fileobj.close()
+        with open(filename, "rb") as fileobj:
+            contents = fileobj.read()
 
         self = cls()
 
@@ -99,9 +99,6 @@ class JPEGFile:
         return self
 
     def write(self, filename):
-        fileobj = open(filename, "wb")
-
-        for segment in self.segments:
-            segment.write(fileobj)
-
-        fileobj.close()
+        with open(filename, "wb") as fileobj:
+            for segment in self.segments:
+                segment.write(fileobj)
