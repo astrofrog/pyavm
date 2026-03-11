@@ -55,3 +55,29 @@ version-file = "pyavm/_version.py"
 include = [
     "/pyavm",
 ]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes
+    "W",      # pycodestyle warnings
+    "I",      # isort
+]
+ignore = [
+    "E501",   # line too long (let formatter handle it)
+    "E721",   # type comparison (use isinstance)
+    "E722",   # bare except
+    "E741",   # ambiguous variable name
+    "F405",   # name may be undefined from star imports
+]
+
+[tool.ruff.lint.per-file-ignores]
+"pyavm/avm.py" = ["E402"]  # imports not at top (intentional structure)
+"pyavm/specs.py" = ["F403"]  # star imports used intentionally
+"pyavm/tests/*.py" = ["E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pyavm"]

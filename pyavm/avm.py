@@ -20,19 +20,21 @@
 # DEALINGS IN THE SOFTWARE.
 
 import warnings
-from io import BytesIO
 import xml.etree.ElementTree as et
+from io import BytesIO
 
-from .specs import SPECS, REVERSE_SPECS
-from .wcs_utils import get_cdelt_crota, get_cd
+from .specs import REVERSE_SPECS, SPECS
+from .wcs_utils import get_cd, get_cdelt_crota
 
 
 def register_namespace(tag, uri):
     et.register_namespace(tag, uri)
 
+
 try:
-    from astropy.wcs import WCS
     from astropy.io import fits
+    from astropy.wcs import WCS
+
     astropy_installed = True
 except ImportError:
     astropy_installed = False
@@ -48,11 +50,11 @@ from .extract import extract_xmp
 # Define namespace to tag mapping
 
 namespaces = {}
-namespaces['http://www.communicatingastronomy.org/avm/1.0/'] = 'avm'
-namespaces['http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/'] = 'Iptc4xmpCore'
-namespaces['http://purl.org/dc/elements/1.1/'] = 'dc'
-namespaces['http://ns.adobe.com/photoshop/1.0/'] = 'photoshop'
-namespaces['http://ns.adobe.com/xap/1.0/rights/'] = 'xapRights'
+namespaces["http://www.communicatingastronomy.org/avm/1.0/"] = "avm"
+namespaces["http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/"] = "Iptc4xmpCore"
+namespaces["http://purl.org/dc/elements/1.1/"] = "dc"
+namespaces["http://ns.adobe.com/photoshop/1.0/"] = "photoshop"
+namespaces["http://ns.adobe.com/xap/1.0/rights/"] = "xapRights"
 
 reverse_namespaces = {}
 for key in namespaces:
@@ -68,12 +70,12 @@ def capitalize(string):
 
 
 def utf8(value):
-    return str(value).encode('utf-8')
+    return str(value).encode("utf-8")
 
 
 def decode_ascii(string):
     try:
-        return string.decode('ascii')
+        return string.decode("ascii")
     except AttributeError:  # already a string
         return string
 
@@ -92,25 +94,25 @@ def auto_type(string):
 
 
 class AVMContainer:
-
     def __init__(self, allow_value=False):
         if allow_value:
             self.value = None
         self._items = {}
 
     def __str__(self, indent=0):
-
         string = ""
         for family in self._items:
-
-            if family.startswith('_'):
+            if family.startswith("_"):
                 continue
 
             if type(self._items[family]) is AVMContainer:
                 substring = self._items[family].__str__(indent + 3)
                 if substring != "":
-                    if hasattr(self._items[family], 'value'):
-                        string += indent * " " + "%s: %s\n" % (family, utf8(self._items[family].value))
+                    if hasattr(self._items[family], "value"):
+                        string += indent * " " + "%s: %s\n" % (
+                            family,
+                            utf8(self._items[family].value),
+                        )
                     else:
                         string += indent * " " + "%s:\n" % family
                     string += substring
@@ -122,8 +124,7 @@ class AVMContainer:
                             string += indent * " " + "   * %s\n" % utf8(elem)
                 else:
                     if self._items[family] is not None:
-                        string += indent * " " + \
-                            "%s: %s\n" % (family, utf8(self._items[family]))
+                        string += indent * " " + "%s: %s\n" % (family, utf8(self._items[family]))
 
         return string
 
@@ -131,7 +132,7 @@ class AVMContainer:
         return self.__str__()
 
     def __setattr__(self, attribute, value):
-        if attribute in ['_items', 'value']:
+        if attribute in ["_items", "value"]:
             object.__setattr__(self, attribute, value)
             return
         if attribute not in self._items:
@@ -147,23 +148,20 @@ class AVMContainer:
 
 
 def parse_avm_content(rdf):
-
     avm_content = {}
 
     for item in rdf.attrib:
-
         # Find URI
-        uri, tag = item[1:].split('}')
+        uri, tag = item[1:].split("}")
 
         if uri in namespaces:
             avm_content[(namespaces[uri], tag)] = rdf.attrib[item]
 
     for item in rdf:
-
         # Find URI
-        uri, tag = item.tag[1:].split('}')
+        uri, tag = item.tag[1:].split("}")
 
-        if uri == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#':
+        if uri == "http://www.w3.org/1999/02/22-rdf-syntax-ns#":
             sub_avm_content = parse_avm_content(item)
             for key in sub_avm_content:
                 avm_content[key] = sub_avm_content[key]
@@ -171,8 +169,12 @@ def parse_avm_content(rdf):
             if len(item) == 0:
                 avm_content[(namespaces[uri], tag)] = item.text
             elif len(item) == 1:
-                c_uri, c_tag = item[0].tag[1:].split('}')
-                if c_uri == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#' and c_tag in ['Bag', 'Seq', 'Alt']:
+                c_uri, c_tag = item[0].tag[1:].split("}")
+                if c_uri == "http://www.w3.org/1999/02/22-rdf-syntax-ns#" and c_tag in [
+                    "Bag",
+                    "Seq",
+                    "Alt",
+                ]:
                     avm_content[(namespaces[uri], tag)] = [x.text for x in item[0]]
                 else:
                     raise Exception("Unexpected tag %s:%s" % (c_uri, c_tag))
@@ -233,7 +235,6 @@ class AVM(AVMContainer):
     """
 
     def __init__(self, origin=None, version=1.2):
-
         self._items = {}
 
         self.MetadataVersion = version
@@ -241,7 +242,6 @@ class AVM(AVMContainer):
         self._update_attributes()
 
     def _update_attributes(self):
-
         # Remove attributes that are no longer in the specs
 
         remove_base = []
@@ -250,17 +250,21 @@ class AVM(AVMContainer):
             if isinstance(item, AVMContainer):
                 remove_sub = []
                 for avm_subset in item._items:
-                    full_name = '{0}.{1}'.format(avm_name, avm_subset)
-                    if not full_name in self._specs:
+                    full_name = f"{avm_name}.{avm_subset}"
+                    if full_name not in self._specs:
                         if item._items[avm_subset] is not None:
-                            warnings.warn("{0} is not defined in format specification {1} and will be deleted".format(full_name, self.MetadataVersion))
+                            warnings.warn(
+                                f"{full_name} is not defined in format specification {self.MetadataVersion} and will be deleted"
+                            )
                         remove_sub.append(avm_subset)
                 for key in remove_sub:
                     item._items.pop(key)
             else:
-                if not avm_name in self._specs:
+                if avm_name not in self._specs:
                     if self._items[avm_name] is not None:
-                        warnings.warn("{0} is not defined in format specification {1} and will be deleted".format(avm_name, self.MetadataVersion))
+                        warnings.warn(
+                            f"{avm_name} is not defined in format specification {self.MetadataVersion} and will be deleted"
+                        )
                     remove_base.append(avm_name)
         for key in remove_base:
             self._items.pop(key)
@@ -270,38 +274,35 @@ class AVM(AVMContainer):
         # First pass for root-level attributes, second pass for nested ones
         for iteration in range(2):
             for avm_name in self._specs:
-
                 if avm_name == "MetadataVersion":
                     continue
 
                 if "Distance" in avm_name:
-                    if not "Distance" in self._items:
-                        self._items['Distance'] = AVMContainer(allow_value=True)
+                    if "Distance" not in self._items:
+                        self._items["Distance"] = AVMContainer(allow_value=True)
 
-                if iteration == 0 and not '.' in avm_name:
-
+                if iteration == 0 and "." not in avm_name:
                     if avm_name not in self._items:
                         if "Distance" in avm_name:
                             self._items[avm_name] = AVMContainer(allow_value=True)
                         else:
                             self._items[avm_name] = None
 
-                elif iteration == 1 and '.' in avm_name:
-
-                    family, key = avm_name.split('.')
-                    if not family in self._items:
+                elif iteration == 1 and "." in avm_name:
+                    family, key = avm_name.split(".")
+                    if family not in self._items:
                         self._items[family] = AVMContainer()
-                    if not key in self._items[family]._items:
+                    if key not in self._items[family]._items:
                         self._items[family]._items[key] = None
 
     def __dir__(self):
         attributes = []
         for key in self._items:
-            if '.' in key:
-                attribute = key.split('.')[0]
+            if "." in key:
+                attribute = key.split(".")[0]
             else:
                 attribute = key
-            if not attribute in attributes:
+            if attribute not in attributes:
                 attributes.append(attribute)
         return attributes
 
@@ -315,24 +316,25 @@ class AVM(AVMContainer):
 
     @property
     def MetadataVersion(self):
-        if 'MetadataVersion' in self._items:
-            return self._items['MetadataVersion']
+        if "MetadataVersion" in self._items:
+            return self._items["MetadataVersion"]
         else:
             return None
 
     @MetadataVersion.setter
     def MetadataVersion(self, value):
-        self._items['MetadataVersion'] = value
+        self._items["MetadataVersion"] = value
         self._update_attributes()
 
     def __setattr__(self, attribute, value):
-
-        if attribute in ['_items', 'MetadataVersion']:
+        if attribute in ["_items", "MetadataVersion"]:
             object.__setattr__(self, attribute, value)
             return
 
         if attribute not in self._specs:
-            raise AttributeError("{0} is not a valid AVM group or tag in the {1} standard".format(attribute, self.MetadataVersion))
+            raise AttributeError(
+                f"{attribute} is not a valid AVM group or tag in the {self.MetadataVersion} standard"
+            )
 
         avm_class = self._specs[attribute]
         value = avm_class.check_data(value)
@@ -341,7 +343,7 @@ class AVM(AVMContainer):
             if hasattr(self._items[attribute], "value"):
                 self._items[attribute].value = value
             else:
-                raise AttributeError("{0} is an AVM group, not a tag".format(attribute))
+                raise AttributeError(f"{attribute} is an AVM group, not a tag")
         else:
             self._items[attribute] = value
 
@@ -383,7 +385,7 @@ class AVM(AVMContainer):
         """
         Instantiate an AVM object from an xml file.
         """
-        with open(filename, 'rb') as f:
+        with open(filename, "rb") as f:
             return cls.from_xml(f.read())
 
     @classmethod
@@ -400,21 +402,19 @@ class AVM(AVMContainer):
         avm_content = parse_avm_content(root)
 
         for tag, name in avm_content:
-
             content = avm_content[(tag, name)]
 
             if (tag, name) in self._reverse_specs:
-
                 avm_name = self._reverse_specs[tag, name]
 
                 # Add to AVM dictionary
                 avm_class = self._specs[avm_name]
                 content = avm_class.check_data(content)
                 if "." in avm_name:
-                    family, key = avm_name.split('.')
+                    family, key = avm_name.split(".")
                     self._items[family]._items[key] = content
                 else:
-                    if hasattr(self._items[avm_name], 'value'):
+                    if hasattr(self._items[avm_name], "value"):
                         self._items[avm_name].value = content
                     else:
                         self._items[avm_name] = content
@@ -446,7 +446,7 @@ class AVM(AVMContainer):
         if not astropy_installed:
             raise Exception("Astropy is required to use to_wcs()")
 
-        if repr(self.Spatial) == '':
+        if repr(self.Spatial) == "":
             raise NoSpatialInformation("AVM meta-data does not contain any spatial information")
 
         if use_full_header and self.Spatial.FITSheader is not None:
@@ -461,39 +461,39 @@ class AVM(AVMContainer):
             ctype = self.Spatial.CoordinateFrame
         else:
             warnings.warn("Spatial.CoordinateFrame not found, assuming ICRS")
-            ctype = 'ICRS'
+            ctype = "ICRS"
 
-        if ctype in ['ICRS', 'FK5', 'FK4']:
+        if ctype in ["ICRS", "FK5", "FK4"]:
             xcoord = "RA--"
             ycoord = "DEC-"
-            wcs.wcs.radesys = ctype.encode('ascii')
-        elif ctype in ['ECL']:
+            wcs.wcs.radesys = ctype.encode("ascii")
+        elif ctype in ["ECL"]:
             xcoord = "ELON"
             ycoord = "ELAT"
-        elif ctype in ['GAL']:
+        elif ctype in ["GAL"]:
             xcoord = "GLON"
             ycoord = "GLAT"
-        elif ctype in ['SGAL']:
+        elif ctype in ["SGAL"]:
             xcoord = "SLON"
             ycoord = "SLAT"
         else:
             raise Exception("Unknown coordinate system: %s" % ctype)
 
         # Find the projection type
-        cproj = ('%+4s' % self.Spatial.CoordsystemProjection).replace(' ', '-')
+        cproj = ("%+4s" % self.Spatial.CoordsystemProjection).replace(" ", "-")
 
-        wcs.wcs.ctype[0] = (xcoord + cproj).encode('ascii')
-        wcs.wcs.ctype[1] = (ycoord + cproj).encode('ascii')
+        wcs.wcs.ctype[0] = (xcoord + cproj).encode("ascii")
+        wcs.wcs.ctype[1] = (ycoord + cproj).encode("ascii")
 
         # Find the equinox
         if self.Spatial.Equinox is None:
             warnings.warn("Spatial.Equinox is not present, assuming 2000")
-            wcs.wcs.equinox = 2000.
+            wcs.wcs.equinox = 2000.0
         elif type(self.Spatial.Equinox) is str:
             if self.Spatial.Equinox == "J2000":
-                wcs.wcs.equinox = 2000.
+                wcs.wcs.equinox = 2000.0
             elif self.Spatial.Equinox == "B1950":
-                wcs.wcs.equinox = 1950.
+                wcs.wcs.equinox = 1950.0
             else:
                 try:
                     wcs.wcs.equinox = float(self.Spatial.Equinox)
@@ -512,8 +512,7 @@ class AVM(AVMContainer):
         wcs.wcs.crpix = self.Spatial.ReferencePixel
 
         if self.Spatial.CDMatrix is not None:
-            wcs.wcs.cd = [self.Spatial.CDMatrix[0:2],
-                          self.Spatial.CDMatrix[2:4]]
+            wcs.wcs.cd = [self.Spatial.CDMatrix[0:2], self.Spatial.CDMatrix[2:4]]
         elif self.Spatial.Scale is not None:
             # AVM Standard 1.2:
             #
@@ -527,8 +526,8 @@ class AVM(AVMContainer):
             # the FITS keywords: CDELT1, CDELT2 (or derived from CD matrix)."
             #
             # Therefore, we have to enforce the sign of CDELT:
-            wcs.wcs.cdelt[0] = - abs(self.Spatial.Scale[0])
-            wcs.wcs.cdelt[1] = + abs(self.Spatial.Scale[1])
+            wcs.wcs.cdelt[0] = -abs(self.Spatial.Scale[0])
+            wcs.wcs.cdelt[1] = +abs(self.Spatial.Scale[1])
             if self.Spatial.Rotation is not None:
                 wcs.wcs.crota = self.Spatial.Rotation, self.Spatial.Rotation
 
@@ -536,21 +535,26 @@ class AVM(AVMContainer):
         # the scale
         if target_image is not None:
             from PIL import Image
+
             target_shape = Image.open(target_image).size
 
         if target_shape is not None:
             if self.Spatial.ReferenceDimension is None:
-                raise ValueError("Spatial.ReferenceDimension should be set in order to determine scale in target image")
+                raise ValueError(
+                    "Spatial.ReferenceDimension should be set in order to determine scale in target image"
+                )
 
             # Find scale in x and y
             scale_x = target_shape[0] / float(wcs_naxis1)
             scale_y = target_shape[1] / float(wcs_naxis2)
 
             # Check that scales are consistent
-            if abs(scale_x - scale_y) / (scale_x + scale_y) * 2. < 0.01:
+            if abs(scale_x - scale_y) / (scale_x + scale_y) * 2.0 < 0.01:
                 scale = scale_x
             else:
-                raise ValueError("Cannot scale WCS to target image consistently in x and y direction")
+                raise ValueError(
+                    "Cannot scale WCS to target image consistently in x and y direction"
+                )
 
             wcs.wcs.cdelt /= scale
             wcs.wcs.crpix *= scale
@@ -567,7 +571,7 @@ class AVM(AVMContainer):
             raise Exception("Astropy is required to use from_wcs()")
 
         wcs = WCS(header)
-        shape = (header['NAXIS2'], header['NAXIS1'])
+        shape = (header["NAXIS2"], header["NAXIS1"])
         self = cls.from_wcs(wcs, shape=shape)
 
         if include_full_header:
@@ -622,27 +626,29 @@ class AVM(AVMContainer):
             self.Spatial.Scale = cdelt1, cdelt2
             self.Spatial.Rotation = crota2
         except ValueError:
-            warnings.warn("cannot represent WCS as a Scale and Rotation, using deprecated CDMatrix instead")
+            warnings.warn(
+                "cannot represent WCS as a Scale and Rotation, using deprecated CDMatrix instead"
+            )
             cd = get_cd(wcs)
             self.Spatial.CDMatrix = cd
 
         xcoord = decode_ascii(wcs.wcs.ctype[0][:4])
         ycoord = decode_ascii(wcs.wcs.ctype[1][:4])
 
-        if xcoord == 'RA--' and ycoord == 'DEC-':
-            if wcs.wcs.radesys in ('ICRS', 'FK5', 'FK4'):
+        if xcoord == "RA--" and ycoord == "DEC-":
+            if wcs.wcs.radesys in ("ICRS", "FK5", "FK4"):
                 self.Spatial.CoordinateFrame = str(wcs.wcs.radesys)
             else:  # assume epoch-independent coordinate system
                 warnings.warn("RADESYS header keyword not found, assuming ICRS")
-                self.Spatial.CoordinateFrame = 'ICRS'
-        elif xcoord == 'ELON' and ycoord == 'ELAT':
-            self.Spatial.CoordinateFrame = 'ECL'
-        elif xcoord == 'GLON' and ycoord == 'GLAT':
-            self.Spatial.CoordinateFrame = 'GAL'
-        elif xcoord == 'SLON' and ycoord == 'SLAT':
-            self.Spatial.CoordinateFrame = 'SGAL'
+                self.Spatial.CoordinateFrame = "ICRS"
+        elif xcoord == "ELON" and ycoord == "ELAT":
+            self.Spatial.CoordinateFrame = "ECL"
+        elif xcoord == "GLON" and ycoord == "GLAT":
+            self.Spatial.CoordinateFrame = "GAL"
+        elif xcoord == "SLON" and ycoord == "SLAT":
+            self.Spatial.CoordinateFrame = "SGAL"
         else:
-            raise Exception("Unknown coordinate system: {0}/{1}".format(xcoord, ycoord))
+            raise Exception(f"Unknown coordinate system: {xcoord}/{ycoord}")
 
         self.Spatial.Quality = "Full"
 
@@ -654,8 +660,8 @@ class AVM(AVMContainer):
         """
 
         # Register namespaces
-        register_namespace('x', "adobe:ns:meta/")
-        register_namespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
+        register_namespace("x", "adobe:ns:meta/")
+        register_namespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#")
         for namespace in namespaces:
             register_namespace(namespaces[namespace], namespace)
 
@@ -672,10 +678,10 @@ class AVM(AVMContainer):
                 for key in self._items[name]._items:
                     if self._items[name]._items[key] is not None:
                         if key == "value":
-                            avm_class = self._specs['%s' % name]
+                            avm_class = self._specs["%s" % name]
                             avm_class.to_xml(branch, self._items[name].value)
                         else:
-                            avm_class = self._specs['%s.%s' % (name, key)]
+                            avm_class = self._specs["%s.%s" % (name, key)]
                             avm_class.to_xml(branch, self._items[name]._items[key])
             else:
                 if self._items[name] is not None and name in self._specs:
@@ -687,7 +693,7 @@ class AVM(AVMContainer):
 
         # Need to create a BytesIO object to write to
         s = BytesIO()
-        tree.write(s, encoding='utf-8')
+        tree.write(s, encoding="utf-8")
 
         # Rewind and read the contents
         s.seek(0)

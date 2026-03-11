@@ -1,10 +1,10 @@
 def arg(x, y):
     import numpy as np
+
     return np.arctan2(y, x)
 
 
 def get_cd(wcs):
-
     pc11, pc12, pc21, pc22 = wcs.wcs.get_pc().ravel()
     cdelt1, cdelt2 = wcs.wcs.get_cdelt()
 
@@ -17,7 +17,6 @@ def get_cd(wcs):
 
 
 def get_cdelt_crota(wcs):
-
     import numpy as np
 
     # This implements the algorithm from:
