@@ -422,14 +422,18 @@ class AVMOrderedListCV(AVMOrderedList, AVMStringCVCapitalize):
         # Check data type in list
         for value in values:
             if isinstance(value, str):
-                value = self.format_data(value)
-
-                if self.check_cv(value):
-                    checked_data.append(value)
+                # Dash is a valid placeholder for unknown values
+                if value.strip() == "-":
+                    checked_data.append("-")
                 else:
-                    raise AVMItemNotInControlledVocabularyError(
-                        "Item is not in the controlled vocabulary."
-                    )
+                    value = self.format_data(value)
+
+                    if self.check_cv(value):
+                        checked_data.append(value)
+                    else:
+                        raise AVMItemNotInControlledVocabularyError(
+                            "Item is not in the controlled vocabulary."
+                        )
             else:
                 if value is None:
                     checked_data.append("-")

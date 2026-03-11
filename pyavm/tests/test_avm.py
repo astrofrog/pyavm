@@ -46,3 +46,17 @@ def test_from_wcs_cd():
     avm = AVM.from_wcs(wcs)
     np.testing.assert_allclose(avm.Spatial.Scale, [-1.5, 2.5])
     np.testing.assert_allclose(avm.Spatial.Rotation, 60)
+
+
+def test_controlled_vocabulary_dash_placeholder():
+    """Test that dash '-' is accepted as a placeholder in controlled vocabulary lists.
+
+    This is a regression test for issue #40.
+    """
+    avm = AVM()
+    # Dash should be accepted as a placeholder for unknown values
+    avm.Spectral.ColorAssignment = ["Blue", "Green", "-", "Red", "-"]
+    assert avm.Spectral.ColorAssignment == ["Blue", "Green", "-", "Red", "-"]
+
+    avm.Spectral.Band = ["Optical", "-", "Infrared"]
+    assert avm.Spectral.Band == ["Optical", "-", "Infrared"]
