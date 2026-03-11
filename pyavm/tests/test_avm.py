@@ -78,3 +78,23 @@ def test_from_wcs_sip():
 
     avm = AVM.from_wcs(wcs)
     assert avm.Spatial.CoordsystemProjection == "TAN"
+
+
+def test_nested_attribute_verification():
+    """Test that nested attributes are validated against specs.
+
+    This is a regression test for issue #38.
+    """
+    avm = AVM()
+
+    # Valid nested attribute assignment should work
+    avm.Spatial.ReferencePixel = [100.0, 200.0]
+    assert avm.Spatial.ReferencePixel == [100.0, 200.0]
+
+    # Invalid type should raise an error
+    with pytest.raises(TypeError):
+        avm.Spatial.ReferencePixel = "hello world"
+
+    # Invalid attribute name should raise AttributeError
+    with pytest.raises(AttributeError):
+        avm.Spatial.InvalidAttribute = "test"
