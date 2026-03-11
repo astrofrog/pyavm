@@ -9,7 +9,7 @@ def embed_xmp(image_in, image_out, xmp_packet):
     if is_jpeg(image_in):
         # Check length
         if len(xmp_packet) >= 65503:
-            raise Exception("XMP packet is too long to embed in JPG file")
+            raise ValueError("XMP packet is too long to embed in JPG file")
 
         # XMP segment
         xmp_segment = JPEGSegment()
@@ -102,4 +102,4 @@ def embed_xmp(image_in, image_out, xmp_packet):
         png_file.write(image_out)
 
     else:
-        raise Exception("Only JPG and PNG files are supported at this time")
+        raise ValueError("Only JPG and PNG files are supported at this time")
