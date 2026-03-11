@@ -1,63 +1,59 @@
-try:
-    unicode
-except:
-    basestring = unicode = str
-
 import os
+
 import pytest
 
-pytest.importorskip('astropy')
+pytest.importorskip("astropy")
 
 from astropy.io import fits
 from astropy.wcs import WCS
 
-from ..avm import AVM, NoSpatialInformation
+from ..avm import AVM
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_from_header():
-    header = fits.Header.fromtextfile(os.path.join(ROOT, 'data', 'example_header.hdr'))
+    header = fits.Header.fromtextfile(os.path.join(ROOT, "data", "example_header.hdr"))
     a = AVM.from_header(header)
-    assert isinstance(a.Spatial.FITSheader, basestring)
+    assert isinstance(a.Spatial.FITSheader, str)
     assert a.Spatial.FITSheader == header
     # assert a.Spatial.Equinox == 2000.  # returns NaN at the moment
-    assert a.Spatial.CoordsystemProjection == 'CAR'
+    assert a.Spatial.CoordsystemProjection == "CAR"
     assert a.Spatial.ReferenceDimension[0] == 599
     assert a.Spatial.ReferenceDimension[1] == 599
-    assert a.Spatial.ReferenceValue[0] == 0.
-    assert a.Spatial.ReferenceValue[1] == 0.
+    assert a.Spatial.ReferenceValue[0] == 0.0
+    assert a.Spatial.ReferenceValue[1] == 0.0
     assert a.Spatial.ReferencePixel[0] == 299.628
     assert a.Spatial.ReferencePixel[1] == 299.394
     assert a.Spatial.Scale[0] == -0.001666666707
     assert a.Spatial.Scale[1] == +0.001666666707
-    assert a.Spatial.Quality == 'Full'
+    assert a.Spatial.Quality == "Full"
 
 
 def test_from_header_cd():
-    header = fits.Header.fromtextfile(os.path.join(ROOT, 'data', 'example_header.hdr'))
-    header['CD1_1'] = header.pop('CDELT1')
-    header['CD2_2'] = header.pop('CDELT2')
+    header = fits.Header.fromtextfile(os.path.join(ROOT, "data", "example_header.hdr"))
+    header["CD1_1"] = header.pop("CDELT1")
+    header["CD2_2"] = header.pop("CDELT2")
     a = AVM.from_header(header)
-    assert isinstance(a.Spatial.FITSheader, basestring)
+    assert isinstance(a.Spatial.FITSheader, str)
     assert a.Spatial.FITSheader == header
     # assert a.Spatial.Equinox == 2000.  # returns NaN at the moment
-    assert a.Spatial.CoordsystemProjection == 'CAR'
+    assert a.Spatial.CoordsystemProjection == "CAR"
     assert a.Spatial.ReferenceDimension[0] == 599
     assert a.Spatial.ReferenceDimension[1] == 599
-    assert a.Spatial.ReferenceValue[0] == 0.
-    assert a.Spatial.ReferenceValue[1] == 0.
+    assert a.Spatial.ReferenceValue[0] == 0.0
+    assert a.Spatial.ReferenceValue[1] == 0.0
     assert a.Spatial.ReferencePixel[0] == 299.628
     assert a.Spatial.ReferencePixel[1] == 299.394
     assert a.Spatial.Scale[0] == -0.001666666707
     assert a.Spatial.Scale[1] == +0.001666666707
-    assert a.Spatial.Quality == 'Full'
+    assert a.Spatial.Quality == "Full"
 
 
 def test_wcs_1():
-    header = fits.Header.fromtextfile(os.path.join(ROOT, 'data', 'example_header.hdr'))
+    header = fits.Header.fromtextfile(os.path.join(ROOT, "data", "example_header.hdr"))
     a = AVM.from_header(header)
-    b = AVM.from_wcs(a.to_wcs(), shape=(header['NAXIS2'], header['NAXIS1']))
+    b = AVM.from_wcs(a.to_wcs(), shape=(header["NAXIS2"], header["NAXIS1"]))
     # assert a.Spatial.Equinox == b.Spatial.Equinox  # returns NaN at the moment
     assert a.Spatial.CoordsystemProjection == b.Spatial.CoordsystemProjection
     assert a.Spatial.ReferenceDimension[0] == b.Spatial.ReferenceDimension[0]
@@ -72,7 +68,7 @@ def test_wcs_1():
 
 
 def test_wcs_2():
-    header = fits.Header.fromtextfile(os.path.join(ROOT, 'data', 'example_header.hdr'))
+    header = fits.Header.fromtextfile(os.path.join(ROOT, "data", "example_header.hdr"))
     a = WCS(header)
     b = AVM.from_wcs(a).to_wcs()
     # assert a.wcs.equinox == b.wcs.equinox

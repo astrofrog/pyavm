@@ -1,13 +1,14 @@
-import pytest
 import warnings
-warnings.filterwarnings('always')
+
+import pytest
+
+warnings.filterwarnings("always")
 
 from ..avm import AVM, AVMContainer
 
 
-@pytest.mark.parametrize('version', [1.1, 1.2])
+@pytest.mark.parametrize("version", [1.1, 1.2])
 def test_specs(version):
-
     a = AVM(version=version)
 
     # Creator Metadata
@@ -44,7 +45,7 @@ def test_specs(version):
     a.Spectral.ColorAssignment = ["Purple"]
     a.Spectral.Band = ["Optical"]
     a.Spectral.Bandpass = ["Arbitrary"]
-    a.Spectral.CentralWavelength = [5.]
+    a.Spectral.CentralWavelength = [5.0]
     a.Spectral.Notes = "Still testing"
     a.Temporal.StartTime = ["5 Feb 2011"]
     a.Temporal.IntegrationTime = [4.4]
@@ -52,12 +53,12 @@ def test_specs(version):
 
     # Coordinate Metadata
     a.Spatial.CoordinateFrame = "GAL"
-    a.Spatial.Equinox = '2000'
+    a.Spatial.Equinox = "2000"
     a.Spatial.ReferenceValue = [33.3, 44.4]
     a.Spatial.ReferenceDimension = [300, 400]
-    a.Spatial.ReferencePixel = [2., 3.]
+    a.Spatial.ReferencePixel = [2.0, 3.0]
     a.Spatial.Scale = [0.2, 0.3]
-    a.Spatial.Rotation = 122.
+    a.Spatial.Rotation = 122.0
     a.Spatial.CoordsystemProjection = "CAR"
     a.Spatial.Quality = "Full"
     a.Spatial.Notes = "Not much to say"
@@ -80,7 +81,7 @@ def test_specs(version):
     a.FL.PeakLevel = [10.2]
     a.FL.WhiteLevel = [11.3]
     a.FL.ScaledBackgroundLevel = [4.5]
-    a.FL.StretchFunction = ['Log']
+    a.FL.StretchFunction = ["Log"]
 
     # Spec-dependent keywords
     if version == 1.1:
@@ -88,11 +89,13 @@ def test_specs(version):
             a.ProposalID = ["12421412"]
         assert exc.value.args[0] == "ProposalID is not a valid AVM group or tag in the 1.1 standard"
         with pytest.raises(AttributeError) as exc:
-            a.PublicationID = ['799292']
-        assert exc.value.args[0] == "PublicationID is not a valid AVM group or tag in the 1.1 standard"
+            a.PublicationID = ["799292"]
+        assert (
+            exc.value.args[0] == "PublicationID is not a valid AVM group or tag in the 1.1 standard"
+        )
     else:
         a.ProposalID = ["12421412"]
-        a.PublicationID = ['799292']
+        a.PublicationID = ["799292"]
 
     x = a.to_xml()
 
@@ -107,7 +110,6 @@ def test_specs(version):
 
 
 def test_warning():
-
     # Start of with a version=1.2 AVM object
     a = AVM(version=1.2)
     a.ProposalID = ["25661"]
@@ -116,7 +118,10 @@ def test_warning():
     with warnings.catch_warnings(record=True) as w:
         a.MetadataVersion = 1.1
         assert len(w) == 1
-        assert str(w[0].message) == "ProposalID is not defined in format specification 1.1 and will be deleted"
+        assert (
+            str(w[0].message)
+            == "ProposalID is not defined in format specification 1.1 and will be deleted"
+        )
 
     try:
         a.ProposalID = ["44663"]
