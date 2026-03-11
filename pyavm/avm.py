@@ -585,9 +585,11 @@ class AVM(AVMContainer):
         self.Spatial.Equinox = wcs.wcs.equinox
 
         # Projection
+        # CTYPE format is CCCC-PPP or CCCC-PPP-SIP for SIP distortions
+        # Extract projection from position 5:8 to handle both cases
 
-        proj1 = wcs.wcs.ctype[0][-3:]
-        proj2 = wcs.wcs.ctype[1][-3:]
+        proj1 = wcs.wcs.ctype[0][5:8]
+        proj2 = wcs.wcs.ctype[1][5:8]
         if proj1 == proj2:
             self.Spatial.CoordsystemProjection = decode_ascii(proj1)
         else:
