@@ -60,3 +60,21 @@ def test_controlled_vocabulary_dash_placeholder():
 
     avm.Spectral.Band = ["Optical", "-", "Infrared"]
     assert avm.Spectral.Band == ["Optical", "-", "Infrared"]
+
+
+def test_from_wcs_sip():
+    """Test that WCS with SIP distortion extensions are handled correctly.
+
+    This is a regression test for issue #26.
+    """
+    pytest.importorskip("astropy")
+    from astropy.wcs import WCS
+
+    wcs = WCS(naxis=2)
+    wcs.wcs.ctype = ["RA---TAN-SIP", "DEC--TAN-SIP"]
+    wcs.wcs.crpix = [100, 100]
+    wcs.wcs.crval = [180, 45]
+    wcs.wcs.cdelt = [-0.001, 0.001]
+
+    avm = AVM.from_wcs(wcs)
+    assert avm.Spatial.CoordsystemProjection == "TAN"
