@@ -307,6 +307,37 @@ class AVM(AVMContainer):
     def __dir__(self):
         return list(self._items.keys())
 
+    def __iter__(self):
+        """Iterate over all tags that have values set.
+
+        Yields (tag_name, value) tuples for each tag with a non-None value.
+        Nested tags are yielded with dotted names (e.g., 'Spatial.Equinox').
+        """
+        return iter(self.items())
+
+    def __len__(self):
+        """Return the number of tags with values set."""
+        return len(list(self.items()))
+
+    def items(self):
+        """Return an iterator over (tag_name, value) pairs for set tags.
+
+        Only tags with non-None values are included.
+        Nested tags are yielded with dotted names (e.g., 'Spatial.Equinox').
+        """
+        for name, item in self._items.items():
+            if isinstance(item, AVMContainer):
+                # Handle containers with a direct value (like Distance)
+                if hasattr(item, "value") and item.value is not None:
+                    yield (name, item.value)
+                # Handle nested items
+                for key, value in item._items.items():
+                    if value is not None:
+                        yield (f"{name}.{key}", value)
+            else:
+                if item is not None:
+                    yield (name, item)
+
     @property
     def _specs(self):
         return SPECS[self.MetadataVersion]

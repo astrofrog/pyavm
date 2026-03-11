@@ -98,3 +98,35 @@ def test_nested_attribute_verification():
     # Invalid attribute name should raise AttributeError
     with pytest.raises(AttributeError):
         avm.Spatial.InvalidAttribute = "test"
+
+
+def test_avm_iteration():
+    """Test that AVM objects can be iterated over.
+
+    This is a regression test for issue #25.
+    """
+    avm = AVM()
+    avm.Title = "Test Image"
+    avm.Publisher = "Test Publisher"
+    avm.Spatial.Equinox = "J2000"
+    avm.Spatial.CoordinateFrame = "ICRS"
+
+    # Test iteration
+    tags = dict(avm)
+    assert "Title" in tags
+    assert tags["Title"] == "Test Image"
+    assert "Publisher" in tags
+    assert tags["Publisher"] == "Test Publisher"
+    assert "Spatial.Equinox" in tags
+    assert tags["Spatial.Equinox"] == "J2000"
+    assert "Spatial.CoordinateFrame" in tags
+    assert tags["Spatial.CoordinateFrame"] == "ICRS"
+
+    # Test len()
+    assert len(avm) >= 4  # At least the 4 tags we set
+
+    # Test items()
+    items = list(avm.items())
+    tag_names = [name for name, value in items]
+    assert "Title" in tag_names
+    assert "Spatial.Equinox" in tag_names
