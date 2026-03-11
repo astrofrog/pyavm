@@ -93,10 +93,12 @@ def auto_type(string):
 
 
 class AVMContainer:
-    def __init__(self, allow_value=False):
+    def __init__(self, allow_value=False, parent=None, name=None):
         if allow_value:
             self.value = None
         self._items = {}
+        self._parent = parent
+        self._name = name
 
     def __str__(self, indent=0):
         string = ""
@@ -128,13 +130,20 @@ class AVMContainer:
         return self.__str__()
 
     def __setattr__(self, attribute, value):
-        if attribute in ["_items", "value"]:
+        if attribute in ["_items", "value", "_parent", "_name"]:
             object.__setattr__(self, attribute, value)
             return
         if attribute not in self._items:
             raise AttributeError(f"{attribute} is not a valid AVM tag")
-        else:
-            self._items[attribute] = value
+
+        # Validate using specs if parent is available
+        if self._parent is not None and self._name is not None:
+            full_name = f"{self._name}.{attribute}"
+            if full_name in self._parent._specs:
+                avm_class = self._parent._specs[full_name]
+                value = avm_class.check_data(value)
+
+        self._items[attribute] = value
 
     def __getattr__(self, attribute):
         if attribute in self._items:
@@ -275,19 +284,23 @@ class AVM(AVMContainer):
 
                 if "Distance" in avm_name:
                     if "Distance" not in self._items:
-                        self._items["Distance"] = AVMContainer(allow_value=True)
+                        self._items["Distance"] = AVMContainer(
+                            allow_value=True, parent=self, name="Distance"
+                        )
 
                 if iteration == 0 and "." not in avm_name:
                     if avm_name not in self._items:
                         if "Distance" in avm_name:
-                            self._items[avm_name] = AVMContainer(allow_value=True)
+                            self._items[avm_name] = AVMContainer(
+                                allow_value=True, parent=self, name=avm_name
+                            )
                         else:
                             self._items[avm_name] = None
 
                 elif iteration == 1 and "." in avm_name:
                     family, key = avm_name.split(".")
                     if family not in self._items:
-                        self._items[family] = AVMContainer()
+                        self._items[family] = AVMContainer(parent=self, name=family)
                     if key not in self._items[family]._items:
                         self._items[family]._items[key] = None
 

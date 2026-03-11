@@ -61,18 +61,24 @@ class AVMString(AVMData):
 
     def check_data(self, value):
         """
-        Check that the data is a string or unicode, otherwise it raises a TypeError.
+        Check that the data is a string or can be converted to one.
 
         :return: String (UTF-8)
         """
-        if not value:
+        if value is None:
             return None
         if isinstance(value, (list, tuple)) and len(value) == 1:
             value = value[0]
         if isinstance(value, str):
-            return value
-        elif value is None:
-            return None
+            return value if value else None
+        elif isinstance(value, (int, float)):
+            # Accept numeric values and convert to string (e.g., for Equinox)
+            # Handle NaN as None
+            import math
+
+            if math.isnan(value):
+                return None
+            return str(value)
         else:
             raise TypeError(f"{self.tag:s} is not a string or unicode")
 
@@ -244,17 +250,15 @@ class AVMFloat(AVMData):
         """
         Checks that data can be represented as a number.
 
-        :return: String (UTF-8)
+        :return: float or None
         """
-        if not value:
+        if value is None:
             return None
 
         try:
-            value = float(value)
+            return float(value)
         except (ValueError, TypeError):
             raise TypeError("Enter a value that can be represented as a number.")
-
-        return value
 
     def to_xml(self, parent, value):
         uri = reverse_namespaces[self.namespace]
@@ -454,16 +458,17 @@ class AVMOrderedFloatList(AVMOrderedList):
     def check_data(self, values):
         """
         Checks that the data is of the correct type, length and elements
-        are strings able to be represented as floats.
+        are floats or strings that can be represented as floats.
 
-        :return: List of strings (UTF-8)
+        :return: List of floats (or None for placeholders)
         """
         checked_data = []
 
         if values:
-            # Check type for list
-            if not isinstance(values, list):
+            # Check type for list or tuple
+            if not isinstance(values, (list, tuple)):
                 raise TypeError("Data needs to be a list.")
+            values = list(values)
 
             # Check length
             if not self.check_length(values):
@@ -471,15 +476,22 @@ class AVMOrderedFloatList(AVMOrderedList):
 
             # Check data type in list
             for value in values:
-                if value.strip() == "-":
+                if value is None:
                     checked_data.append(None)
+                elif isinstance(value, str):
+                    if value.strip() == "-":
+                        checked_data.append(None)
+                    else:
+                        try:
+                            checked_data.append(float(value))
+                        except (ValueError, TypeError):
+                            raise TypeError("Enter a value that can be represented as a number.")
+                elif isinstance(value, (int, float)):
+                    checked_data.append(float(value))
                 else:
-                    try:
-                        checked_data.append(float(value))
-                    except (ValueError, TypeError):
-                        raise TypeError("Enter a string that can be represented as a number.")
+                    raise TypeError("Enter a value that can be represented as a number.")
 
-            if len(set(checked_data)) == 1 and checked_data[0] == "-":
+            if len(set(checked_data)) == 1 and checked_data[0] is None:
                 checked_data = []
 
         return checked_data
