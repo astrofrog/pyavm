@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.9.9
+
+### What's Changed
+* Infrastructure updates by @astrofrog in https://github.com/astrofrog/pyavm/pull/48
+* General improvements and modernization of code by @astrofrog in https://github.com/astrofrog/pyavm/pull/49
+* Allow dash '-' as placeholder in controlled vocabulary lists by @astrofrog in https://github.com/astrofrog/pyavm/pull/50
+* Fix CTYPE parsing for WCS with SIP distortion extensions by @astrofrog in https://github.com/astrofrog/pyavm/pull/52
+* Validate nested attribute values using specs by @astrofrog in https://github.com/astrofrog/pyavm/pull/53
+* Add iteration support for AVM objects by @astrofrog in https://github.com/astrofrog/pyavm/pull/51
+* Added support for MetadataVersion 1.0 by @astrofrog in https://github.com/astrofrog/pyavm/pull/54
+* Add changelog entries to CHANGES.md on release by @astrofrog in https://github.com/astrofrog/pyavm/pull/55
+
+**Full Changelog**: https://github.com/astrofrog/pyavm/compare/v0.9.8...v0.9.9
+
 ## v0.9.8
 
 ### What's Changed
