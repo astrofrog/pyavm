@@ -12,6 +12,7 @@ from .cv import (
     SPECTRAL_BAND_CHOICES,
     SPECTRAL_COLOR_ASSIGNMENT_CHOICES,
     TYPE_CHOICES,
+    TYPE_CHOICES_1_0,
 )
 from .datatypes import (
     AVMURL,
@@ -116,8 +117,26 @@ SPECS[1.1] = {
     "FL.StretchFunction": AVMOrderedList("avm:FL.StretchFunction"),
 }
 
-# TODO: write specification for version 1.0
+# AVM 1.0 specification - derived from 1.1 by removing fields added in 1.1
+# (see "Modifications from v1.0 to v1.1" in the AVM 1.1 standard document)
 SPECS[1.0] = deepcopy(SPECS[1.1])
+
+# Remove fields that were NEW in 1.1
+del SPECS[1.0]["Title"]
+del SPECS[1.0]["Distance"]
+del SPECS[1.0]["Distance.Notes"]
+del SPECS[1.0]["Spatial.FITSheader"]
+del SPECS[1.0]["MetadataDate"]
+del SPECS[1.0]["ResourceURL"]
+del SPECS[1.0]["RelatedResources"]
+
+# Type values "Collage" and "Chart" were added in 1.1
+SPECS[1.0]["Type"] = AVMStringCVCapitalize("avm:Type", TYPE_CHOICES_1_0)
+
+# Spatial.CDMatrix was deprecated in 1.1, so it was NOT deprecated in 1.0
+SPECS[1.0]["Spatial.CDMatrix"] = AVMOrderedFloatList(
+    "avm:Spatial.CDMatrix", length=4, strict_length=True
+)
 
 SPECS[1.2] = deepcopy(SPECS[1.1])
 
