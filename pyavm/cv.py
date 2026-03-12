@@ -12,6 +12,15 @@ TYPE_CHOICES = [
     "Chart",
 ]
 
+# 1.0 Type choices (Collage and Chart were added in 1.1)
+TYPE_CHOICES_1_0 = [
+    "Observation",
+    "Artwork",
+    "Photographic",
+    "Planetary",
+    "Simulation",
+]
+
 IMAGE_PRODUCT_QUALITY_CHOICES = ["Good", "Moderate", "Poor"]
 
 SPECTRAL_COLOR_ASSIGNMENT_CHOICES = [
