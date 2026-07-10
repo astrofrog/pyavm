@@ -69,6 +69,10 @@ class AVMString(AVMData):
             return None
         if isinstance(value, (list, tuple)) and len(value) == 1:
             value = value[0]
+        if value is None:
+            # This can happen e.g. for list values containing a single empty
+            # item, and should be treated as the value being absent.
+            return None
         if isinstance(value, str):
             return value if value else None
         elif isinstance(value, (int, float)):
