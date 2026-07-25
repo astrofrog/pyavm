@@ -130,3 +130,18 @@ def test_avm_iteration():
     tag_names = [name for name, value in items]
     assert "Title" in tag_names
     assert "Spatial.Equinox" in tag_names
+
+
+def test_from_xml_empty_list_value():
+    # Some images in the wild (e.g. current images from eso.org) contain tags
+    # with a list containing a single empty item, which should be treated the
+    # same as the tag being absent.
+    with open(os.path.join(ROOT, "3c321.avm.xml")) as f:
+        content = f.read()
+    content = content.replace(
+        "<avm:Type>Observation</avm:Type>",
+        "<avm:Type>Observation</avm:Type>"
+        "<avm:Spatial.Notes><rdf:Alt><rdf:li/></rdf:Alt></avm:Spatial.Notes>",
+    )
+    avm = AVM.from_xml(content.encode("utf-8"))
+    assert avm.Spatial.Notes is None
