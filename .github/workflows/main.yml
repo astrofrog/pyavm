@@ -7,9 +7,8 @@ on:
 jobs:
 
   tests:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v2
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v3
     with:
-      coverage: codecov
       envs: |
         # Minimal dependencies
         - linux: py310-test
@@ -26,7 +25,7 @@ jobs:
         - windows: py314-test-all
 
   publish:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@v2
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@v3
     with:
       test_extras: test
       test_command: pytest --pyargs pyavm
