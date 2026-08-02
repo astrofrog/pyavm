@@ -9,7 +9,6 @@ jobs:
   tests:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v3
     with:
-      coverage: codecov-oidc
       envs: |
         # Minimal dependencies
         - linux: py310-test
