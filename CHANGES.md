@@ -1,8 +1,17 @@
 # Changelog
 
+## v0.9.10 - 2026-11-18
+
+### What's Changed
+
+* Treat tag values given as a list containing a single empty item as absent by @astrofrog in https://github.com/astrofrog/pyavm/pull/60
+
+**Full Changelog**: https://github.com/astrofrog/pyavm/compare/v0.9.9...v0.9.10
+
 ## v0.9.9
 
 ### What's Changed
+
 * Infrastructure updates by @astrofrog in https://github.com/astrofrog/pyavm/pull/48
 * General improvements and modernization of code by @astrofrog in https://github.com/astrofrog/pyavm/pull/49
 * Allow dash '-' as placeholder in controlled vocabulary lists by @astrofrog in https://github.com/astrofrog/pyavm/pull/50
@@ -17,11 +26,13 @@
 ## v0.9.8
 
 ### What's Changed
+
 * Accept more JPEG formats by @astrofrog in https://github.com/astrofrog/pyavm/pull/47
 * Fix bad function call by @keflavich in https://github.com/astrofrog/pyavm/pull/46
 * remove some Python2 leftovers by @a-detiste in https://github.com/astrofrog/pyavm/pull/45
 
 ### New Contributors
+
 * @a-detiste made their first contribution in https://github.com/astrofrog/pyavm/pull/45
 
 **Full Changelog**: https://github.com/astrofrog/pyavm/compare/v0.9.7...v0.9.8
@@ -29,6 +40,7 @@
 ## v0.9.7
 
 ### What's Changed
+
 * Correct XML output: ordered lists are rdf:Seq, not rdf:Bag by @pkgw in https://github.com/astrofrog/pyavm/pull/44
 
 **Full Changelog**: https://github.com/astrofrog/pyavm/compare/v0.9.6...v0.9.7
